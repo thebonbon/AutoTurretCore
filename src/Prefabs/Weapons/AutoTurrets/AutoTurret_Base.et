@@ -1,0 +1,56 @@
+GenericEntity {
+ ID "62ACAE2FAC6D2BB1"
+ components {
+  SignalsManagerComponent "{62ACAE2F976BB347}" {
+  }
+  SoundComponent "{62ACAE2F976BB3F9}" {
+   Filenames {
+    "{2C3081D1EE023D68}Sounds/Weapons/Rifles/AK-74/Weapons_Rifles_AK-74_Shot.acp"
+   }
+   SoundPoints {
+    SoundPointInfo Muzzle {
+     PivotID "barrel_muzzle"
+    }
+   }
+  }
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_fAttackInaccuracy 0
+   m_sShootSound "SOUND_SHOT"
+   m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
+    Offset 0.0186 0.083 4.6516
+   }
+   m_sBodyBone "w_body"
+   m_sBarrelBone "w_barrel"
+   m_vLimitHorizontal -360 360 0
+   m_TargetFlags CHARACTERS
+  }
+  FactionAffiliationComponent "{62ACAE2F976BB213}" {
+  }
+  MeshObject "{62ACAE2F976BB2AB}" {
+  }
+  RigidBody "{62ACF1D3ED0F7C62}" {
+   ModelGeometry 1
+  }
+  SCR_DestructionMultiPhaseComponent "{62ACF1D12DE6C3BD}" {
+  }
+  AnimationControllerComponent "{62ACAE2F976BB285}" {
+   AnimGraph "{97FB2EE0B4F71FFA}anims/workspaces/AutoTurret/AutoTurretTemplate.agr"
+   AnimInstance "{7A917B3BA8FE4D14}anims/workspaces/AutoTurret/AutoTurretTemplate.asi"
+   AnimVariables {
+    AnimationVariable "{62ACAE2F976BB28D}" {
+     VariableName "BodyRotation"
+     SignalName "BodyRotation"
+    }
+    AnimationVariable "{62ACAE2F976BB28A}" {
+     VariableName "BarrelRotation"
+     SignalName "BarrelRotation"
+    }
+   }
+  }
+  RplComponent "{62ACF1D12BA7808E}" {
+  }
+  Hierarchy "{62ACAE2F976BB280}" {
+  }
+ }
+ coords 249.103 1 125.302
+}

@@ -1,0 +1,7 @@
+Projectile {
+ ID "DA5C6308000CDEF2"
+ components {
+  BON_ProjectileTrackingComponent "{62AE85BAD0278B90}" {
+  }
+ }
+}

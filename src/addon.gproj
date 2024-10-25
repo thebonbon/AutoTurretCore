@@ -1,0 +1,8 @@
+GameProject {
+ ID "AutoTurretCore"
+ GUID "621E93B201310954"
+ TITLE "AutoTurretCore"
+ Dependencies {
+  "58D0FB3206B6F859"
+ }
+}

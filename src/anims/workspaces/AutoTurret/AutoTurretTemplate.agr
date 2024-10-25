@@ -1,0 +1,32 @@
+AnimSrcGraph {
+ AnimSetTemplate "{850948E08332CB09}anims/workspaces/AutoTurret/AutoTurretTemplate.ast"
+ ControlTemplate AnimSrcGCT "{62991CF30BA21769}" {
+  Variables {
+   AnimSrcGCTVarFloat BodyRotation {
+    MinValue -360
+    MaxValue 360
+   }
+   AnimSrcGCTVarFloat BarrelRotation {
+    MinValue -360
+    MaxValue 360
+   }
+  }
+  Commands {
+   AnimSrcGCTCmd CMD_SHOOT {
+   }
+  }
+  BoneMasks {
+   AnimSrcGCTBoneMask body {
+    Bones {
+     "w_body"
+     "w_barrel"
+    }
+   }
+  }
+ }
+ Debug AnimSrcGD "{62991CF30BA21762}" {
+ }
+ GraphFilesResourceNames {
+  "{B8F5305A2A5476CA}anims/workspaces/AutoTurret/AutoTurretTemplate.agf"
+ }
+}

@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{CB9C9D08DF50CF02}Assets/Weapons/AutoTurrets/CIWS/Data/Top.emat"
+ Configurations {
+  EMATResourceClass PC {
+  }
+  EMATResourceClass XBOX_ONE : PC {
+  }
+  EMATResourceClass XBOX_SERIES : PC {
+  }
+  EMATResourceClass PS4 : PC {
+  }
+  EMATResourceClass PS5 : PC {
+  }
+  EMATResourceClass HEADLESS : PC {
+  }
+ }
+}

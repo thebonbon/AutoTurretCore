@@ -1,0 +1,8 @@
+$grp GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
+ {
+  coords 4433.249 51.739 10731.648
+ }
+ {
+  coords 4775.905 23.219 12067.27
+ }
+}

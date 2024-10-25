@@ -1,0 +1,110 @@
+SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
+ coords 0 0 0
+}
+GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
+ components {
+  SoundComponent "{62ACAE2F976BB3F9}" {
+   SoundPoints {
+    SoundPointInfo Muzzle {
+     PivotID "w_barrel"
+     Offset 0 0 4.6598
+    }
+   }
+  }
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_TargetFlags 31
+  }
+  FactionAffiliationComponent "{62ACAE2F976BB213}" {
+   "faction affiliation" "US"
+  }
+  MeshObject "{62ACAE2F976BB2AB}" {
+   Object "{22231BFF749287E1}Assets/Weapons/AutoTurrets/CIWS/CIWS.xob"
+  }
+  RigidBody "{62ACF1D3ED0F7C62}" {
+   Gravity 0
+   Static 1
+  }
+  SCR_DestructionMultiPhaseComponent "{62ACF1D12DE6C3BD}" {
+   "Additional hit zones" {
+    SCR_HitZone default {
+     HZDefault 1
+     MaxHealth 5000
+     DamageReduction 40
+     DamageThreshold 8
+     "Melee multiplier" 0.01
+     "Kinetic multiplier" 0.1
+     "Explosive multiplier" 0.7
+     "DamageState threshold" +{
+     }
+    }
+   }
+   CollisionVelocityThreshold 100000
+   "Heavy damage threshold" 200000
+   m_fBaseHealth 8000
+   m_DestroySpawnObjects {
+    SCR_ParticleSpawnable "{62ACFC81DB34B364}" {
+     m_Particle "{33736FDD82DD3405}Particles/Logistics/Explosion/Ammo_Rack/Explosion_Ammo_Rack_Small.ptc"
+    }
+   }
+   m_eMaterialSoundType BREAK_METAL
+  }
+ }
+ coords 204.67 1 145.151
+}
+TracerProjectile : "{27E671E1F169ED18}Prefabs/Weapons/Ammo/Ammo_127x108_APIT_BZT44.et" {
+ coords 139.598 1 135.298
+}
+Projectile : "{32E12D322E107F1C}Prefabs/Weapons/Ammo/Ammo_Rocket_PG7VM.et" {
+ coords 170.329 1 138.059
+}
+$grp TracerProjectile : "{678188455B777E61}Prefabs/Weapons/Ammo/Ammo_127x99_Tracer_M10.et" {
+ {
+  coords 232.859 1 131.699
+ }
+ {
+  components {
+   ShellMoveComponent "{851AA4A2AE0A5691}" {
+    AirDrag 0
+   }
+   RplComponent "{62AABA5911F22C8A}" {
+   }
+  }
+  coords 139.424 1 111.82
+ }
+}
+GenericEntity : "{757FCCE8E756175C}Prefabs/Props/Furniture/MeetingTable_01.et" {
+ coords 139.864 35.909 125.436
+}
+Projectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3.et" {
+ coords 171.197 1 139.111
+}
+$grp GenericEntity : "{85C71F17C37D274C}Prefabs/Structures/BuildingParts/Entry/Entry_Block_Platform_01_3x6.et" {
+ {
+  coords 139.297 19.845 163.031
+ }
+ {
+  coords 119.021 8.76 163.031
+ }
+ {
+  coords 107.787 4.786 132.246
+  angleY 90
+ }
+ {
+  coords 81.96 15.258 102.385
+  angleY 90
+ }
+ {
+  coords 173.585 4.62 38.362
+ }
+ {
+  coords 103.315 22.663 34.673
+ }
+ {
+  coords 14.891 4.786 244.875
+  angleY 90
+ }
+ {
+  coords -66.557 183.88 309.549
+  angleY 90
+ }
+}

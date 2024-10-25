@@ -1,0 +1,10 @@
+AnimSetInstanceSource "{62991CF30BA11010}" {
+ Template "{850948E08332CB09}anims/workspaces/AutoTurret/AutoTurretTemplate.ast"
+ Lines {
+  AnimSetInstanceSource_Line "turret.Default.shoot" {
+   Resource "{D72A70ACE1494EC0}Assets/Weapons/AutoTurrets/CIWS/anims/w_shoot.anm"
+  }
+ }
+ RBF AnimSetInstanceSourceRBFArray "{62991CF65EA134AE}" {
+ }
+}

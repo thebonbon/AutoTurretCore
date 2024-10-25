@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{A09821387C53DB27}Assets/Weapons/AutoTurrets/CIWS/Data/Barrel.emat"
+ Configurations {
+  EMATResourceClass PC {
+  }
+  EMATResourceClass XBOX_ONE : PC {
+  }
+  EMATResourceClass XBOX_SERIES : PC {
+  }
+  EMATResourceClass PS4 : PC {
+  }
+  EMATResourceClass PS5 : PC {
+  }
+  EMATResourceClass HEADLESS : PC {
+  }
+ }
+}

@@ -1,0 +1,34 @@
+GenericEntity : "{3B3574CAEA4AEAED}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_USSR.et" {
+ ID "62ACAE2FAC6D2BB1"
+ components {
+  SCR_EditableEntityComponent "{62B26BF059903AE6}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
+    Name "CIWS Phalanx USSR"
+    Icon "{4802E7182AFEA3A9}UI/Textures/EditableEntities/AutoTurrets/EditableEntity_AutoTurret_CIWS_Phalanx.edds"
+    m_Image ""
+    m_sFaction "USSR"
+    m_aAuthoredLabels {
+    }
+    m_aAutoLabels {
+     10 1 122
+    }
+   }
+   m_Flags 773
+  }
+  SCR_PreviewEntityComponent "{62B26BF05B59AF67}" : "{6CADA7A88A6265FD}Prefabs/Editor/Components/PreviewEntityComponentClass.ct" {
+   m_bRuntime 0
+   m_aEntries {
+    SCR_BasePreviewEntry "{62B26BF05B59B7AB}" {
+     m_iParentID -1
+     m_Mesh "{22231BFF749287E1}Assets/Weapons/AutoTurrets/CIWS/CIWS.xob"
+     m_Flags EDITABLE
+     m_Shape MESH
+     m_iPivotID ""
+     m_vScale 1 1 1
+     m_vPosition 0 0 0
+     m_vAngles 0 0 0
+    }
+   }
+  }
+ }
+}

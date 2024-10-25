@@ -1,0 +1,13 @@
+AnimSetTemplateSource {
+ Groups {
+  AnimSetTemplateSource_AnimationGroup "{62991CF1B85A2622}" {
+   Name "turret"
+   Animations {
+    "shoot"
+   }
+   Columns {
+    "Default"
+   }
+  }
+ }
+}

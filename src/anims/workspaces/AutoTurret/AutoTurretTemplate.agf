@@ -1,0 +1,48 @@
+AnimSrcGraphFile {
+ Sheets {
+  AnimSrcGraphSheet Master {
+   Nodes {
+    AnimSrcNodeProcTransform "Proc Rotation 34305" {
+     EditorPos 363 249.3
+     Child "Bind Pose 42109"
+     Expression "1"
+     Bones {
+      AnimSrcNodeProcTrBoneItem "{62991CF041C2C4D7}" {
+       Bone "w_body"
+       Axis Z
+       Op Rotate
+       Amount "rad(BodyRotation)"
+      }
+      AnimSrcNodeProcTrBoneItem "{62991CF0880F1188}" {
+       Bone "w_barrel"
+       Op Rotate
+       Amount "rad(BarrelRotation)"
+      }
+     }
+    }
+    AnimSrcNodeBindPose "Bind Pose 42109" {
+     EditorPos 363 250.4
+     BoneMask "body"
+    }
+    AnimSrcNodeSource Shoot {
+     EditorPos 365.9 249.2
+     Source "turret.Default.shoot"
+     Interpolate 0
+    }
+    AnimSrcNodeQueue MasterControl {
+     EditorPos 363.1 247.8
+     Child "Proc Rotation 34305"
+     QueueItems {
+      AnimSrcNodeQueueItem "{62B29A9A9C6E0B49}" {
+       Child "Shoot"
+       StartExpr "IsCommand(CMD_SHOOT)"
+       BlendInTime 0
+       BlendOutTime 0
+       IsReentrant 1
+      }
+     }
+    }
+   }
+  }
+ }
+}

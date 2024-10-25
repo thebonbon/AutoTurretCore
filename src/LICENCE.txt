@@ -1,0 +1,4 @@
+Based on the Arma Public License (https://www.bohemia.net/community/licenses/arma-public-license), with the following modifications:
+
+No Reupload: You may not solely reupload all or any portion of this material.
+Moddable: You are permitted to remix, transform, or build upon the material, using this mod as a dependency.
