@@ -143,15 +143,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	[RplRpc(RplChannel.Reliable, RplRcver.Broadcast)]
-	void RpcDo_LaunchMissile(RplId id, vector direction)
-	{
-		RplComponent rocketRplComp = RplComponent.Cast(Replication.FindItem(id));
-
-		LaunchMissile(rocketRplComp.GetEntity(), direction);
-	}
-
-	//------------------------------------------------------------------------------------------------
 	void LaunchMissile(notnull IEntity rocket, vector direction)
 	{
 		ProjectileMoveComponent moveComp = ProjectileMoveComponent.Cast(rocket.FindComponent(ProjectileMoveComponent));
@@ -431,7 +422,8 @@ class BON_AutoTurretComponent : ScriptComponent
 		}
 
 		SoundComponent soundComponent = SoundComponent.Cast(GetOwner().FindComponent(SoundComponent));
-		soundComponent.SoundEvent(m_sShootSound);
+		if (soundComponent)
+			soundComponent.SoundEvent(m_sShootSound);
 
 		ParticleEffectEntitySpawnParams params();
 		params.TransformMode = ETransformMode.WORLD;
@@ -457,7 +449,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!m_bActive)
 			return;
 
-		if (Replication.IsServer())
+		if (RplSession.Mode() != RplMode.Client)
 		{
 			Aim(timeSlice);
 

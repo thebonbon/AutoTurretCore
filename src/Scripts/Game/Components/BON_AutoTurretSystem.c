@@ -43,7 +43,11 @@ class BON_AutoTurretSystem : GameSystem
 			return;
 		
 		if (!m_aTurretManagers.Contains(component))
+		{
 			m_aTurretManagers.Insert(component);
+			Print("[ATC] System registered: " + component.GetOwner());
+		}
+		
 	}
 
 	//------------------------------------------------------------------------------------------------

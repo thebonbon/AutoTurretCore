@@ -9,10 +9,11 @@ class BON_ProjectileTrackingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void OnInventoryParentChanged(InventoryStorageSlot oldSlot, InventoryStorageSlot newSlot)
 	{
-		if (!newSlot && GetOwner().GetPhysics().IsActive())
+		Physics projectileRb = GetOwner().GetPhysics();
+		if (!newSlot && projectileRb && projectileRb.IsActive())
 			BON_ProjectileTrackingComponentClass.s_aTrackedProjectiles.Insert(GetOwner());
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	override void OnPostInit(IEntity owner)
 	{
