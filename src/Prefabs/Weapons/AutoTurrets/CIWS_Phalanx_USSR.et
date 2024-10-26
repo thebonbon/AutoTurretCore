@@ -1,3 +1,8 @@
 GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
  ID "62ACAE2FAC6D2BB1"
+ components {
+  FactionAffiliationComponent "{62ACAE2F976BB213}" {
+   "faction affiliation" "USSR"
+  }
+ }
 }

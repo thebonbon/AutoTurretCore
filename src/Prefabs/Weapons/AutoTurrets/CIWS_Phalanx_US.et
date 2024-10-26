@@ -24,7 +24,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    m_fAttackInaccuracy 0.5
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
-   "faction affiliation" "USSR"
+   "faction affiliation" "US"
   }
   MeshObject "{62ACAE2F976BB2AB}" {
    Object "{22231BFF749287E1}Assets/Weapons/AutoTurrets/CIWS/CIWS.xob"
