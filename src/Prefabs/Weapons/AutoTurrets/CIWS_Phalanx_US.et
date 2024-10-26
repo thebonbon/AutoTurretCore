@@ -10,7 +10,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    }
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_Projectile "{B9AB11A51D795EC5}Prefabs/Weapons/Ammo/Ammo_762x39_Tracer_57T231P.et"
+   m_Projectile "{678188455B777E61}Prefabs/Weapons/Ammo/Ammo_127x99_Tracer_M10.et"
    m_sMuzzleParticle "{C6C9B60060A01334}Particles/CIWS_Muzzle.ptc"
    m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
     PivotID "w_barrel"
