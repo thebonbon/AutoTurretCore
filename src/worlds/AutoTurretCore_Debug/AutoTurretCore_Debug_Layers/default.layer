@@ -13,6 +13,7 @@ GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.e
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    m_TargetFlags 31
+   m_bDebug 1
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
    "faction affiliation" "US"

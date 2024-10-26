@@ -55,18 +55,18 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
 	protected BON_TurretTargetFilterFlags m_TargetFlags;
 
-	[Attribute("1", UIWidgets.Auto, "Rotation Speed", category: "Aiming")]
+	[Attribute("1", UIWidgets.Auto, "Rotation Speed. Higher = faster. 0 = no rotation", "0 inf 1", category: "Aiming")]
 	float m_fRotationSpeed;
 
-	[Attribute("1", UIWidgets.Auto, "Attack cooldown (s)", category: "Aiming")]
+	[Attribute("1", UIWidgets.Auto, "Attack cooldown (s). Lower = faster", "0 inf 1", category: "Aiming")]
 	float m_fMaxAttackSpeed;
 
 	[Attribute("500", UIWidgets.Auto, "Attack range (m)", category: "Aiming")]
 	float m_fAttackRange;
 
-	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles", category: "Aiming")]
+	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Aiming")]
 	float m_fAttackInaccuracy;
-	
+
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
 
@@ -120,6 +120,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected IEntity m_TempNearestTarget;
 	ref array<IEntity> m_aValidTargets = {};
 	protected float m_fNearestDis = float.MAX;
+	ref Shape m_LoSDebug;
 
 	//------------------------------------------------------------------------------------------------
 	void OnTargetChanged()
@@ -245,7 +246,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_aValidTargets.Remove(0);
 			if (!target)
 				return;
-			
+
 			//TODO: Make custom class for target with distance already in cause we dont need to do this twice
 			float dis = vector.DistanceSq(target.GetOrigin(), GetOwner().GetOrigin());
 			if (dis < m_fNearestDis && LineOfSightCheck(target))
@@ -343,7 +344,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		vector muzzleMat[4];
 		m_ProjectileMuzzle.GetTransform(muzzleMat);
-		
+
 		TraceParam param = new TraceParam();
 		param.Start = muzzleMat[3];
 		param.End = ent.GetOrigin(); //TODO: Add aimpoint
@@ -352,7 +353,13 @@ class BON_AutoTurretComponent : ScriptComponent
 		param.LayerMask = EPhysicsLayerPresets.Projectile;
 		float traceDistance = GetOwner().GetWorld().TraceMove(param, null);
 
-		return (traceDistance == 1);
+		if (m_bDebug)
+		{
+			vector position = (param.End - param.Start) * traceDistance + param.Start;
+			m_LoSDebug = Shape.CreateArrow(muzzleMat[3], position, 0.1, COLOR_GREEN, ShapeFlags.NOZBUFFER);
+		}
+
+		return (traceDistance == 1 || param.TraceEnt == ent);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -458,17 +465,17 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (m_NearestTarget)
 				Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, m_NearestTarget.GetOrigin(), 1);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void OnUpdate(float timeSlice)
 	{
 		if (!m_bActive)
 			return;
 
-		
+
 		if (m_bDebug)
 			ShowDebug();
-		
+
 		if (RplSession.Mode() != RplMode.Client)
 		{
 			Aim(timeSlice);
