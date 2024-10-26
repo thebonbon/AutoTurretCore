@@ -70,7 +70,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
 
-
 	static ref array<EVehicleType> m_aTargetVehicleTypes = {
 		EVehicleType.APC,
 		EVehicleType.CAR,
@@ -83,7 +82,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected float m_fNearestDist = float.MAX;
 	protected float m_fAttackSpeed = 0;
 	protected bool m_bActive = false;
-	protected float m_fMaxSearchDelay = 1;
+	protected float m_fMaxSearchDelay = 0.2;
 
 	protected IEntity m_LastTarget;
 	protected ref Faction m_Faction;
@@ -191,14 +190,14 @@ class BON_AutoTurretComponent : ScriptComponent
 			return;
 		}
 
-		//Targeting
-		vector barrelMat[4];
-		GetOwner().GetAnimation().GetBoneMatrix(m_iBarrelBoneIndex, barrelMat);
-		vector barrelOrigin = GetOwner().GetOrigin() + barrelMat[3];
-		float targetDistance = vector.Distance(barrelOrigin, m_NearestTarget.GetOrigin());
+		//Inital source and target points
 		vector targetAimPoint = m_NearestTarget.GetOrigin();
 
-		//Aim Point
+		vector barrelMat[4];
+		GetOwner().GetAnimation().GetBoneMatrix(m_iBarrelBoneIndex, barrelMat);
+		vector barrelOrigin = GetOwner().CoordToParent(barrelMat[3]);
+
+		//Add Aimpoint
 		if (m_TargetPerceivableComp)
 		{
 			array<vector> aimPoints();
@@ -206,33 +205,39 @@ class BON_AutoTurretComponent : ScriptComponent
 			targetAimPoint = aimPoints[0];
 		}
 
-		//Leading
+		//Add Leading
+		float targetDistance = vector.Distance(barrelOrigin, targetAimPoint);
 		if (m_NearestTarget.GetPhysics())
+		{
 			targetAimPoint += (m_NearestTarget.GetPhysics().GetVelocity() * targetDistance / m_fProjectileSpeed);
+			targetDistance = vector.Distance(barrelOrigin, targetAimPoint); //Re-calculate distance for leading point
+		}
 
-		vector targetDir = targetAimPoint - GetOwner().GetOrigin();
-		targetDir[1] = 0;
-		Math3D.MatrixNormalize(targetDir);
+		//Add Ballistics
+		float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, null, m_ProjectileSource);
+		targetAimPoint = targetAimPoint + vector.Up * heightOffset;
+
+		vector targetDirection = targetAimPoint - barrelOrigin;
+		vector localTargetDirection = GetOwner().VectorToLocal(targetDirection);
 
 		//Body
-		vector rotationMatrixBody;
-		Math3D.MatrixFromForwardVec(targetDir, rotationMatrixBody);
-		vector newBodyAngles = Math3D.MatrixToAngles(rotationMatrixBody);
-		float targetBodyYaw = -newBodyAngles[0];
-		m_fNewBodyYaw = Math.Lerp(m_fCurrectBodyYaw, targetBodyYaw, m_fLerp);
+		vector horizontalDir = localTargetDirection;
+		horizontalDir[1] = 0;
+		horizontalDir.Normalize();
+		vector rotationMatrixBody[3];
+		Math3D.MatrixFromForwardVec(horizontalDir, rotationMatrixBody);
+		vector localBodyAngles = Math3D.MatrixToAngles(rotationMatrixBody);
+		float bodyYaw = -localBodyAngles[0];
+
+		m_fNewBodyYaw = Math.Lerp(m_fCurrectBodyYaw, bodyYaw, m_fLerp);
 		m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
 
 		// Barrel
-		float flightTime;
-		float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, flightTime, m_ProjectileSource);
-		targetDistance = Math.Sqrt(
-			(targetAimPoint[0] - barrelOrigin[0]) * (targetAimPoint[0] - barrelOrigin[0]) +
-			(targetAimPoint[2] - barrelOrigin[2]) * (targetAimPoint[2] - barrelOrigin[2])
-		);
+		float deltaY = localTargetDirection[1];
+		float horizontalDistance = Math.Sqrt(localTargetDirection[0] * localTargetDirection[0] + localTargetDirection[2] * localTargetDirection[2]);
+		float barrelPitch = Math.RAD2DEG * Math.Atan2(deltaY, horizontalDistance);
 
-		float targetDeltaY = (targetAimPoint[1] - barrelOrigin[1]) + heightOffset;
-		float targetBarrelPitch = Math.RAD2DEG * Math.Atan2(targetDeltaY, targetDistance);
-		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, targetBarrelPitch, m_fLerp);
+		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, barrelPitch, m_fLerp);
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
 	}
 
@@ -240,14 +245,13 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Checks a single target in valid target list
 	void FindNearestTarget()
 	{
-		if (!m_aValidTargets.IsEmpty())
+		if (m_aValidTargets.Count() > 0)
 		{
 			IEntity target = m_aValidTargets.Get(0);
 			m_aValidTargets.Remove(0);
 			if (!target)
 				return;
 
-			//TODO: Make custom class for target with distance already in cause we dont need to do this twice
 			float dis = vector.DistanceSq(target.GetOrigin(), GetOwner().GetOrigin());
 			if (dis < m_fNearestDis && LineOfSightCheck(target))
 			{
@@ -258,9 +262,11 @@ class BON_AutoTurretComponent : ScriptComponent
 		else //All targets checked
 		{
 			GetValidTargets();
-			m_fMaxSearchDelay = 1;
-			if (!m_aValidTargets.IsEmpty())
-				m_fMaxSearchDelay = 0.5 / m_aValidTargets.Count(); //Checking all targets will always take 0.5 second
+
+			if (m_aValidTargets.Count() > 0)
+				m_fMaxSearchDelay = 0.5 / m_aValidTargets.Count();
+			else
+				m_fMaxSearchDelay = 0.5;
 
 			m_NearestTarget = m_TempNearestTarget;
 			m_fNearestDis = float.MAX;
@@ -345,9 +351,18 @@ class BON_AutoTurretComponent : ScriptComponent
 		vector muzzleMat[4];
 		m_ProjectileMuzzle.GetTransform(muzzleMat);
 
+		//Add Aimpoint
+		vector targetAimPoint = ent.GetOrigin();
+		if (m_TargetPerceivableComp)
+		{
+			array<vector> aimPoints();
+			m_TargetPerceivableComp.GetAimpoints(aimPoints);
+			targetAimPoint = aimPoints[0];
+		}
+
 		TraceParam param = new TraceParam();
 		param.Start = muzzleMat[3];
-		param.End = ent.GetOrigin(); //TODO: Add aimpoint
+		param.End = targetAimPoint;
 		param.Flags = TraceFlags.WORLD | TraceFlags.ENTS | TraceFlags.VISIBILITY;
 		param.Exclude = GetOwner();
 		param.LayerMask = EPhysicsLayerPresets.Projectile;
@@ -389,6 +404,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		}
 
 		bool isValidTarget = (
+			ent.GetPhysics() &&
 			dmgManager &&
 			!dmgManager.IsDestroyed() &&
 			factionComp &&
@@ -463,7 +479,12 @@ class BON_AutoTurretComponent : ScriptComponent
 	void ShowDebug()
 	{
 		if (m_NearestTarget)
-				Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, m_NearestTarget.GetOrigin(), 1);
+			Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, m_NearestTarget.GetOrigin(), 1);
+
+		vector barrelMat[4];
+		GetOwner().GetAnimation().GetBoneMatrix(m_iBarrelBoneIndex, barrelMat);
+		vector barrelOrigin = GetOwner().CoordToParent(barrelMat[3]);
+		Shape.CreateSphere(Color.YELLOW, ShapeFlags.ONCE, barrelOrigin, 0.2);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -471,7 +492,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		if (!m_bActive)
 			return;
-
 
 		if (m_bDebug)
 			ShowDebug();
