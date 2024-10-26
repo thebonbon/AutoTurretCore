@@ -66,6 +66,9 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles", category: "Aiming")]
 	float m_fAttackInaccuracy;
+	
+	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
+	bool m_bDebug;
 
 
 	static ref array<EVehicleType> m_aTargetVehicleTypes = {
@@ -240,9 +243,12 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			IEntity target = m_aValidTargets.Get(0);
 			m_aValidTargets.Remove(0);
+			if (!target)
+				return;
+			
 			//TODO: Make custom class for target with distance already in cause we dont need to do this twice
 			float dis = vector.DistanceSq(target.GetOrigin(), GetOwner().GetOrigin());
-			if (dis < m_fNearestDis || LineOfSightCheck(target))
+			if (dis < m_fNearestDis && LineOfSightCheck(target))
 			{
 				m_fNearestDist = dis;
 				m_TempNearestTarget = target;
@@ -253,7 +259,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			GetValidTargets();
 			m_fMaxSearchDelay = 1;
 			if (!m_aValidTargets.IsEmpty())
-				m_fMaxSearchDelay = 1 / m_aValidTargets.Count(); //Checking all targets will always take 1 second
+				m_fMaxSearchDelay = 0.5 / m_aValidTargets.Count(); //Checking all targets will always take 0.5 second
 
 			m_NearestTarget = m_TempNearestTarget;
 			m_fNearestDis = float.MAX;
@@ -335,9 +341,12 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool LineOfSightCheck(IEntity ent)
 	{
+		vector muzzleMat[4];
+		m_ProjectileMuzzle.GetTransform(muzzleMat);
+		
 		TraceParam param = new TraceParam();
-		param.Start = GetOwner().GetOrigin();
-		param.End = ent.GetOrigin();
+		param.Start = muzzleMat[3];
+		param.End = ent.GetOrigin(); //TODO: Add aimpoint
 		param.Flags = TraceFlags.WORLD | TraceFlags.ENTS | TraceFlags.VISIBILITY;
 		param.Exclude = GetOwner();
 		param.LayerMask = EPhysicsLayerPresets.Projectile;
@@ -444,11 +453,22 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
+	void ShowDebug()
+	{
+		if (m_NearestTarget)
+				Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, m_NearestTarget.GetOrigin(), 1);
+	}
+	
+	//------------------------------------------------------------------------------------------------
 	void OnUpdate(float timeSlice)
 	{
 		if (!m_bActive)
 			return;
 
+		
+		if (m_bDebug)
+			ShowDebug();
+		
 		if (RplSession.Mode() != RplMode.Client)
 		{
 			Aim(timeSlice);
