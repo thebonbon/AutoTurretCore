@@ -8,6 +8,7 @@ GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.e
     m_Image ""
     m_sFaction "US"
     m_aAuthoredLabels {
+     1001
     }
     m_aAutoLabels {
      11 1 122

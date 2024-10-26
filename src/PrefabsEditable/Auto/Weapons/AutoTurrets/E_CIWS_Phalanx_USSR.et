@@ -8,6 +8,7 @@ GenericEntity : "{3B3574CAEA4AEAED}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_USSR
     m_Image ""
     m_sFaction "USSR"
     m_aAuthoredLabels {
+     1001
     }
     m_aAutoLabels {
      10 1 122
