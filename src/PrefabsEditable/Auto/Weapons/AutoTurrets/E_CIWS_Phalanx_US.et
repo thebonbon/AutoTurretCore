@@ -14,6 +14,7 @@ GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.e
      11 1 122
     }
    }
+   m_sIconBoneName "w_barrel"
    m_Flags 773
   }
   SCR_PreviewEntityComponent "{62B08A24E935ACDC}" : "{6CADA7A88A6265FD}Prefabs/Editor/Components/PreviewEntityComponentClass.ct" {

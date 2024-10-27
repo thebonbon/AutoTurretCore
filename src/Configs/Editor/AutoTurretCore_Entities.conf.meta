@@ -1,5 +1,5 @@
 MetaFileClass {
- Name "{353BEA756F2A84C7}Configs/Editor/PlaceableEntities/Objects/Props_Military.conf"
+ Name "{7754D393A7156E30}Configs/Editor/AutoTurretCore_Entities.conf"
  Configurations {
   CONFResourceClass PC {
   }

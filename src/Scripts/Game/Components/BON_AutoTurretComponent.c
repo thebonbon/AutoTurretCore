@@ -53,7 +53,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected vector m_vLimitVertical;
 
 	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
-	protected BON_TurretTargetFilterFlags m_TargetFlags;
+	BON_TurretTargetFilterFlags m_TargetFlags;
 
 	[Attribute("1", UIWidgets.Auto, "Rotation Speed. Higher = faster. 0 = no rotation", "0 inf 1", category: "Aiming")]
 	float m_fRotationSpeed;
@@ -62,7 +62,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	float m_fMaxAttackSpeed;
 
 	[Attribute("500", UIWidgets.Auto, "Attack range (m)", category: "Aiming")]
-	float m_fAttackRange;
+	int m_iAttackRange;
 
 	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Aiming")]
 	float m_fAttackInaccuracy;
@@ -121,6 +121,33 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected float m_fNearestDis = float.MAX;
 	ref Shape m_LoSDebug;
 
+	//------------------------------------------------------------------------------------------------
+	static BON_AutoTurretComponent IsAutoTurret(Managed item)
+	{
+		SCR_EditableEntityComponent editableEntity = SCR_EditableEntityComponent.Cast(item);
+		if (!editableEntity)
+			return null;
+
+		IEntity owner = editableEntity.GetOwner();
+		if (!owner)
+			return null;
+
+		BON_AutoTurretComponent autoTurretComp = BON_AutoTurretComponent.Cast(owner.FindComponent(BON_AutoTurretComponent));
+		return autoTurretComp;
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	int GetAttackRange()
+	{
+		return Math.Sqrt(m_iAttackRange);
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void SetAttackRange(int range)
+	{
+		m_iAttackRange = Math.Pow(range, 2);
+	}
+	
 	//------------------------------------------------------------------------------------------------
 	void OnTargetChanged()
 	{
@@ -325,7 +352,7 @@ class BON_AutoTurretComponent : ScriptComponent
 				continue;
 
 			float dis = vector.DistanceSq(entityPos, GetOwner().GetOrigin());
-			if (dis > m_fAttackRange)
+			if (dis > m_iAttackRange)
 				continue;
 
 			m_aValidTargets.Insert(entityComp.GetOwner());
@@ -338,7 +365,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		foreach (IEntity projectile : BON_ProjectileTrackingComponentClass.s_aTrackedProjectiles)
 		{
 			float dist = vector.DistanceSq(GetOwner().GetOrigin(), projectile.GetOrigin());
-			if (dist > m_fAttackRange)
+			if (dist > m_iAttackRange)
 				continue;
 
 			m_aValidTargets.Insert(projectile);
@@ -554,7 +581,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_ProjectileMuzzle.Init(owner);
 
 		//Cause we calculate distance squared
-		m_fAttackRange *= m_fAttackRange;
+		SetAttackRange(m_iAttackRange);
 
 		FactionAffiliationComponent factionAffiliation = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 		m_Faction = factionAffiliation.GetAffiliatedFaction();
