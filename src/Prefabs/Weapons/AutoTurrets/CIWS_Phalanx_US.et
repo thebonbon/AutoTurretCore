@@ -10,7 +10,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    }
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_Projectile "{678188455B777E61}Prefabs/Weapons/Ammo/Ammo_127x99_Tracer_M10.et"
+   m_Projectile "{B235232B080D2F83}Prefabs/Weapons/Ammo/Ammo_127x99_AP_Tracer_M2.et"
    m_sMuzzleParticle "{C6C9B60060A01334}Particles/CIWS_Muzzle.ptc"
    m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
     PivotID "w_barrel"
@@ -21,7 +21,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    m_fRotationSpeed 1
    m_fMaxAttackSpeed 0.01
    m_iAttackRange 1000
-   m_fAttackInaccuracy 0.5
+   m_fAttackInaccuracy 0.17
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
    "faction affiliation" "US"

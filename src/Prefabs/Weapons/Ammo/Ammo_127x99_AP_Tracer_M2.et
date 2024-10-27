@@ -1,0 +1,17 @@
+TracerProjectile : "{6DEC9F287271AB24}Prefabs/Weapons/Ammo/Ammo_127x99_AP_M2.et" {
+ ID "476AE74C1F2F140D"
+ components {
+  ShellMoveComponent "{851AA4A2AE0A5691}" {
+   ProjectileEffects {
+    ProjectileDamage "{5168BBF3DBD79134}" {
+     DamageValue 500
+    }
+   }
+   PenetrationDepth 30
+  }
+ }
+ ProjectileVisibleTimeScale 2
+ ProjectileModel "{D807332FCA58B894}Assets/Weapons/Ammo/Tracers/Tracer_red.xob"
+ "Tracer Burn Start After" 0.02
+ "Tracer Burn Time" 3
+}
