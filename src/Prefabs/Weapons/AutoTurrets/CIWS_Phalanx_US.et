@@ -18,7 +18,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    }
    m_iAttacksPerProjectile 25
    m_TargetFlags 30
-   m_fRotationSpeed 1
+   m_fRotationSpeed 2
    m_fMaxAttackSpeed 0.01
    m_iAttackRange 1000
    m_fAttackInaccuracy 0.17
