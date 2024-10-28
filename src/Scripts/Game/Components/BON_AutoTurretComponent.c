@@ -66,8 +66,6 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Aiming")]
 	float m_fAttackInaccuracy;
-	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Aiming")]
-	float m_fOsset;
 
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
@@ -99,7 +97,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected int m_iShootCmd;
 	protected int m_iBodyVar;
 	protected TNodeId m_iBarrelBoneIndex;
-	protected TNodeId m_iBodyBoneIndex;
 	protected float m_fProjectileSpeed;
 	protected float m_fSearchDelay = 0;
 	protected float m_iAttacksOnTarget;
@@ -118,7 +115,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected IEntity m_TempNearestTarget;
 	ref array<IEntity> m_aValidTargets = {};
 	protected float m_fNearestDis = float.MAX;
-	ref Shape m_LoSDebug, m_s1, m_s2;
+	ref Shape m_LoSDebug;
 
 	//------------------------------------------------------------------------------------------------
 	static BON_AutoTurretComponent IsAutoTurret(Managed item)
@@ -236,13 +233,13 @@ class BON_AutoTurretComponent : ScriptComponent
 		vector localTargetDir = GetOwner().VectorToLocal(targetDir);
 		vector angles = localTargetDir.VectorToAngles();
 		angles = SCR_Math3D.FixEulerVector180(angles);
-		
+
 		m_fNewBodyYaw = Math.Lerp(m_fCurrectBodyYaw, -angles[0], m_fLerp);
 		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, angles[1] - 0.333, m_fLerp); //Idk why 0.333
-		
+
 		m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
-		
+
 		if (m_fLerp == 1)
 		{
 			SetOnTarget(true);
@@ -288,7 +285,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	void SetNewTarget(IEntity target)
 	{
 		m_NearestTarget = target;
-		
+
 		if (target)
 			m_TargetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
 		else
@@ -520,7 +517,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		GetOwner().GetAnimation().GetBoneMatrix(m_iBarrelBoneIndex, barrelMat);
 		vector barrelOrigin = GetOwner().CoordToParent(barrelMat[3]);
 
-
 		vector muzzleFwd = barrelMat[2].Normalized();
 		float dis = vector.Distance(barrelOrigin, m_NearestTarget.GetOrigin());
 		Shape.CreateArrow(barrelOrigin, barrelOrigin + muzzleFwd * dis, 0.1, COLOR_BLUE, ShapeFlags.ONCE);
@@ -593,7 +589,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (m_ProjectileMuzzle)
 			m_ProjectileMuzzle.Init(owner);
 
-		//Cause we calculate distance squared
 		SetAttackRange(m_iAttackRange);
 
 		FactionAffiliationComponent factionAffiliation = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
@@ -607,7 +602,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_iSignalBarrel = m_SignalsManager.AddOrFindMPSignal("BarrelRotation", 0.1, 1, 0, SignalCompressionFunc.RotDEG);
 
 		m_iBarrelBoneIndex = GetOwner().GetAnimation().GetBoneIndex(m_sBarrelBone);
-		m_iBodyBoneIndex = GetOwner().GetAnimation().GetBoneIndex(m_sBodyBone);
 
 		if (m_Projectile)
 		{
