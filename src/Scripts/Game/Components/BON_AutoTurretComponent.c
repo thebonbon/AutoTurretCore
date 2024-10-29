@@ -551,6 +551,8 @@ class BON_AutoTurretComponent : ScriptComponent
 					CheckNextTarget();
 				else
 					CheckCurrentTarget();
+				
+				m_fSearchDelay = m_fMaxSearchDelay;
 			}
 		}
 
