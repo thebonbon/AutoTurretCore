@@ -79,10 +79,9 @@ class BON_AutoTurretComponent : ScriptComponent
 		EVehicleType.SUPPLY_TRUCK
 	};
 
-	protected float m_fNearestDist = float.MAX;
 	protected float m_fAttackSpeed = 0;
 	protected bool m_bActive = false;
-	protected float m_fMaxSearchDelay = 0.2;
+	protected float m_fMaxSearchDelay = 1;
 
 	protected IEntity m_LastTarget;
 	protected ref Faction m_Faction;
@@ -105,7 +104,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected float m_fLerp;
 	protected float m_fNewBodyYaw;
 	protected float m_fNewBarrelPitch;
-	protected float m_fCurrectBodyYaw;
+	protected float m_fCurrentBodyYaw;
 	protected float m_fCurrentBarrelPitch;
 
 	bool m_bOnTarget;
@@ -207,7 +206,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			SetOnTarget(false);
 
-			m_fNewBodyYaw = Math.Lerp(m_fCurrectBodyYaw, 0, m_fLerp);
+			m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, 0, m_fLerp);
 			m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
 
 			m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, 0, m_fLerp);
@@ -216,7 +215,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			if (m_fLerp == 1)
 			{
 				m_fLerp = 0;
-				m_fCurrectBodyYaw = m_fNewBodyYaw;
+				m_fCurrentBodyYaw = m_fNewBodyYaw;
 				m_fCurrentBarrelPitch = m_fNewBarrelPitch;
 			}
 			return;
@@ -256,7 +255,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		vector angles = localTargetDir.VectorToAngles();
 		angles = SCR_Math3D.FixEulerVector180(angles);
 
-		m_fNewBodyYaw = Math.Lerp(m_fCurrectBodyYaw, -angles[0], m_fLerp);
+		m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, -angles[0], m_fLerp);
 		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, angles[1] - 0.333, m_fLerp); //Idk why 0.333
 
 		m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
@@ -266,7 +265,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			SetOnTarget(true);
 			m_fLerp = 0;
-			m_fCurrectBodyYaw = m_fNewBodyYaw;
+			m_fCurrentBodyYaw = m_fNewBodyYaw;
 			m_fCurrentBarrelPitch = m_fNewBarrelPitch;
 		}
 	}
@@ -293,7 +292,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			float dis = vector.DistanceSq(target.GetOrigin(), GetOwner().GetOrigin());
 			if (dis < m_fNearestDis && LineOfSightCheck(target))
 			{
-				m_fNearestDist = dis;
+				m_fNearestDis = dis;
 				m_TempNearestTarget = target;
 			}
 		}
@@ -323,7 +322,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		Replication.BumpMe();
 		
 		//Apply current rotation
-		m_fCurrectBodyYaw = m_fNewBodyYaw;
+		m_fCurrentBodyYaw = m_fNewBodyYaw;
 		m_fCurrentBarrelPitch = m_fNewBarrelPitch;
 		m_fLerp = 0;
 	}
@@ -408,7 +407,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		TraceParam param = new TraceParam();
 		param.Start = muzzleMat[3];
 		param.End = targetAimPoint;
-		param.Flags = TraceFlags.WORLD | TraceFlags.ENTS | TraceFlags.ANY_CONTACT;
+		param.Flags = TraceFlags.WORLD | TraceFlags.ENTS;
 		param.Exclude = GetOwner();
 		param.LayerMask = EPhysicsLayerPresets.Projectile;
 		float traceDistance = GetOwner().GetWorld().TraceMove(param, null);
@@ -460,18 +459,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		);
 
 		return isValidTarget;
-
-		//TODO: Fix
-		/*
-		vector mat[4];
-		vector localUp = GetOwner().GetTransformAxis(1).Normalized();
-		SCR_Math3D.LookAt(GetOwner().GetOrigin(), ent.GetOrigin(), localUp, mat);
-		vector targetAngles = Math3D.MatrixToAngles(mat);
-		bool inRangeHoriz = Math.IsInRange(targetAngles[0], m_vLimitHorizontal[0], m_vLimitHorizontal[1]);
-		bool inRangeVert = Math.IsInRange(targetAngles[1], m_vLimitVertical[0], m_vLimitVertical[1]);
-
-		return (inRangeHoriz && inRangeVert);
-		*/
 	}
 	
 	//------------------------------------------------------------------------------------------------
