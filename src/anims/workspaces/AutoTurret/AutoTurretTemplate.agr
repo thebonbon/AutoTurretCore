@@ -5,14 +5,17 @@ AnimSrcGraph {
    AnimSrcGCTVarFloat BodyRotation {
     MinValue -360
     MaxValue 360
+    Synchronized 0
    }
    AnimSrcGCTVarFloat BarrelRotation {
     MinValue -360
     MaxValue 360
+    Synchronized 0
    }
   }
   Commands {
    AnimSrcGCTCmd CMD_SHOOT {
+    Synchronized 0
    }
   }
   BoneMasks {
