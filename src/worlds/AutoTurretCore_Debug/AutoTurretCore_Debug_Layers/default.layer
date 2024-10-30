@@ -1,6 +1,9 @@
 SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
+SCR_ChimeraCharacter : "{145DBC42B19FC4D6}Prefabs/Characters/Factions/OPFOR/USSR_Army/KLMK/Character_USSR_Rifleman_KLMK.et" {
+ coords 2.033 1 2.132
+}
 TracerProjectile : "{27E671E1F169ED18}Prefabs/Weapons/Ammo/Ammo_127x108_APIT_BZT44.et" {
  coords 139.598 1 135.298
 }
@@ -24,35 +27,26 @@ $grp TracerProjectile : "{678188455B777E61}Prefabs/Weapons/Ammo/Ammo_127x99_Trac
 }
 GenericEntity : "{6D7296248186E975}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_US.et" {
  components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
+    Offset 0 0 2.4374
+   }
+   m_TargetFlags 31
+   m_bDebug 1
+  }
   SCR_EditableEntityComponent "{62B08A24E90BD1E1}" {
    m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
    }
    m_sIconBoneName "w_barrel"
   }
  }
- coords 185.905 1 155.072
+ coords 190.732 1 153.27
 }
 GenericEntity : "{757FCCE8E756175C}Prefabs/Props/Furniture/MeetingTable_01.et" {
  coords 139.864 35.909 125.436
 }
-$grp Projectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3.et" {
- {
-  coords 171.197 1 139.111
- }
- {
-  components {
-   BON_GuidedMissleComponent "{62B681CFD663FFD7}" {
-   }
-   MissileMoveComponent "{0EF36690881261EF}" {
-    Enabled 0
-   }
-  }
-  coords 171.732 5.757 150.6
-  scale 5
- }
-}
-SCR_ChimeraCharacter BOBBY : "{84B40583F4D1B7A3}Prefabs/Characters/Factions/INDFOR/FIA/Character_FIA_Rifleman.et" {
- coords 139.507 36.815 125.631
+Projectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3.et" {
+ coords 171.197 1 139.111
 }
 $grp GenericEntity : "{85C71F17C37D274C}Prefabs/Structures/BuildingParts/Entry/Entry_Block_Platform_01_3x6.et" {
  {

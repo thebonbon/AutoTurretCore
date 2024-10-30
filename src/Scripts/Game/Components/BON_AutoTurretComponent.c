@@ -8,9 +8,23 @@ enum BON_TurretTargetFilterFlags
 	PROJECTILES = 1 << 3,
 }
 
+class BON_AutoTurretTarget
+{
+	IEntity m_Ent;
+	float m_fDistance;
+
+	//------------------------------------------------------------------------------------------------
+	void BON_AutoTurretTarget(IEntity ent, float distance)
+	{
+		m_Ent = ent;
+		m_fDistance = distance;
+	}
+}
+
 [ComponentEditorProps(category: "BON/Turrets", description: "Auto Aiming Turrets without AI Characters")]
 class BON_AutoTurretComponentClass : ScriptComponentClass
 {
+	//------------------------------------------------------------------------------------------------
 	static override array<typename> Requires(IEntityComponentSource src)
 	{
 		array<typename> requires = {};
@@ -20,6 +34,21 @@ class BON_AutoTurretComponentClass : ScriptComponentClass
 		requires.Insert(AnimationControllerComponent);
 
 		return requires;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	static BON_AutoTurretComponent IsAutoTurret(Managed item)
+	{
+		SCR_EditableEntityComponent editableEntity = SCR_EditableEntityComponent.Cast(item);
+		if (!editableEntity)
+			return null;
+
+		IEntity owner = editableEntity.GetOwner();
+		if (!owner)
+			return null;
+
+		BON_AutoTurretComponent autoTurretComp = BON_AutoTurretComponent.Cast(owner.FindComponent(BON_AutoTurretComponent));
+		return autoTurretComp;
 	}
 }
 
@@ -70,6 +99,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
 
+	[RplProp(onRplName: "OnTargetChanged")]
+	RplId m_iNearestTargetId;
+
 	static ref array<EVehicleType> m_aTargetVehicleTypes = {
 		EVehicleType.APC,
 		EVehicleType.CAR,
@@ -81,7 +113,6 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	protected float m_fAttackSpeed = 0;
 	protected bool m_bActive = false;
-	protected float m_fMaxSearchDelay = 1;
 
 	protected IEntity m_LastTarget;
 	protected ref Faction m_Faction;
@@ -97,7 +128,8 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected int m_iBodyVar;
 	protected TNodeId m_iBarrelBoneIndex;
 	protected float m_fProjectileSpeed;
-	protected float m_fSearchDelay = 0;
+	protected float m_fSearchDelay;
+	protected float m_fMaxSearchDelay = 0.2;
 	protected float m_iAttacksOnTarget;
 	protected bool m_bIsProjectileReplicated;
 
@@ -109,12 +141,10 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	bool m_bOnTarget;
 
-	[RplProp(onRplName: "OnTargetChanged")]
-	RplId m_iNearestTargetId;
 
 	protected IEntity m_NearestTarget;
 	protected IEntity m_TempNearestTarget;
-	ref array<IEntity> m_aValidTargets = {};
+	ref array<ref BON_AutoTurretTarget> m_aValidTargets = {};
 	protected float m_fNearestDis = float.MAX;
 	ref Shape m_LoSDebug;
 
@@ -143,21 +173,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	static BON_AutoTurretComponent IsAutoTurret(Managed item)
-	{
-		SCR_EditableEntityComponent editableEntity = SCR_EditableEntityComponent.Cast(item);
-		if (!editableEntity)
-			return null;
-
-		IEntity owner = editableEntity.GetOwner();
-		if (!owner)
-			return null;
-
-		BON_AutoTurretComponent autoTurretComp = BON_AutoTurretComponent.Cast(owner.FindComponent(BON_AutoTurretComponent));
-		return autoTurretComp;
-	}
-
-	//------------------------------------------------------------------------------------------------
 	int GetAttackRange()
 	{
 		return Math.Sqrt(m_iAttackRange);
@@ -176,7 +191,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	void LaunchMissile(notnull IEntity rocket, vector direction)
+	void LaunchProjectile(notnull IEntity rocket, vector direction)
 	{
 		ProjectileMoveComponent moveComp = ProjectileMoveComponent.Cast(rocket.FindComponent(ProjectileMoveComponent));
 
@@ -278,35 +293,25 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (m_aValidTargets.IsEmpty())
 		{
 			GetValidTargets();
-			m_fNearestDis = float.MAX;
 			m_TempNearestTarget = null;
 		}
 
 		if (!m_aValidTargets.IsEmpty())
 		{
-			IEntity target = m_aValidTargets.Get(0);
-			m_aValidTargets.Remove(0);
-			if (!target)
-				return;
+			BON_AutoTurretTarget targetData = m_aValidTargets.Get(0);
 
-			float dis = vector.DistanceSq(target.GetOrigin(), GetOwner().GetOrigin());
-			if (dis < m_fNearestDis && LineOfSightCheck(target))
-			{
-				m_fNearestDis = dis;
-				m_TempNearestTarget = target;
-			}
+			if (LineOfSightCheck(targetData.m_Ent))
+				SetNewTarget(targetData.m_Ent);
+
+			m_aValidTargets.RemoveOrdered(0);
 		}
-
-		//All targets checked
-		if (m_aValidTargets.IsEmpty() && m_TempNearestTarget != null)
-			SetNewTarget(m_TempNearestTarget);
 	}
 
 	//------------------------------------------------------------------------------------------------
 	void SetNewTarget(IEntity target)
 	{
 		m_NearestTarget = target;
-		
+
 		if (target)
 		{
 			RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
@@ -318,9 +323,9 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_iNearestTargetId = -1;
 			m_TargetPerceivableComp = null;
 		}
-		
+
 		Replication.BumpMe();
-		
+
 		//Apply current rotation
 		m_fCurrentBodyYaw = m_fNewBodyYaw;
 		m_fCurrentBarrelPitch = m_fNewBarrelPitch;
@@ -341,22 +346,28 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		foreach (SCR_EditableEntityComponent entityComp : entities)
 		{
+			IEntity ent = entityComp.GetOwner();
+
 			if (!entityComp.HasEntityFlag(EEditableEntityFlag.HAS_FACTION))
 				continue;
 
-			if (!IsEnemyAndAlive(entityComp.GetOwner()))
+			if (!IsEnemyAndAlive(ent))
 				continue;
 
-			if (entityComp.GetEntityType() == EEditableEntityType.CHARACTER && !SCR_Enum.HasFlag(m_TargetFlags, BON_TurretTargetFilterFlags.CHARACTERS))
+			if (entityComp.GetEntityType() == EEditableEntityType.CHARACTER && !SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.CHARACTERS))
 				continue;
 
 			if (entityComp.GetEntityType() == EEditableEntityType.VEHICLE)
 			{
-				EVehicleType vehType = Vehicle.Cast(entityComp.GetOwner()).m_eVehicleType;
-				if (m_aTargetVehicleTypes.Contains(vehType) && !SCR_Enum.HasFlag(m_TargetFlags, BON_TurretTargetFilterFlags.VEHICLES))
+				Vehicle veh = Vehicle.Cast(ent);
+				if (!veh || !veh.m_eVehicleType)
+					continue;
+
+				EVehicleType vehType = veh.m_eVehicleType;
+				if (m_aTargetVehicleTypes.Contains(vehType) && !SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.VEHICLES))
 					continue;
 				//No Helicopter type yet
-				if (vehType == EVehicleType.VEHICLE && !SCR_Enum.HasFlag(m_TargetFlags, BON_TurretTargetFilterFlags.AIRCRAFTS))
+				if (vehType == EVehicleType.VEHICLE && !SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.AIRCRAFTS))
 					continue;
 			}
 
@@ -364,11 +375,11 @@ class BON_AutoTurretComponent : ScriptComponent
 			if (!entityComp.GetPos(entityPos))
 				continue;
 
-			float dis = vector.DistanceSq(entityPos, GetOwner().GetOrigin());
-			if (dis > m_iAttackRange)
+			float distance = vector.DistanceSq(entityPos, GetOwner().GetOrigin());
+			if (distance > m_iAttackRange)
 				continue;
 
-			m_aValidTargets.Insert(entityComp.GetOwner());
+			AddNewTarget(ent, distance);
 		}
 
 		//Projectiles
@@ -377,26 +388,46 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		foreach (IEntity projectile : BON_ProjectileTrackingComponentClass.s_aTrackedProjectiles)
 		{
-			float dist = vector.DistanceSq(GetOwner().GetOrigin(), projectile.GetOrigin());
-			if (dist > m_iAttackRange)
+			float distance = vector.DistanceSq(GetOwner().GetOrigin(), projectile.GetOrigin());
+			if (distance > m_iAttackRange)
 				continue;
 
-			m_aValidTargets.Insert(projectile);
+			AddNewTarget(projectile, distance);
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void AddNewTarget(IEntity ent, float distance)
+	{
+		BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(ent, distance);
+
+		if (m_aValidTargets.IsEmpty())
+			m_aValidTargets.Insert(newTarget);
+		else
+		{
+			foreach (int i, BON_AutoTurretTarget target : m_aValidTargets)
+			{
+				if (distance < m_aValidTargets.Get(i).m_fDistance)
+					m_aValidTargets.InsertAt(target, i);
+			}
 		}
 	}
 
 	//------------------------------------------------------------------------------------------------
 	bool LineOfSightCheck(IEntity ent)
 	{
+		if (!ent)
+			return false;
+
 		vector muzzleMat[4];
 		m_ProjectileMuzzle.GetTransform(muzzleMat);
 
 		vector targetAimPoint = ent.GetOrigin();
-		
+
 		//Add Aimpoint. Little up offset to not hit ground
 		if (!Projectile.Cast(ent))
 			targetAimPoint += vector.Up;
-		
+
 		if (m_TargetPerceivableComp)
 		{
 			array<vector> aimPoints();
@@ -426,7 +457,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		if (Projectile.Cast(ent))
 			return true;
-		
+
 		DamageManagerComponent dmgManager;
 		FactionAffiliationComponent factionComp;
 		SCR_ChimeraCharacter character = SCR_ChimeraCharacter.Cast(ent);
@@ -460,7 +491,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		return isValidTarget;
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void TriggerProjectile(IEntity projectile)
 	{
@@ -495,7 +526,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!m_bIsProjectileReplicated || Replication.IsServer())
 		{
 			lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
-			LaunchMissile(lastSpawnedProjectile, direction);
+			LaunchProjectile(lastSpawnedProjectile, direction);
 		}
 
 		SoundComponent soundComponent = SoundComponent.Cast(GetOwner().FindComponent(SoundComponent));

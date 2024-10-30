@@ -6,7 +6,7 @@ class BON_AutoTurretTargetsEditorAttribute : SCR_BaseMultiSelectPresetsEditorAtt
 	{
 		super.ReadVariable(item, manager);
 
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (!autoTurretComponent)
 			return null;
 
@@ -25,7 +25,7 @@ class BON_AutoTurretTargetsEditorAttribute : SCR_BaseMultiSelectPresetsEditorAtt
 	{
 		super.WriteVariable(item, var, manager, playerID);
 
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (!autoTurretComponent)
 			return;
 
@@ -62,7 +62,7 @@ class BON_AutoTurretRangeEditorAttribute : SCR_BaseValueListEditorAttribute
 	//------------------------------------------------------------------------------------------------
 	override SCR_BaseEditorAttributeVar ReadVariable(Managed item, SCR_AttributesManagerEditorComponent manager)
 	{
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (!autoTurretComponent)
 			return null;
 
@@ -75,7 +75,7 @@ class BON_AutoTurretRangeEditorAttribute : SCR_BaseValueListEditorAttribute
 		if (!var)
 			return;
 
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
 			autoTurretComponent.SetAttackRange(var.GetInt());
 	}
@@ -87,7 +87,7 @@ class BON_AutoTurretInaccuracyEditorAttribute : SCR_BaseValueListEditorAttribute
 	//------------------------------------------------------------------------------------------------
 	override SCR_BaseEditorAttributeVar ReadVariable(Managed item, SCR_AttributesManagerEditorComponent manager)
 	{
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (!autoTurretComponent)
 			return null;
 
@@ -100,7 +100,7 @@ class BON_AutoTurretInaccuracyEditorAttribute : SCR_BaseValueListEditorAttribute
 		if (!var)
 			return;
 
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
 			autoTurretComponent.m_fAttackInaccuracy = var.GetFloat();
 	}
@@ -112,7 +112,7 @@ class BON_AutoTurretAttackSpeedEditorAttribute : SCR_BaseValueListEditorAttribut
 	//------------------------------------------------------------------------------------------------
 	override SCR_BaseEditorAttributeVar ReadVariable(Managed item, SCR_AttributesManagerEditorComponent manager)
 	{
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (!autoTurretComponent)
 			return null;
 
@@ -125,7 +125,7 @@ class BON_AutoTurretAttackSpeedEditorAttribute : SCR_BaseValueListEditorAttribut
 		if (!var)
 			return;
 
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
 			autoTurretComponent.m_fMaxAttackSpeed = var.GetFloat();
 	}
@@ -137,7 +137,7 @@ class BON_AutoTurretRotationSpeedEditorAttribute : SCR_BaseValueListEditorAttrib
 	//------------------------------------------------------------------------------------------------
 	override SCR_BaseEditorAttributeVar ReadVariable(Managed item, SCR_AttributesManagerEditorComponent manager)
 	{
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (!autoTurretComponent)
 			return null;
 
@@ -150,7 +150,7 @@ class BON_AutoTurretRotationSpeedEditorAttribute : SCR_BaseValueListEditorAttrib
 		if (!var)
 			return;
 
-		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponent.IsAutoTurret(item);
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
 			autoTurretComponent.m_fRotationSpeed = var.GetFloat();
 	}
