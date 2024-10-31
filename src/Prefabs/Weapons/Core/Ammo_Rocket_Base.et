@@ -1,7 +1,8 @@
 Projectile {
  ID "DA5C6308000CDEF2"
  components {
-  BON_ProjectileTrackingComponent "{62AE85BAD0278B90}" {
+  BON_AutoTurretTargetComponent "{62BE9479AA0C2E3D}" {
+   m_TargetFlags PROJECTILES
   }
  }
 }

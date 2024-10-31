@@ -1,0 +1,8 @@
+Vehicle {
+ ID "BBCBA43A9778AE21"
+ components {
+  BON_AutoTurretTargetComponent "{62BE947980BCDA5F}" {
+   m_TargetFlags VEHICLES
+  }
+ }
+}

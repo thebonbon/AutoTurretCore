@@ -1,0 +1,8 @@
+SCR_ChimeraCharacter {
+ ID "520EC961A090B1EE"
+ components {
+  BON_AutoTurretTargetComponent "{62BE946549BDC293}" {
+   m_TargetFlags CHARACTERS
+  }
+ }
+}

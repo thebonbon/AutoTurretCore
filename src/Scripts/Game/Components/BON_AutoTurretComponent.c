@@ -1,25 +1,5 @@
 //Made by TheBonBon :)
 
-enum BON_TurretTargetFilterFlags
-{
-	CHARACTERS = 1 << 0,
-	VEHICLES = 1 << 1,
-	AIRCRAFTS = 1 << 2,
-	PROJECTILES = 1 << 3,
-}
-
-class BON_AutoTurretTarget
-{
-	IEntity m_Ent;
-	float m_fDistance;
-
-	//------------------------------------------------------------------------------------------------
-	void BON_AutoTurretTarget(IEntity ent, float distance)
-	{
-		m_Ent = ent;
-		m_fDistance = distance;
-	}
-}
 
 [ComponentEditorProps(category: "BON/Turrets", description: "Auto Aiming Turrets without AI Characters")]
 class BON_AutoTurretComponentClass : ScriptComponentClass
@@ -129,9 +109,12 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected TNodeId m_iBarrelBoneIndex;
 	protected float m_fProjectileSpeed;
 	protected float m_fSearchDelay;
-	protected float m_fMaxSearchDelay = 0.2;
+	protected float m_fMaxSearchDelay = 1;
 	protected float m_iAttacksOnTarget;
 	protected bool m_bIsProjectileReplicated;
+
+	protected int m_iTargetCount;
+	protected int m_iCurrentTargetIndex;
 
 	protected float m_fLerp;
 	protected float m_fNewBodyYaw;
@@ -141,9 +124,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	bool m_bOnTarget;
 
-
 	protected IEntity m_NearestTarget;
-	protected IEntity m_TempNearestTarget;
 	ref array<ref BON_AutoTurretTarget> m_aValidTargets = {};
 	protected float m_fNearestDis = float.MAX;
 	ref Shape m_LoSDebug;
@@ -289,21 +270,21 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Checks a single target in valid target list
 	void CheckNextTarget()
 	{
-		//Find all valid targets, and reset vars
-		if (m_aValidTargets.IsEmpty())
+		if (m_iCurrentTargetIndex >= m_iTargetCount)
 		{
-			GetValidTargets();
-			m_TempNearestTarget = null;
+				GetValidTargets();
+				m_iCurrentTargetIndex = 0;
+				m_iTargetCount = 0;
 		}
 
 		if (!m_aValidTargets.IsEmpty())
 		{
-			BON_AutoTurretTarget targetData = m_aValidTargets.Get(0);
+			BON_AutoTurretTarget targetData = m_aValidTargets.Get(m_iCurrentTargetIndex);
 
 			if (LineOfSightCheck(targetData.m_Ent))
 				SetNewTarget(targetData.m_Ent);
 
-			m_aValidTargets.RemoveOrdered(0);
+			m_iCurrentTargetIndex++;
 		}
 	}
 
@@ -339,60 +320,21 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		m_aValidTargets.Clear();
 
-		//Vehicles and Characters
-		SCR_EditableEntityCore core = SCR_EditableEntityCore.Cast(SCR_EditableEntityCore.GetInstance(SCR_EditableEntityCore));
-		set<SCR_EditableEntityComponent> entities = new set<SCR_EditableEntityComponent>();
-		core.GetAllEntities(entities);
+		array<IEntity> allTargets = {};
+		if (SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.CHARACTERS))
+			allTargets.InsertAll(BON_AutoTurretTargets.s_aTargetCharacters);
+		if (SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.VEHICLES))
+			allTargets.InsertAll(BON_AutoTurretTargets.s_aTargetVehicles);
+		if (SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.AIRCRAFTS))
+			allTargets.InsertAll(BON_AutoTurretTargets.s_aTargetAircrafts);
+		if (SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.PROJECTILES))
+			allTargets.InsertAll(BON_AutoTurretTargets.s_aTargetProjectiles);
 
-		foreach (SCR_EditableEntityComponent entityComp : entities)
+		foreach (IEntity target : allTargets)
 		{
-			IEntity ent = entityComp.GetOwner();
-
-			if (!entityComp.HasEntityFlag(EEditableEntityFlag.HAS_FACTION))
-				continue;
-
-			if (!IsEnemyAndAlive(ent))
-				continue;
-
-			if (entityComp.GetEntityType() == EEditableEntityType.CHARACTER && !SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.CHARACTERS))
-				continue;
-
-			if (entityComp.GetEntityType() == EEditableEntityType.VEHICLE)
-			{
-				Vehicle veh = Vehicle.Cast(ent);
-				if (!veh || !veh.m_eVehicleType)
-					continue;
-
-				EVehicleType vehType = veh.m_eVehicleType;
-				if (m_aTargetVehicleTypes.Contains(vehType) && !SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.VEHICLES))
-					continue;
-				//No Helicopter type yet
-				if (vehType == EVehicleType.VEHICLE && !SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.AIRCRAFTS))
-					continue;
-			}
-
-			vector entityPos;
-			if (!entityComp.GetPos(entityPos))
-				continue;
-
-			float distance = vector.DistanceSq(entityPos, GetOwner().GetOrigin());
-			if (distance > m_iAttackRange)
-				continue;
-
-			AddNewTarget(ent, distance);
-		}
-
-		//Projectiles
-		if (!SCR_Enum.HasPartialFlag(m_TargetFlags, BON_TurretTargetFilterFlags.PROJECTILES))
-			return;
-
-		foreach (IEntity projectile : BON_ProjectileTrackingComponentClass.s_aTrackedProjectiles)
-		{
-			float distance = vector.DistanceSq(GetOwner().GetOrigin(), projectile.GetOrigin());
-			if (distance > m_iAttackRange)
-				continue;
-
-			AddNewTarget(projectile, distance);
+			float distance = vector.DistanceSq(target.GetOrigin(), GetOwner().GetOrigin());
+			if (distance < m_iAttackRange && IsEnemyAndAlive(target))
+				AddNewTarget(target, distance);
 		}
 	}
 
@@ -411,6 +353,7 @@ class BON_AutoTurretComponent : ScriptComponent
 					m_aValidTargets.InsertAt(target, i);
 			}
 		}
+		m_iTargetCount++;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -562,6 +505,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		vector muzzleFwd = barrelMat[2].Normalized();
 		float dis = vector.Distance(barrelOrigin, m_NearestTarget.GetOrigin());
 		Shape.CreateArrow(barrelOrigin, barrelOrigin + muzzleFwd * dis, 0.1, COLOR_BLUE, ShapeFlags.ONCE);
+
 	}
 
 	//------------------------------------------------------------------------------------------------
