@@ -61,7 +61,6 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 				break;
 			case BON_TurretTargetFilterFlags.CHARACTERS:
 				BON_AutoTurretTargets.s_aTargetCharacters.RemoveItem(owner);
-				Print("DELETE CHAR TARGET " + owner);
 				break;
 			case BON_TurretTargetFilterFlags.PROJECTILES:
 			{
