@@ -5,17 +5,18 @@ class BON_GuidedProjectileClass : ProjectileClass
 
 class BON_GuidedProjectile : Projectile
 {
-	IEntity trackedTarget;
-	Physics rb;
-	MissileMoveComponent missileMove;
-	bool ok;
-	float m_fLerp;
 	[Attribute()]
 	float m_fTrackDelay;
+	
 	[Attribute()]
 	float m_fMoveSpeed;
+	
 	[Attribute()]
 	float m_fRotSpeed;
+	
+	IEntity m_TrackedTarget;
+	Physics m_Rb;
+	vector m_vAimOffset;
 
 	//------------------------------------------------------------------------------------------------
 	void SteerToTarget(float timeSlice)
@@ -25,7 +26,7 @@ class BON_GuidedProjectile : Projectile
 		if (m_vAimOffset)
 			dirToTarget = m_vAimOffset - GetOrigin();
 		else
-			dirToTarget = trackedTarget.GetOrigin() + trackedTarget.GetTransformAxis(1).Normalized() * 2 - GetOrigin(); //Default up offset to not hit ground pivot
+			dirToTarget = m_TrackedTarget.GetOrigin() + m_TrackedTarget.GetTransformAxis(1).Normalized() * 2 - GetOrigin(); //Default up offset to not hit ground pivot
 		
 		dirToTarget.Normalize();
 		
@@ -35,17 +36,14 @@ class BON_GuidedProjectile : Projectile
 
 		float losRate = angleDifference / timeSlice;
 		
-		rb.SetVelocity(localFwd * m_fMoveSpeed);
-		rb.SetAngularVelocity(rotationAxis * losRate * m_fRotSpeed);
+		m_Rb.SetVelocity(localFwd * m_fMoveSpeed);
+		m_Rb.SetAngularVelocity(rotationAxis * losRate * m_fRotSpeed);
 	}
 	
 	//------------------------------------------------------------------------------------------------
 	override protected void EOnFrame(IEntity owner, float timeSlice)
 	{
-		if (!rb)
-			rb = GetPhysics();
-		
-		if (trackedTarget)
+		if (m_TrackedTarget)
 			SteerToTarget(timeSlice);
 	}
 	
@@ -62,10 +60,10 @@ class BON_GuidedProjectile : Projectile
 	//------------------------------------------------------------------------------------------------
 	void Launch(IEntity target)
 	{
-		trackedTarget = target;
-		rb.SetActive(ActiveState.ACTIVE);
+		m_TrackedTarget = target;
+		m_Rb.SetActive(ActiveState.ACTIVE);
 		
-		missileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
+		MissileMoveComponent missileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
 		missileMove.Launch(vector.Zero, vector.Zero, 0, this, null, null, null, null);
 		
 		PerceivableComponent targetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
@@ -79,7 +77,6 @@ class BON_GuidedProjectile : Projectile
 		SetEventMask(EntityEvent.FRAME);
 	}
 
-	vector m_vAimOffset;
 	
 	//------------------------------------------------------------------------------------------------
 	override protected void EOnInit(IEntity owner)
@@ -87,7 +84,7 @@ class BON_GuidedProjectile : Projectile
 		if (!GetGame().InPlayMode())
 			return;
 
-		rb = GetPhysics();
+		m_Rb = GetPhysics();
 	}
 
 	//------------------------------------------------------------------------------------------------
