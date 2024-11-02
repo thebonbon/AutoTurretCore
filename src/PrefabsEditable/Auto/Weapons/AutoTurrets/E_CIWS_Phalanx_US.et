@@ -1,6 +1,11 @@
 GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
  ID "62ACAE2FAC6D2BB1"
  components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
+    Offset 0 0 2.4223
+   }
+  }
   SCR_EditableEntityComponent "{62B08A24E90BD1E1}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
     Name "CIWS Phalanx US"

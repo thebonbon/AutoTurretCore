@@ -1,0 +1,50 @@
+BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3.et" {
+ ID "DA5C6308000CDEF2"
+ components {
+  AICombatPropertiesComponent "{59C92CB0FD688D78}" {
+   Enabled 0
+  }
+  BON_AutoTurretTargetComponent "{62BE9479AA0C2E3D}" {
+   Enabled 0
+  }
+  CollisionTriggerComponent "{5184AB9D098A0025}" {
+   TRIGGER_ALIVE 1
+   SafetyDistance 0
+  }
+  InventoryItemComponent "{526E87778842822F}" {
+   Enabled 0
+  }
+  MagazineComponent "{50F6614BB5D5B0A8}" {
+   Enabled 0
+  }
+  MeshObject "{851AA4A2AE0A56BF}" {
+   Object "{63A314D8B7899DBA}Assets/Weapons/Magazines/Missile_KR/Missile_KR.xob"
+  }
+  MissileMoveComponent "{0EF36690881261EF}" {
+   Enabled 1
+   InitSpeed 0.1
+   InitSpeedVariation 0
+   TimeToLive 99
+   TriggerWhenTimeout 0
+   MaxControlRange 0
+   Maneuvrability 0
+   TrackLead 0
+  }
+  RigidBody "{529E88841E9EDFB4}" {
+   Gravity 1
+   AngularSleepingThreashold 1
+   ResponseIndex "Normal"
+  }
+  RocketTraceEffectComponent "{52CA7A152C8BCB83}" {
+   ParticleEffect "{E8EC50638198AB9B}Particles/Trail_Missle.ptc"
+  }
+  ActionsManagerComponent "{50F6614BA1D6E54A}" {
+   Enabled 0
+  }
+ }
+ coords 194.965 2.163 161.241
+ ProjectileModel "{63A314D8B7899DBA}Assets/Weapons/Magazines/Missile_KR/Missile_KR.xob"
+ m_fTrackDelay 0
+ m_fMoveSpeed 250
+ m_fRotSpeed 2
+}

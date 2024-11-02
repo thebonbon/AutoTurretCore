@@ -14,15 +14,14 @@ GenericEntity {
    }
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_fAttackInaccuracy 0
-   m_sShootSound "SOUND_SHOT"
    m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
-    Offset 0.0186 0.083 4.6516
    }
+   m_sShootSound "SOUND_SHOT"
    m_sBodyBone "w_body"
    m_sBarrelBone "w_barrel"
    m_vLimitHorizontal -360 360 0
    m_TargetFlags CHARACTERS
+   m_fAttackInaccuracy 0
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
   }

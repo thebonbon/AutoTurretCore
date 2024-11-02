@@ -1,8 +1,28 @@
-$grp GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
- {
-  coords 4433.249 51.739 10731.648
+GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM.et" {
+ components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_fMaxAttackSpeed 20
+  }
+  FactionAffiliationComponent "{62ACAE2F976BB213}" {
+   "faction affiliation" "USSR"
+  }
  }
- {
-  coords 4775.905 23.219 12067.27
+ coords 4665.185 15.138 10301.213
+}
+BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et" {
+ coords 4661.311 15.174 10303.27
+}
+Vehicle av8b1 : "{F99A0DC56483CB98}frefabs/vehicles/fixed wing/av8b/av8b2.et" {
+ components {
+  SCR_VehicleSoundComponent "{55C2E66AD4EF2CA6}" {
+   Filenames + {
+    "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
+   }
+  }
+  BON_AutoTurretTargetComponent "{62BE947980BCDA5F}" {
+   m_TargetFlags AIRCRAFTS
+  }
  }
+ coords 4771.258 27.844 11202.952
+ angleY 0
 }

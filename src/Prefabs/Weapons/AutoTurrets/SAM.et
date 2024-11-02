@@ -1,0 +1,35 @@
+GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.et" {
+ ID "62ACAE2FAC6D2BB1"
+ components {
+  SoundComponent "{62ACAE2F976BB3F9}" {
+   Filenames {
+    "{910AB3BC20ED9A93}Sounds/Weapons/Launchers/M72A3_LAW/Weapons_Launchers_M72A3_LAW_Shot.acp"
+   }
+  }
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_Projectile "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et"
+   m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
+    PivotID "w_barrel"
+    Offset -1.546 -0.2815 1.5396
+   }
+   m_TargetFlags 6
+   m_fMaxAttackSpeed 15
+   m_iAttackRange 2000
+   m_bDebug 1
+  }
+  FactionAffiliationComponent "{62ACAE2F976BB213}" {
+   "faction affiliation" "USSR"
+  }
+  MeshObject "{62ACAE2F976BB2AB}" {
+   Object "{5977DE55E69EF71B}Assets/Weapons/AutoTurrets/SAM/SAM_Turret.xob"
+  }
+  SCR_DestructionMultiPhaseComponent "{62ACF1D12DE6C3BD}" {
+   "Additional hit zones" {
+    SCR_HitZone default {
+     HZDefault 1
+    }
+   }
+  }
+ }
+ coords 198.839 1 156.022
+}

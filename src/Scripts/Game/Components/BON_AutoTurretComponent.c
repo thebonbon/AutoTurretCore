@@ -174,6 +174,13 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void LaunchProjectile(notnull IEntity rocket, vector direction)
 	{
+		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(rocket);
+		if (guidedProjectile)
+		{
+			guidedProjectile.Launch(m_NearestTarget);
+			return;
+		}
+		
 		ProjectileMoveComponent moveComp = ProjectileMoveComponent.Cast(rocket.FindComponent(ProjectileMoveComponent));
 
 		if (!moveComp)
@@ -181,7 +188,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
 
-		moveComp.Launch(direction, vector.Zero, 1, rocket, GetOwner(), null, m_NearestTarget, null);
+		moveComp.Launch(direction, vector.Zero, 1, rocket, GetOwner(), null, null, null);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -288,9 +295,17 @@ class BON_AutoTurretComponent : ScriptComponent
 		}
 	}
 
+	
 	//------------------------------------------------------------------------------------------------
 	void SetNewTarget(IEntity target)
 	{
+		//Reset old target vars
+		if (m_NearestTarget)
+		{	
+			SoundComponent soundComp = SoundComponent.Cast(m_NearestTarget.FindComponent(SoundComponent));
+			soundComp.SetSignalValue(soundComp.GetSignalIndex("TrackingState"), 0);
+		}
+		
 		m_NearestTarget = target;
 
 		if (target)
@@ -298,6 +313,10 @@ class BON_AutoTurretComponent : ScriptComponent
 			RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
 			m_iNearestTargetId = targetRplComp.Id();
 			m_TargetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
+			
+			SoundComponent soundComp = SoundComponent.Cast(target.FindComponent(SoundComponent));
+			soundComp.SetSignalValue(soundComp.GetSignalIndex("TrackingState"), 1);
+			soundComp.SoundEvent("SOUND_TARGET_BEEP");	
 		}
 		else
 		{
