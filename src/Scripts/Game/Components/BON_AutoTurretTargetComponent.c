@@ -42,7 +42,8 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 		}
 		
 		SoundComponent soundComp = SoundComponent.Cast(owner.FindComponent(SoundComponent));
-		soundComp.SoundEvent("SOUND_TARGET_BEEP");
+		if (soundComp)
+			soundComp.SoundEvent("SOUND_TARGET_BEEP");
 	}
 
 	//------------------------------------------------------------------------------------------------
