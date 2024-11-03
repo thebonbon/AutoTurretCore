@@ -20,8 +20,8 @@ $object "" {
    #weight 0
    #material "Metal_CE9253778DD8FBDE"
    #layers "ItemFireView"
-   #radius 0.3663
-   #length 2.7243
+   #radius 0.6698
+   #length 3.0103
   }
  }
  $lod 0 {
