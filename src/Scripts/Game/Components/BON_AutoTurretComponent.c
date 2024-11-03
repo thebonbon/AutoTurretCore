@@ -64,6 +64,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
 	BON_TurretTargetFilterFlags m_TargetFlags;
 
+	[Attribute("1", UIWidgets.CheckBox, "Enable turret on spawn?", category: "Aiming")]
+	bool m_bActiveOnSpawn;
+	
 	[Attribute("1", UIWidgets.Auto, "Rotation Speed. Higher = faster. 0 = no rotation", "0 inf 1", category: "Aiming")]
 	float m_fRotationSpeed;
 
@@ -172,9 +175,16 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	void ToggleActive()
+	bool ToggleActive()
 	{
 		m_bActive = !m_bActive;
+		
+		if (m_bActive)
+			ConnectToAutoTurretSystem();
+		else
+			DisconnectFromAutoTurretSystem();
+		
+		return m_bActive;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -634,7 +644,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		ConnectToAutoTurretSystem();
 
-		m_bActive = true;
+		m_bActive = m_bActiveOnSpawn;
 	}
 
 	//------------------------------------------------------------------------------------------------
