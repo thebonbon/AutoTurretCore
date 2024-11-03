@@ -1,0 +1,31 @@
+GenericEntity : "{8C3C62C58D2DBEDA}Prefabs/Weapons/Warheads/Warhead_HEAT.et" {
+ ID "9D9BE68EA2672F76"
+ components {
+  BaseTriggerComponent "{55129E81CBAA1390}" {
+   PROJECTILE_EFFECTS {
+    ExplosionDamageContainer "{567CBC1D0F5B4AEA}" {
+     ExplosionEffects {
+      BaseExplosionDamage "{567CBC1D7B765F0A}" {
+       DamageValue 3000
+       DamageDistance 20
+      }
+      ExplosionFragmentationEffect "{567CBC1D7AB652C7}" {
+       CaseWeight 1297
+      }
+     }
+     ChargeWeight 403
+     TntEquivalent 2
+    }
+    SubmunitionEffect "{567CB8E002C26D97}" {
+     Prefab "{2D86FDF6894069B3}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3_Penetrator.et"
+    }
+    SubmunitionEffect "{5D692C94EC533259}" {
+     Prefab "{B40479180A86C261}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3_Spall.et"
+    }
+   }
+  }
+  HitEffectComponent "{9D9BE68D6F65A10F}" {
+   ParticleEffect "{D3F38F8AA37B77E8}Particles/Weapon/Explosion_M72LAW.ptc"
+  }
+ }
+}

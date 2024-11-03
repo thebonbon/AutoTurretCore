@@ -8,6 +8,11 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
    Enabled 0
   }
   CollisionTriggerComponent "{5184AB9D098A0025}" {
+   PROJECTILE_EFFECTS {
+    ExplosionEffect "{5184AB9D05324718}" {
+     EffectPrefab "{E70E2981F83C7BE4}Prefabs/Weapons/Warheads/Warhead_HEAT_SAM.et"
+    }
+   }
    TRIGGER_ALIVE 1
    SafetyDistance 0
   }
@@ -19,13 +24,19 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
   }
   MeshObject "{851AA4A2AE0A56BF}" {
    Object "{63A314D8B7899DBA}Assets/Weapons/Magazines/Missile_KR/Missile_KR.xob"
+   RainOccluder 0
+   WetnessOccluder 0
   }
   MissileMoveComponent "{0EF36690881261EF}" {
    Enabled 1
    InitSpeed 0.1
    InitSpeedVariation 0
-   TimeToLive 99
-   TriggerWhenTimeout 0
+   TimeToLive 22
+   ProjectileEffects {
+    ProjectileDamage "{56829D01651CE9A7}" {
+     DamageValue 500
+    }
+   }
    MaxControlRange 0
    Maneuvrability 0
    TrackLead 0
@@ -44,7 +55,6 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
  }
  coords 194.965 2.163 161.241
  ProjectileModel "{63A314D8B7899DBA}Assets/Weapons/Magazines/Missile_KR/Missile_KR.xob"
- m_fTrackDelay 0
- m_fMoveSpeed 250
- m_fRotSpeed 2
+ m_fMoveSpeed 230
+ m_fGuidanceStrength 1
 }
