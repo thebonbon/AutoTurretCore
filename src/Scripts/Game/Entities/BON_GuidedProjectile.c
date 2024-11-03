@@ -6,38 +6,31 @@ class BON_GuidedProjectileClass : ProjectileClass
 class BON_GuidedProjectile : Projectile
 {
 	[Attribute()]
-	float m_fTrackDelay;
-	
-	[Attribute()]
 	float m_fMoveSpeed;
 	
 	[Attribute()]
-	float m_fRotSpeed;
+	float m_fGuidanceStrength;
 	
 	IEntity m_TrackedTarget;
 	Physics m_Rb;
 	vector m_vAimOffset;
+	vector m_vLastDirToTarget;
 
 	//------------------------------------------------------------------------------------------------
+	//TODO: Change to Proportional Navigation Guidance
 	void SteerToTarget(float timeSlice)
 	{
 		vector localFwd = GetTransformAxis(2).Normalized();
-		vector dirToTarget;
-		if (m_vAimOffset)
-			dirToTarget = m_vAimOffset - GetOrigin();
-		else
-			dirToTarget = m_TrackedTarget.GetOrigin() + m_TrackedTarget.GetTransformAxis(1).Normalized() * 2 - GetOrigin(); //Default up offset to not hit ground pivot
-		
+		vector dirToTarget = m_TrackedTarget.CoordToParent(m_vAimOffset)- GetOrigin();
 		dirToTarget.Normalize();
 		
-		vector rotationAxis = Cross(localFwd, dirToTarget).Normalized();
-		float dot = vector.Dot(localFwd, dirToTarget);
-		float angleDifference = Math.Acos(Math.Clamp(dot, -1.0, 1.0));
-
-		float losRate = angleDifference / timeSlice;
+		vector dirChangeRate = (dirToTarget - m_vLastDirToTarget) / timeSlice;
+		vector angularVelocity = Cross(dirToTarget, dirChangeRate);
 		
 		m_Rb.SetVelocity(localFwd * m_fMoveSpeed);
-		m_Rb.SetAngularVelocity(rotationAxis * losRate * m_fRotSpeed);
+		m_Rb.SetAngularVelocity(angularVelocity * m_fGuidanceStrength);
+		
+		m_vLastDirToTarget = dirToTarget;
 	}
 	
 	//------------------------------------------------------------------------------------------------
@@ -67,12 +60,18 @@ class BON_GuidedProjectile : Projectile
 		missileMove.Launch(vector.Zero, vector.Zero, 0, this, null, null, null, null);
 		
 		PerceivableComponent targetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
+		
 		if (targetPerceivableComp)
 		{
 			array<vector> aimPoints();
 			targetPerceivableComp.GetAimpoints(aimPoints);
-			m_vAimOffset = aimPoints[0];
+			m_vAimOffset = target.CoordToLocal(aimPoints[0]);
 		}
+		else
+			m_vAimOffset = Vector(0, 2, 0);
+		
+		m_vLastDirToTarget = target.CoordToParent(m_vAimOffset) - GetOrigin();
+		m_vLastDirToTarget.Normalize();
 		
 		SetEventMask(EntityEvent.FRAME);
 	}
@@ -84,9 +83,11 @@ class BON_GuidedProjectile : Projectile
 		if (!GetGame().InPlayMode())
 			return;
 
+		
 		m_Rb = GetPhysics();
 	}
 
+	
 	//------------------------------------------------------------------------------------------------
 	void BON_GuidedProjectile(IEntitySource src, IEntity parent)
 	{
