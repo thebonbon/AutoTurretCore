@@ -193,7 +193,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(rocket);
 		if (guidedProjectile)
 		{
-			guidedProjectile.Launch(m_NearestTarget);
+			guidedProjectile.SetTargetAndLaunch(m_NearestTarget);
 			return;
 		}
 

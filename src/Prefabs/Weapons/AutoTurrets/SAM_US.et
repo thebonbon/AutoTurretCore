@@ -15,6 +15,8 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    m_TargetFlags 6
    m_fMaxAttackSpeed 15
    m_iAttackRange 2000
+   m_bLeading 0
+   m_bBallistics 0
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
    "faction affiliation" "US"

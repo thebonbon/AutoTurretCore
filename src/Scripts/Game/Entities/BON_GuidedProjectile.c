@@ -11,13 +11,25 @@ class BON_GuidedProjectile : Projectile
 	[Attribute()]
 	float m_fGuidanceStrength;
 
+	[RplProp(onRplName: "OnTargetChanged")]
+	RplId m_iTrackedTargetId;
+	
 	IEntity m_TrackedTarget;
 	Physics m_Rb;
 	vector m_vAimOffset;
 	vector m_vLastDirToTarget;
 
 	//------------------------------------------------------------------------------------------------
-	//TODO: Change to Proportional Navigation Guidance
+	void OnTargetChanged()
+	{
+		RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(m_iTrackedTargetId));
+		if (rplComponent)
+		{
+			Launch(rplComponent.GetEntity());
+		}
+	}
+	
+	//------------------------------------------------------------------------------------------------
 	void SteerToTarget(float timeSlice)
 	{
 		vector localFwd = GetTransformAxis(2).Normalized();
@@ -51,13 +63,26 @@ class BON_GuidedProjectile : Projectile
 	}
 
 	//------------------------------------------------------------------------------------------------
+	void SetTargetAndLaunch(IEntity target)
+	{
+		if (!target)
+			return;
+		
+		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
+		m_iTrackedTargetId = targetRplComp.Id();
+		Replication.BumpMe();
+		
+		MissileMoveComponent missileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
+		missileMove.Launch(vector.Zero, vector.Zero, 0, this, null, null, null, null);
+		
+		Launch(target);
+	}
+	
+	//------------------------------------------------------------------------------------------------
 	void Launch(IEntity target)
 	{
 		m_TrackedTarget = target;
 		m_Rb.SetActive(ActiveState.ACTIVE);
-
-		MissileMoveComponent missileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
-		missileMove.Launch(vector.Zero, vector.Zero, 0, this, null, null, null, null);
 
 		PerceivableComponent targetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
 
@@ -75,14 +100,12 @@ class BON_GuidedProjectile : Projectile
 
 		SetEventMask(EntityEvent.FRAME);
 	}
-
-
+	
 	//------------------------------------------------------------------------------------------------
 	override protected void EOnInit(IEntity owner)
 	{
 		if (!GetGame().InPlayMode())
 			return;
-
 
 		m_Rb = GetPhysics();
 	}
