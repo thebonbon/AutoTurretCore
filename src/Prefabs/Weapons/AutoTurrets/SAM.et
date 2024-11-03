@@ -15,7 +15,6 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    m_TargetFlags 6
    m_fMaxAttackSpeed 15
    m_iAttackRange 2000
-   m_bDebug 1
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
    "faction affiliation" "USSR"

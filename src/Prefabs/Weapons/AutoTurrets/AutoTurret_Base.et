@@ -20,7 +20,7 @@ GenericEntity {
    m_sBodyBone "w_body"
    m_sBarrelBone "w_barrel"
    m_vLimitHorizontal -360 360 0
-   m_TargetFlags CHARACTERS
+   m_TargetFlags 0
    m_fAttackInaccuracy 0
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
