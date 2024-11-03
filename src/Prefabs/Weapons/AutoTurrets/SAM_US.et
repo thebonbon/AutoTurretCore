@@ -17,7 +17,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    m_iAttackRange 2000
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
-   "faction affiliation" "USSR"
+   "faction affiliation" "US"
   }
   MeshObject "{62ACAE2F976BB2AB}" {
    Object "{5977DE55E69EF71B}Assets/Weapons/AutoTurrets/SAM/SAM_Turret.xob"

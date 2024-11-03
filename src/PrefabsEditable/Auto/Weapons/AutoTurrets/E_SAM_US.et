@@ -1,0 +1,36 @@
+GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
+ ID "62ACAE2FAC6D2BB1"
+ components {
+  SCR_EditableEntityComponent "{62C6A65B96BC485D}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
+    Name "SAM Turret US"
+    Icon "{CA395A8742244AF2}UI/Textures/EditableEntities/AutoTurrets/EditableEntity_AutoTurret_SAM.edds"
+    m_Image ""
+    m_sFaction "US"
+    m_aAuthoredLabels {
+     1001
+    }
+    m_aAutoLabels {
+     11 1 122
+    }
+   }
+   m_sIconBoneName "w_body"
+   m_Flags 773
+  }
+  SCR_PreviewEntityComponent "{62C6A65B96BD3B28}" : "{6CADA7A88A6265FD}Prefabs/Editor/Components/PreviewEntityComponentClass.ct" {
+   m_bRuntime 0
+   m_aEntries {
+    SCR_BasePreviewEntry "{62C6A65B96BD41AA}" {
+     m_iParentID -1
+     m_Mesh "{5977DE55E69EF71B}Assets/Weapons/AutoTurrets/SAM/SAM_Turret.xob"
+     m_Flags EDITABLE
+     m_Shape MESH
+     m_iPivotID ""
+     m_vScale 1 1 1
+     m_vPosition 0 0 0
+     m_vAngles 0 0 0
+    }
+   }
+  }
+ }
+}
