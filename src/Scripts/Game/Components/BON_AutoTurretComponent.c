@@ -76,6 +76,12 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Aiming")]
 	float m_fAttackInaccuracy;
 
+	[Attribute("1", UIWidgets.CheckBox, "Enable leading? (Shooting in front of the target to account for velocity)", category: "Aiming")]
+	bool m_bLeading;
+	
+	[Attribute("1", UIWidgets.CheckBox, "Enable ballistics offset? (Shooting above the target to account for projectile ballistics)", category: "Aiming")]
+	bool m_bBallistics;
+
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
 
@@ -241,7 +247,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		//Add Leading
 		float targetDistance = vector.Distance(barrelOrigin, targetAimPoint);
-		if (m_NearestTarget.GetPhysics())
+		if (m_bLeading && m_NearestTarget.GetPhysics())
 		{
 			float timeToTarget = targetDistance / m_fProjectileSpeed;
 			targetAimPoint += m_NearestTarget.GetPhysics().GetVelocity() * timeToTarget;
@@ -249,8 +255,11 @@ class BON_AutoTurretComponent : ScriptComponent
 		}
 
 		//Add Ballistics
-		float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, null, m_ProjectileSource);
-		targetAimPoint = targetAimPoint + vector.Up * heightOffset;
+		if (m_bBallistics)
+		{
+			float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, null, m_ProjectileSource);
+			targetAimPoint = targetAimPoint + vector.Up * heightOffset;
+		}
 
 		//Set Signals
 		vector targetDir = targetAimPoint - barrelOrigin;
@@ -259,7 +268,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		angles = SCR_Math3D.FixEulerVector180(angles);
 
 		m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, -angles[0], m_fLerp);
-		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, angles[1] - 0.333, m_fLerp); //Idk why 0.333
+		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, angles[1], m_fLerp);
 
 		m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
