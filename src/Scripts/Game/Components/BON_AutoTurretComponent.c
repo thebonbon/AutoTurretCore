@@ -370,6 +370,9 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		foreach (IEntity target : allTargets)
 		{
+			if (!target)
+				continue;
+			
 			float distance = vector.DistanceSq(target.GetOrigin(), GetOwner().GetOrigin());
 			if (distance < m_iAttackRange && IsEnemyAndAlive(target))
 				AddNewTarget(target, distance);
