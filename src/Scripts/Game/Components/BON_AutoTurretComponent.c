@@ -78,7 +78,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	[Attribute("1", UIWidgets.CheckBox, "Enable leading? (Shooting in front of the target to account for velocity)", category: "Aiming")]
 	bool m_bLeading;
-	
+
 	[Attribute("1", UIWidgets.CheckBox, "Enable ballistics offset? (Shooting above the target to account for projectile ballistics)", category: "Aiming")]
 	bool m_bBallistics;
 
@@ -186,7 +186,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			guidedProjectile.Launch(m_NearestTarget);
 			return;
 		}
-		
+
 		ProjectileMoveComponent moveComp = ProjectileMoveComponent.Cast(rocket.FindComponent(ProjectileMoveComponent));
 
 		if (!moveComp)
@@ -304,17 +304,17 @@ class BON_AutoTurretComponent : ScriptComponent
 		}
 	}
 
-	
+
 	//------------------------------------------------------------------------------------------------
 	void SetNewTarget(IEntity target)
 	{
 		//Reset old target vars
 		if (m_NearestTarget)
-		{	
+		{
 			SoundComponent soundComp = SoundComponent.Cast(m_NearestTarget.FindComponent(SoundComponent));
 			soundComp.SetSignalValue(soundComp.GetSignalIndex("TrackingState"), 0);
 		}
-		
+
 		m_NearestTarget = target;
 
 		if (target)
@@ -322,10 +322,10 @@ class BON_AutoTurretComponent : ScriptComponent
 			RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
 			m_iNearestTargetId = targetRplComp.Id();
 			m_TargetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
-			
+
 			SoundComponent soundComp = SoundComponent.Cast(target.FindComponent(SoundComponent));
 			soundComp.SetSignalValue(soundComp.GetSignalIndex("TrackingState"), 1);
-			soundComp.SoundEvent("SOUND_TARGET_BEEP");	
+			soundComp.SoundEvent("SOUND_TARGET_BEEP");
 		}
 		else
 		{
