@@ -298,9 +298,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		if (m_iCurrentTargetIndex >= m_iTargetCount)
 		{
-				GetValidTargets();
-				m_iCurrentTargetIndex = 0;
-				m_iTargetCount = 0;
+			m_iCurrentTargetIndex = 0;
+			m_iTargetCount = 0;
+			GetValidTargets();
 		}
 
 		if (!m_aValidTargets.IsEmpty())
@@ -383,17 +383,27 @@ class BON_AutoTurretComponent : ScriptComponent
 	void AddNewTarget(IEntity ent, float distance)
 	{
 		BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(ent, distance);
-
+		bool inserted;
+		
 		if (m_aValidTargets.IsEmpty())
 			m_aValidTargets.Insert(newTarget);
 		else
 		{
 			foreach (int i, BON_AutoTurretTarget target : m_aValidTargets)
 			{
-				if (distance < m_aValidTargets.Get(i).m_fDistance)
+				if (distance < target.m_fDistance)
+				{
 					m_aValidTargets.InsertAt(target, i);
+					inserted = true;
+					break;
+				}					
 			}
 		}
+		
+		//Biggest dist, insert at the end
+		if (!inserted)
+			m_aValidTargets.Insert(newTarget);
+		
 		m_iTargetCount++;
 	}
 
@@ -473,6 +483,9 @@ class BON_AutoTurretComponent : ScriptComponent
 			factionComp.GetAffiliatedFaction().IsFactionEnemy(m_Faction)
 		);
 
+		if (m_bDebug && isValidTarget)
+			Print("Valid: " + ent);
+		
 		return isValidTarget;
 	}
 
