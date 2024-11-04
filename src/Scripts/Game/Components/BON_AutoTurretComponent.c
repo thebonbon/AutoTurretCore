@@ -66,7 +66,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	[Attribute("1", UIWidgets.CheckBox, "Enable turret on spawn?", category: "Aiming")]
 	bool m_bActiveOnSpawn;
-	
+
 	[Attribute("1", UIWidgets.Auto, "Rotation Speed. Higher = faster. 0 = no rotation", "0 inf 1", category: "Aiming")]
 	float m_fRotationSpeed;
 
@@ -178,12 +178,12 @@ class BON_AutoTurretComponent : ScriptComponent
 	bool ToggleActive()
 	{
 		m_bActive = !m_bActive;
-		
+
 		if (m_bActive)
 			ConnectToAutoTurretSystem();
 		else
 			DisconnectFromAutoTurretSystem();
-		
+
 		return m_bActive;
 	}
 
@@ -372,7 +372,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			if (!target)
 				continue;
-			
+
 			float distance = vector.DistanceSq(target.GetOrigin(), GetOwner().GetOrigin());
 			if (distance < m_iAttackRange && IsEnemyAndAlive(target))
 				AddNewTarget(target, distance);
@@ -384,7 +384,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(ent, distance);
 		bool inserted;
-		
+
 		if (m_aValidTargets.IsEmpty())
 			m_aValidTargets.Insert(newTarget);
 		else
@@ -396,14 +396,14 @@ class BON_AutoTurretComponent : ScriptComponent
 					m_aValidTargets.InsertAt(target, i);
 					inserted = true;
 					break;
-				}					
+				}
 			}
 		}
-		
+
 		//Biggest dist, insert at the end
 		if (!inserted)
 			m_aValidTargets.Insert(newTarget);
-		
+
 		m_iTargetCount++;
 	}
 
@@ -485,7 +485,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		if (m_bDebug && isValidTarget)
 			Print("Valid: " + ent);
-		
+
 		return isValidTarget;
 	}
 
@@ -530,10 +530,13 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (soundComponent)
 			soundComponent.SoundEvent(m_sShootSound);
 
-		ParticleEffectEntitySpawnParams params();
-		params.TransformMode = ETransformMode.WORLD;
-		m_ProjectileMuzzle.GetTransform(params.Transform);
-		ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_sMuzzleParticle, params);
+		if (m_sMuzzleParticle)
+		{
+			ParticleEffectEntitySpawnParams params();
+			params.TransformMode = ETransformMode.WORLD;
+			m_ProjectileMuzzle.GetTransform(params.Transform);
+			ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_sMuzzleParticle, params);
+		}
 
 		if (m_NearestTarget && m_NearestTarget.FindComponent(MissileMoveComponent))
 		{
