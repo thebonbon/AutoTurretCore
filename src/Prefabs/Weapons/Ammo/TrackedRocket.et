@@ -13,8 +13,6 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
      EffectPrefab "{E70E2981F83C7BE4}Prefabs/Weapons/Warheads/Warhead_HEAT_SAM.et"
     }
    }
-   TRIGGER_ALIVE 1
-   SafetyDistance 0
   }
   InventoryItemComponent "{526E87778842822F}" {
    Enabled 0
