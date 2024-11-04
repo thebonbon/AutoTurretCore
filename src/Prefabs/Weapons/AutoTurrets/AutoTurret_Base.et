@@ -23,6 +23,9 @@ GenericEntity {
    m_TargetFlags 0
    m_fAttackInaccuracy 0
   }
+  BON_AutoTurretTargetComponent "{62C91C0D0A7CBA50}" {
+   m_TargetFlags VEHICLES
+  }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
   }
   MeshObject "{62ACAE2F976BB2AB}" {
