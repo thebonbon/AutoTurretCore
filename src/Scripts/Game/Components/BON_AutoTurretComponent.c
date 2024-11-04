@@ -483,9 +483,6 @@ class BON_AutoTurretComponent : ScriptComponent
 			factionComp.GetAffiliatedFaction().IsFactionEnemy(m_Faction)
 		);
 
-		if (m_bDebug && isValidTarget)
-			Print("Valid: " + ent);
-
 		return isValidTarget;
 	}
 
