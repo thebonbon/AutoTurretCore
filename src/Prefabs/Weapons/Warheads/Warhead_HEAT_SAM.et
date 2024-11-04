@@ -6,8 +6,8 @@ GenericEntity : "{8C3C62C58D2DBEDA}Prefabs/Weapons/Warheads/Warhead_HEAT.et" {
     ExplosionDamageContainer "{567CBC1D0F5B4AEA}" {
      ExplosionEffects {
       BaseExplosionDamage "{567CBC1D7B765F0A}" {
-       DamageValue 3000
-       DamageDistance 20
+       DamageValue 4000
+       DamageDistance 50
       }
       ExplosionFragmentationEffect "{567CBC1D7AB652C7}" {
        CaseWeight 1297

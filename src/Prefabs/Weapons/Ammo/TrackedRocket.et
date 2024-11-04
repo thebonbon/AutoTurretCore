@@ -34,7 +34,7 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
    TimeToLive 22
    ProjectileEffects {
     ProjectileDamage "{56829D01651CE9A7}" {
-     DamageValue 500
+     DamageValue 750
     }
    }
    MaxControlRange 0
