@@ -101,7 +101,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	};
 
 	protected float m_fAttackSpeed = 0;
-	protected bool m_bActive = false;
+	bool m_bActive = false;
 
 	protected IEntity m_LastTarget;
 	protected ref Faction m_Faction;
@@ -121,6 +121,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected float m_fMaxSearchDelay = 1;
 	protected float m_iAttacksOnTarget;
 	protected bool m_bIsProjectileReplicated;
+	float m_fRocketGuidanceStrength = 0;
 
 	protected int m_iTargetCount;
 	protected int m_iCurrentTargetIndex;
@@ -193,6 +194,8 @@ class BON_AutoTurretComponent : ScriptComponent
 		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(rocket);
 		if (guidedProjectile)
 		{
+			if (m_fRocketGuidanceStrength != 0)
+				guidedProjectile.m_fGuidanceStrength = m_fRocketGuidanceStrength;
 			guidedProjectile.SetTargetAndLaunch(m_NearestTarget);
 			return;
 		}
