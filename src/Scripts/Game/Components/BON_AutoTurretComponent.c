@@ -46,8 +46,8 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("SOUND_SHOT", UIWidgets.Auto, "", category: "Setup")]
 	string m_sShootSound;
 
-	[Attribute("50", UIWidgets.Auto, "How many shots need to be fired at a Projectile to (fake) explode it?", category: "Setup")]
-	float m_iAttacksPerProjectile;
+	[Attribute("5", UIWidgets.Auto, "Every shot has this % chance to explode the projectile (missile) its shooting at", "0 100 1", category: "Setup")]
+	int m_fProjectileTriggerChance;
 
 	[Attribute("w_body", UIWidgets.Auto, "", category: "Setup")]
 	protected string m_sBodyBone;
@@ -538,15 +538,8 @@ class BON_AutoTurretComponent : ScriptComponent
 			ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_sMuzzleParticle, params);
 		}
 
-		if (m_NearestTarget && m_NearestTarget.FindComponent(MissileMoveComponent))
-		{
-			if (m_iAttacksOnTarget >= m_iAttacksPerProjectile)
-			{
-				TriggerProjectile(m_NearestTarget);
-				m_iAttacksOnTarget = 0;
-			}
-			m_iAttacksOnTarget++;
-		}
+		if (m_NearestTarget && m_NearestTarget.FindComponent(MissileMoveComponent) && s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance)
+			TriggerProjectile(m_NearestTarget);
 	}
 
 	//------------------------------------------------------------------------------------------------
