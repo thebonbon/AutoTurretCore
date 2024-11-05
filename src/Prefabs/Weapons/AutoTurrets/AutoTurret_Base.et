@@ -43,6 +43,19 @@ GenericEntity {
    ModelGeometry 1
   }
   SCR_DestructionMultiPhaseComponent "{62ACF1D12DE6C3BD}" {
+   "Additional hit zones" {
+    SCR_HitZone default {
+     HZDefault 1
+     MaxHealth 5000
+    }
+   }
+   m_fBaseHealth 5000
+   m_DestroySpawnObjects {
+    SCR_ParticleSpawnable "{62CA80161915D831}" {
+     m_Particle "{33736FDD82DD3405}Particles/Logistics/Explosion/Ammo_Rack/Explosion_Ammo_Rack_Small.ptc"
+    }
+   }
+   m_eMaterialSoundType BREAK_METAL
   }
   AnimationControllerComponent "{62ACAE2F976BB285}" {
    AnimGraph "{97FB2EE0B4F71FFA}anims/workspaces/AutoTurret/AutoTurretTemplate.agr"
