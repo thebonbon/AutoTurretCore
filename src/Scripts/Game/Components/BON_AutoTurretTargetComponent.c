@@ -8,13 +8,17 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 	[Attribute(uiwidget: UIWidgets.ComboBox, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
 	BON_TurretTargetFilterFlags m_TargetFlags;
 	
-	private Physics m_Rb;
-	
 	//------------------------------------------------------------------------------------------------
-	void OnInventoryParentChanged(InventoryStorageSlot oldSlot, InventoryStorageSlot newSlot)
+	override void EOnPhysicsActive(IEntity owner, bool activeState)
 	{
-		if (!newSlot && m_Rb && m_Rb.IsActive())
+		Print(activeState);
+		if (m_TargetFlags != BON_TurretTargetFilterFlags.PROJECTILES)
+			return;
+		
+		if (activeState)
 			BON_AutoTurretTargets.s_aTargetProjectiles.Insert(GetOwner());
+		else
+			BON_AutoTurretTargets.s_aTargetProjectiles.RemoveItem(GetOwner());
 	}
 	
 	//------------------------------------------------------------------------------------------------
@@ -31,14 +35,6 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 			case BON_TurretTargetFilterFlags.CHARACTERS:
 				BON_AutoTurretTargets.s_aTargetCharacters.Insert(owner);
 				break;
-			case BON_TurretTargetFilterFlags.PROJECTILES:
-			{
-				m_Rb = GetOwner().GetPhysics();
-				InventoryItemComponent invComp = InventoryItemComponent.Cast(owner.FindComponent(InventoryItemComponent));
-				if (invComp && invComp.m_OnParentSlotChangedInvoker)
-					invComp.m_OnParentSlotChangedInvoker.Insert(OnInventoryParentChanged);			
-				break;
-			}
 		}
 		
 		SoundComponent soundComp = SoundComponent.Cast(owner.FindComponent(SoundComponent));
@@ -49,7 +45,7 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void OnPostInit(IEntity owner)
 	{
-		SetEventMask(owner, EntityEvent.INIT);
+		SetEventMask(owner, EntityEvent.INIT | EntityEvent.PHYSICSACTIVE);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -66,14 +62,6 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 			case BON_TurretTargetFilterFlags.CHARACTERS:
 				BON_AutoTurretTargets.s_aTargetCharacters.RemoveItem(owner);
 				break;
-			case BON_TurretTargetFilterFlags.PROJECTILES:
-			{
-				InventoryItemComponent invComp = InventoryItemComponent.Cast(owner.FindComponent(InventoryItemComponent));
-				if (invComp && invComp.m_OnParentSlotChangedInvoker)
-					invComp.m_OnParentSlotChangedInvoker.Remove(OnInventoryParentChanged);		
-				BON_AutoTurretTargets.s_aTargetCharacters.RemoveItem(owner);	
-				break;
-			}
 		}
 	}
 }
