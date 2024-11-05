@@ -11,7 +11,6 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void EOnPhysicsActive(IEntity owner, bool activeState)
 	{
-		Print(activeState);
 		if (m_TargetFlags != BON_TurretTargetFilterFlags.PROJECTILES)
 			return;
 		
