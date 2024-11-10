@@ -10,7 +10,7 @@ GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.e
    m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
     Name "CIWS Phalanx US"
     Icon "{4802E7182AFEA3A9}UI/Textures/EditableEntities/AutoTurrets/EditableEntity_AutoTurret_CIWS_Phalanx.edds"
-    m_Image ""
+    m_Image "{2393FE90AE2AC8AC}UI/Textures/EditableEntities/AutoTurrets/AutoTurret_Phalanx_BCR.edds"
     m_sFaction "US"
     m_aAuthoredLabels {
      1001
