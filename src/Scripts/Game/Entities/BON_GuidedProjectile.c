@@ -13,12 +13,13 @@ class BON_GuidedProjectile : Projectile
 
 	[RplProp(onRplName: "OnTargetChanged")]
 	RplId m_iTrackedTargetId;
-	
+
 	IEntity m_TrackedTarget;
 	Physics m_Rb;
 	vector m_vAimOffset;
 	vector m_vLastDirToTarget;
-
+	
+	
 	//------------------------------------------------------------------------------------------------
 	void OnTargetChanged()
 	{
@@ -28,12 +29,12 @@ class BON_GuidedProjectile : Projectile
 			Launch(rplComponent.GetEntity());
 		}
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void SteerToTarget(float timeSlice)
 	{
 		vector localFwd = GetTransformAxis(2).Normalized();
-		vector dirToTarget = m_TrackedTarget.CoordToParent(m_vAimOffset)- GetOrigin();
+		vector dirToTarget = m_TrackedTarget.CoordToParent(m_vAimOffset) - GetOrigin();
 		dirToTarget.Normalize();
 
 		vector dirChangeRate = (dirToTarget - m_vLastDirToTarget) / timeSlice;
@@ -67,17 +68,17 @@ class BON_GuidedProjectile : Projectile
 	{
 		if (!target)
 			return;
-		
+
 		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
 		m_iTrackedTargetId = targetRplComp.Id();
 		Replication.BumpMe();
-		
+
 		MissileMoveComponent missileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
 		missileMove.Launch(vector.Zero, vector.Zero, 0, this, null, null, null, null);
-		
+
 		Launch(target);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void Launch(IEntity target)
 	{
@@ -100,7 +101,7 @@ class BON_GuidedProjectile : Projectile
 
 		SetEventMask(EntityEvent.FRAME);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	override protected void EOnInit(IEntity owner)
 	{
@@ -110,15 +111,9 @@ class BON_GuidedProjectile : Projectile
 		m_Rb = GetPhysics();
 	}
 
-
 	//------------------------------------------------------------------------------------------------
 	void BON_GuidedProjectile(IEntitySource src, IEntity parent)
 	{
 		SetEventMask(EntityEvent.INIT);
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void ~BON_GuidedProjectile()
-	{
 	}
 }

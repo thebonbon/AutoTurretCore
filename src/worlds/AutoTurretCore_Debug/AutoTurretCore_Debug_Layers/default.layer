@@ -1,41 +1,20 @@
 SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
-GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM.et" {
- components {
-  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_fMaxAttackSpeed 10
-  }
- }
- coords 198.849 1 157.406
-}
-TracerProjectile : "{27E671E1F169ED18}Prefabs/Weapons/Ammo/Ammo_127x108_APIT_BZT44.et" {
- coords 139.598 1 135.298
-}
-Projectile : "{32E12D322E107F1C}Prefabs/Weapons/Ammo/Ammo_Rocket_PG7VM.et" {
- coords 170.329 1 138.059
+GenericEntity : "{05E6942F6E616690}Prefabs/Weapons/AutoTurrets/SAM_USSR.et" {
+ coords 13.273 1 12.54
 }
 BON_GuidedProjectile BOBBY_KILLER : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et" {
+ components {
+  MissileMoveComponent "{0EF36690881261EF}" {
+   TimeToLive 15
+  }
+ }
  coords 203.356 7.277 133.027
  angleX 39.953
  angleY -180
  angleZ 180
- m_fRotSpeed 0.01
-}
-$grp TracerProjectile : "{678188455B777E61}Prefabs/Weapons/Ammo/Ammo_127x99_Tracer_M10.et" {
- {
-  coords 232.859 1 131.699
- }
- {
-  components {
-   ShellMoveComponent "{851AA4A2AE0A5691}" {
-    AirDrag 0
-   }
-   RplComponent "{62AABA5911F22C8A}" {
-   }
-  }
-  coords 139.424 1 111.82
- }
+ m_fGuidanceStrength 1.1
 }
 GenericEntity : "{6D7296248186E975}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_US.et" {
  components {
@@ -48,15 +27,22 @@ GenericEntity : "{6D7296248186E975}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CI
    }
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   Enabled 0
-   m_TargetFlags 31
-   m_bDebug 1
+   m_TargetFlags 24
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
    "faction affiliation" "US"
   }
   MeshObject "{62ACAE2F976BB2AB}" {
    Object "{22231BFF749287E1}Assets/Weapons/AutoTurrets/CIWS/CIWS.xob"
+  }
+  PerceivableComponent "{62C90A57DDAC34D4}" {
+   "Additional aim points" {
+    AimPoint "{62C90A57D1A114AF}" {
+     AimPointPosition PointInfo "{62C90A57EBF191BA}" {
+      PivotID "w_barrel"
+     }
+    }
+   }
   }
   RigidBody "{62ACF1D3ED0F7C62}" {
    Gravity 0
@@ -132,59 +118,58 @@ GenericEntity : "{6D7296248186E975}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CI
    }
   }
  }
- coords 187.32 1 147.914
+ coords 212.855 1 178.103
 }
-Vehicle UH1H1 : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
- components {
-  SCR_HelicopterSoundComponent "{5A7CE769E7A9C43E}" {
-   Filenames + {
-    "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
+$grp Vehicle : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
+ UH1H1 {
+  components {
+   SCR_HelicopterSoundComponent "{5A7CE769E7A9C43E}" {
+    Filenames + {
+     "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
+    }
    }
   }
+  coords 9.751 1 243.819
  }
- coords 9.751 1 243.819
+ UH1H2 {
+  components {
+   SCR_HelicopterSoundComponent "{5A7CE769E7A9C43E}" {
+    Filenames + {
+     "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
+    }
+   }
+   VehicleHelicopterSimulation "{51FAEE57F7DA270E}" {
+    Simulation Helicopter "{51FAED9EF37A2D29}" {
+     Engine HelicopterEngine "{51FAED9EF37A2D2B}" {
+      StartUpTime 1
+      ShutdownTime 1
+     }
+    }
+   }
+  }
+  coords 65.125 1 204.642
+ }
+ UH1H3 {
+  components {
+   SCR_HelicopterSoundComponent "{5A7CE769E7A9C43E}" {
+    Filenames + {
+     "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
+    }
+   }
+   VehicleHelicopterSimulation "{51FAEE57F7DA270E}" {
+    Simulation Helicopter "{51FAED9EF37A2D29}" {
+     Engine HelicopterEngine "{51FAED9EF37A2D2B}" {
+      StartUpTime 1
+      ShutdownTime 1
+     }
+    }
+   }
+  }
+  coords 12.055 1 225.008
+ }
 }
-GenericEntity : "{757FCCE8E756175C}Prefabs/Props/Furniture/MeetingTable_01.et" {
- coords 139.864 35.909 125.436
-}
-Projectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3.et" {
- coords 171.197 1 139.111
-}
-SCR_ChimeraCharacter BOBBY : "{84B40583F4D1B7A3}Prefabs/Characters/Factions/INDFOR/FIA/Character_FIA_Rifleman.et" {
- coords 139.511 19.845 162.733
-}
-$grp GenericEntity : "{85C71F17C37D274C}Prefabs/Structures/BuildingParts/Entry/Entry_Block_Platform_01_3x6.et" {
- {
-  coords 139.297 19.845 163.031
- }
- {
-  coords 119.021 8.76 163.031
- }
- {
-  coords 107.787 4.786 132.246
-  angleY 90
- }
- {
-  coords 81.96 15.258 102.385
-  angleY 90
- }
- {
-  coords 173.585 4.62 38.362
- }
- {
-  coords 103.315 22.663 34.673
- }
- {
-  coords 32.045 4.786 252.899
-  angleY 90
- }
- {
-  coords -66.557 183.88 309.549
-  angleY 90
- }
- {
-  coords 32.045 31.626 233.14
-  angleY 90
-  scale 7.8
- }
+GenericEntity : "{85C71F17C37D274C}Prefabs/Structures/BuildingParts/Entry/Entry_Block_Platform_01_3x6.et" {
+ coords 32.045 31.626 233.14
+ angleY 90
+ scale 7.8
 }
