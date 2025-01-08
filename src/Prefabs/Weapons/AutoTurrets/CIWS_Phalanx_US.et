@@ -14,9 +14,8 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    m_sMuzzleParticle "{C6C9B60060A01334}Particles/CIWS_Muzzle.ptc"
    m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
     PivotID "w_barrel"
-    Offset 0.011 0.044 2.4223
+    Offset 0.011 0.044 2.5864
    }
-   m_iAttacksPerProjectile 25
    m_TargetFlags 30
    m_fRotationSpeed 2
    m_fMaxAttackSpeed 0.01
