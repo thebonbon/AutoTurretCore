@@ -189,7 +189,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	void LaunchProjectile(notnull IEntity rocket, vector direction)
+	void LaunchProjectile(notnull IEntity rocket)
 	{
 		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(rocket);
 		if (guidedProjectile)
@@ -207,7 +207,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
 
-		moveComp.Launch(direction, vector.Zero, 1, rocket, GetOwner(), null, null, null);
+		moveComp.Launch(rocket.GetTransformAxis(2), vector.Zero, 1, rocket, GetOwner(), null, null, null);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -325,7 +325,8 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (m_NearestTarget)
 		{
 			SoundComponent soundComp = SoundComponent.Cast(m_NearestTarget.FindComponent(SoundComponent));
-			soundComp.SetSignalValue(soundComp.GetSignalIndex("TrackingState"), 0);
+			if (soundComp)
+				soundComp.SetSignalValue(soundComp.GetSignalIndex("TrackingState"), 0);
 		}
 
 		m_NearestTarget = target;
@@ -337,8 +338,11 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_TargetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
 
 			SoundComponent soundComp = SoundComponent.Cast(target.FindComponent(SoundComponent));
-			soundComp.SetSignalValue(soundComp.GetSignalIndex("TrackingState"), 1);
-			soundComp.SoundEvent("SOUND_TARGET_BEEP");
+			if (soundComp)
+			{
+				soundComp.SetSignalValue(soundComp.GetSignalIndex("TrackingState"), 1);
+				soundComp.SoundEvent("SOUND_TARGET_BEEP");
+			}
 		}
 		else
 		{
@@ -523,7 +527,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!m_bIsProjectileReplicated || Replication.IsServer())
 		{
 			lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
-			LaunchProjectile(lastSpawnedProjectile, direction);
+			LaunchProjectile(lastSpawnedProjectile);
 		}
 
 		SoundComponent soundComponent = SoundComponent.Cast(GetOwner().FindComponent(SoundComponent));
