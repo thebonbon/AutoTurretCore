@@ -1,8 +1,14 @@
 SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
-GenericEntity : "{05E6942F6E616690}Prefabs/Weapons/AutoTurrets/SAM_USSR.et" {
- coords 13.273 1 12.54
+GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
+ components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_TargetFlags 31
+   m_fAttackInaccuracy 0
+  }
+ }
+ coords 199.435 1 166.738
 }
 BON_GuidedProjectile BOBBY_KILLER : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et" {
  components {
@@ -15,110 +21,6 @@ BON_GuidedProjectile BOBBY_KILLER : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Trac
  angleY -180
  angleZ 180
  m_fGuidanceStrength 1.1
-}
-GenericEntity : "{6D7296248186E975}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_US.et" {
- components {
-  SoundComponent "{62ACAE2F976BB3F9}" {
-   SoundPoints {
-    SoundPointInfo Muzzle {
-     PivotID "w_barrel"
-     Offset 0 0 4.6598
-    }
-   }
-  }
-  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_TargetFlags 24
-  }
-  FactionAffiliationComponent "{62ACAE2F976BB213}" {
-   "faction affiliation" "US"
-  }
-  MeshObject "{62ACAE2F976BB2AB}" {
-   Object "{22231BFF749287E1}Assets/Weapons/AutoTurrets/CIWS/CIWS.xob"
-  }
-  PerceivableComponent "{62C90A57DDAC34D4}" {
-   "Additional aim points" {
-    AimPoint "{62C90A57D1A114AF}" {
-     AimPointPosition PointInfo "{62C90A57EBF191BA}" {
-      PivotID "w_barrel"
-     }
-    }
-   }
-  }
-  RigidBody "{62ACF1D3ED0F7C62}" {
-   Gravity 0
-   Static 1
-  }
-  SCR_DestructionMultiPhaseComponent "{62ACF1D12DE6C3BD}" {
-   "Additional hit zones" {
-    SCR_HitZone default {
-     HZDefault 1
-     MaxHealth 5000
-     DamageReduction 40
-     DamageThreshold 8
-     "Melee multiplier" 0.01
-     "Kinetic multiplier" 0.1
-     "Explosive multiplier" 0.7
-     "DamageState threshold" +{
-     }
-    }
-   }
-   CollisionVelocityThreshold 100000
-   "Heavy damage threshold" 200000
-   m_fBaseHealth 8000
-   m_DestroySpawnObjects {
-    SCR_ParticleSpawnable "{62ACFC81DB34B364}" {
-     m_Particle "{33736FDD82DD3405}Particles/Logistics/Explosion/Ammo_Rack/Explosion_Ammo_Rack_Small.ptc"
-    }
-   }
-   m_eMaterialSoundType BREAK_METAL
-  }
-  SCR_EditableEntityComponent "{62B08A24E90BD1E1}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
-   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
-    Name "CIWS Phalanx US"
-    Icon "{4802E7182AFEA3A9}UI/Textures/EditableEntities/AutoTurrets/EditableEntity_AutoTurret_CIWS_Phalanx.edds"
-    m_Image ""
-    m_sFaction "US"
-    m_aAuthoredLabels {
-     1001
-    }
-    m_aAutoLabels {
-     11 1 122
-    }
-   }
-   m_sIconBoneName "w_barrel"
-   m_Flags 773
-  }
-  SCR_PreviewEntityComponent "{62B08A24E935ACDC}" : "{6CADA7A88A6265FD}Prefabs/Editor/Components/PreviewEntityComponentClass.ct" {
-   m_bRuntime 0
-   m_aEntries {
-    SCR_BasePreviewEntry "{62B08A24E935B53A}" {
-     m_iParentID -1
-     m_Mesh "{22231BFF749287E1}Assets/Weapons/AutoTurrets/CIWS/CIWS.xob"
-     m_Flags EDITABLE
-     m_Shape MESH
-     m_iPivotID ""
-     m_vScale 1 1 1
-     m_vPosition 0 0 0
-     m_vAngles 0 0 0
-    }
-   }
-  }
-  AnimationControllerComponent "{62ACAE2F976BB285}" {
-   AnimGraph "{97FB2EE0B4F71FFA}anims/workspaces/AutoTurret/AutoTurretTemplate.agr"
-   AnimInstance "{7A917B3BA8FE4D14}anims/workspaces/AutoTurret/AutoTurretTemplate.asi"
-   AnimVariables {
-    AnimationVariable "{62ACAE2F976BB28D}" {
-     VariableName "BodyRotation"
-     SignalName "BodyRotation"
-    }
-    AnimationVariable "{62ACAE2F976BB28A}" {
-     VariableName "BarrelRotation"
-     SignalName "BarrelRotation"
-    }
-   }
-  }
- }
- coords 212.855 1 178.103
 }
 $grp Vehicle : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
  UH1H1 {

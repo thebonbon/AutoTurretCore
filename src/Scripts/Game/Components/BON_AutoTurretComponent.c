@@ -317,7 +317,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		}
 	}
 
-
 	//------------------------------------------------------------------------------------------------
 	void SetNewTarget(IEntity target)
 	{
