@@ -1,6 +1,5 @@
 //Made by TheBonBon :)
 
-
 [ComponentEditorProps(category: "BON/Turrets", description: "Auto Aiming Turrets without AI Characters")]
 class BON_AutoTurretComponentClass : ScriptComponentClass
 {
@@ -40,8 +39,8 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("", UIWidgets.ResourcePickerThumbnail, "Muzzle particle effect", "ptc", category: "Setup")]
 	protected ResourceName m_sMuzzleParticle;
 
-	[Attribute(desc: "Turret muzzle (Projectile spawn pos)", category: "Setup")]
-	protected ref PointInfo m_ProjectileMuzzle;
+	[Attribute(desc: "Turret muzzles (Projectile spawn pos) E.g one for each barrel", category: "Setup")]
+	protected ref array<ref PointInfo> m_ProjectileMuzzles;
 
 	[Attribute("SOUND_SHOT", UIWidgets.Auto, "", category: "Setup")]
 	string m_sShootSound;
@@ -100,6 +99,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		EVehicleType.SUPPLY_TRUCK
 	};
 
+	protected int m_iCurrentMuzzle;
 	protected float m_fAttackSpeed = 0;
 	bool m_bActive = false;
 
@@ -420,7 +420,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			return false;
 
 		vector muzzleMat[4];
-		m_ProjectileMuzzle.GetTransform(muzzleMat);
+		m_ProjectileMuzzles[m_iCurrentMuzzle].GetTransform(muzzleMat);
 
 		vector targetAimPoint = ent.GetOrigin();
 
@@ -507,7 +507,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	void Fire()
 	{
 		vector mat[4];
-		m_ProjectileMuzzle.GetTransform(mat);
+		m_ProjectileMuzzles[m_iCurrentMuzzle].GetTransform(mat);
 		vector inaccuracyAngles = Vector(
 				s_AIRandomGenerator.RandFloatXY(-m_fAttackInaccuracy, m_fAttackInaccuracy),
 				s_AIRandomGenerator.RandFloatXY(-m_fAttackInaccuracy, m_fAttackInaccuracy),
@@ -537,12 +537,17 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			ParticleEffectEntitySpawnParams params();
 			params.TransformMode = ETransformMode.WORLD;
-			m_ProjectileMuzzle.GetTransform(params.Transform);
+			m_ProjectileMuzzles[m_iCurrentMuzzle].GetTransform(params.Transform);
 			ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_sMuzzleParticle, params);
 		}
 
 		if (m_NearestTarget && m_NearestTarget.FindComponent(MissileMoveComponent) && s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance)
 			TriggerProjectile(m_NearestTarget);
+
+
+		m_iCurrentMuzzle++;
+		if (m_iCurrentMuzzle >= m_ProjectileMuzzles.Count())
+			m_iCurrentMuzzle = 0;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -624,11 +629,11 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
+		foreach (PointInfo muzzle : m_ProjectileMuzzles)
+			muzzle.Init(owner);
+
 		if (!GetGame().InPlayMode())
 			return;
-
-		if (m_ProjectileMuzzle)
-			m_ProjectileMuzzle.Init(owner);
 
 		SetAttackRange(m_iAttackRange);
 
@@ -678,5 +683,16 @@ class BON_AutoTurretComponent : ScriptComponent
 	override void OnDelete(IEntity owner)
 	{
 		DisconnectFromAutoTurretSystem();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	override event void _WB_AfterWorldUpdate(IEntity owner, float timeSlice)
+	{
+		foreach (PointInfo muzzle : m_ProjectileMuzzles)
+		{
+			vector mat[4];
+			muzzle.GetTransform(mat);
+			Shape.CreateSphere(Color.RED, ShapeFlags.ONCE | ShapeFlags.WIREFRAME, mat[3], 0.075);
+		}
 	}
 }
