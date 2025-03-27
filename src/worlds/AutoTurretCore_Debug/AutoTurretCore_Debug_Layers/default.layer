@@ -1,77 +1,12 @@
 SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
-GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
- components {
-  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_TargetFlags 31
-   m_fAttackInaccuracy 0
-  }
- }
- coords 199.435 1 166.738
+GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SAM_USSR.et" {
+ coords 103.134 1 135.514
 }
-BON_GuidedProjectile BOBBY_KILLER : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et" {
- components {
-  MissileMoveComponent "{0EF36690881261EF}" {
-   TimeToLive 15
-  }
- }
- coords 203.356 7.277 133.027
- angleX 39.953
- angleY -180
- angleZ 180
- m_fGuidanceStrength 1.1
+GenericEntity : "{0838D33167666DDA}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_USSR.et" {
+ coords 119.764 1 136.383
 }
-$grp Vehicle : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
- UH1H1 {
-  components {
-   SCR_HelicopterSoundComponent "{5A7CE769E7A9C43E}" {
-    Filenames + {
-     "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
-    }
-   }
-  }
-  coords 9.751 1 243.819
- }
- UH1H2 {
-  components {
-   SCR_HelicopterSoundComponent "{5A7CE769E7A9C43E}" {
-    Filenames + {
-     "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
-    }
-   }
-   VehicleHelicopterSimulation "{51FAEE57F7DA270E}" {
-    Simulation Helicopter "{51FAED9EF37A2D29}" {
-     Engine HelicopterEngine "{51FAED9EF37A2D2B}" {
-      StartUpTime 1
-      ShutdownTime 1
-     }
-    }
-   }
-  }
-  coords 65.125 1 204.642
- }
- UH1H3 {
-  components {
-   SCR_HelicopterSoundComponent "{5A7CE769E7A9C43E}" {
-    Filenames + {
-     "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
-    }
-   }
-   VehicleHelicopterSimulation "{51FAEE57F7DA270E}" {
-    Simulation Helicopter "{51FAED9EF37A2D29}" {
-     Engine HelicopterEngine "{51FAED9EF37A2D2B}" {
-      StartUpTime 1
-      ShutdownTime 1
-     }
-    }
-   }
-  }
-  coords 12.055 1 225.008
- }
-}
-GenericEntity : "{85C71F17C37D274C}Prefabs/Structures/BuildingParts/Entry/Entry_Block_Platform_01_3x6.et" {
- coords 32.045 31.626 233.14
- angleY 90
- scale 7.8
+Vehicle UH1H1 : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
+ coords 100.215 1 124.261
 }
