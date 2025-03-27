@@ -629,6 +629,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
+		if (m_ProjectileMuzzles.IsEmpty())
+			return;
+		
 		foreach (PointInfo muzzle : m_ProjectileMuzzles)
 			muzzle.Init(owner);
 
