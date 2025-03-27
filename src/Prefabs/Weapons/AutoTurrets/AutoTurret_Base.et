@@ -14,8 +14,6 @@ GenericEntity {
    }
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
-   }
    m_sShootSound "SOUND_SHOT"
    m_sBodyBone "w_body"
    m_sBarrelBone "w_barrel"
@@ -29,15 +27,6 @@ GenericEntity {
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
   }
   MeshObject "{62ACAE2F976BB2AB}" {
-  }
-  PerceivableComponent "{62C90A57DDAC34D4}" {
-   "Additional aim points" {
-    AimPoint "{62C90A57D1A114AF}" {
-     AimPointPosition PointInfo "{62C90A57EBF191BA}" {
-     }
-    }
-   }
-   UnitType VehicleUnarmored
   }
   RigidBody "{62ACF1D3ED0F7C62}" {
    ModelGeometry 1
@@ -56,6 +45,15 @@ GenericEntity {
     }
    }
    m_eMaterialSoundType BREAK_METAL
+  }
+  PerceivableComponent "{62C90A57DDAC34D4}" {
+   "Additional aim points" {
+    AimPoint "{62C90A57D1A114AF}" {
+     AimPointPosition PointInfo "{62C90A57EBF191BA}" {
+     }
+    }
+   }
+   UnitType VehicleUnarmored
   }
   AnimationControllerComponent "{62ACAE2F976BB285}" {
    AnimGraph "{97FB2EE0B4F71FFA}anims/workspaces/AutoTurret/AutoTurretTemplate.agr"
