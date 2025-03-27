@@ -41,9 +41,6 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
    AngularSleepingThreashold 1
    ResponseIndex "Normal"
   }
-  RocketTraceEffectComponent "{52CA7A152C8BCB83}" {
-   ParticleEffect "{E8EC50638198AB9B}Particles/Trail_Missle.ptc"
-  }
   ActionsManagerComponent "{50F6614BA1D6E54A}" {
    Enabled 0
   }
