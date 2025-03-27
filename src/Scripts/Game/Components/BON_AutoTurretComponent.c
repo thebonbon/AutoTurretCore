@@ -688,6 +688,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override event void _WB_AfterWorldUpdate(IEntity owner, float timeSlice)
 	{
+		if (!m_bDebug)
+			return;
+		
 		foreach (PointInfo muzzle : m_ProjectileMuzzles)
 		{
 			vector mat[4];
