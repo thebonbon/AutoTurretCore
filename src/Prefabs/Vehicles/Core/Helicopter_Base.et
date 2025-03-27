@@ -1,11 +1,6 @@
 Vehicle : "{4085446E2B406849}Prefabs/Vehicles/Core/Vehicle_Base.et" {
  ID "57DA6675519A417B"
  components {
-  SCR_HelicopterSoundComponent "{5A7CE769E7A9C43E}" {
-   Filenames + {
-    "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
-   }
-  }
   BON_AutoTurretTargetComponent "{62BE947980BCDA5F}" {
    m_TargetFlags AIRCRAFTS
   }
