@@ -1,0 +1,8 @@
+Projectile {
+ ID "5098E3DEA78F878B"
+ components {
+  BON_AutoTurretTargetComponent "{64FB47A52F49D7D7}" {
+   m_TargetFlags PROJECTILES
+  }
+ }
+}
