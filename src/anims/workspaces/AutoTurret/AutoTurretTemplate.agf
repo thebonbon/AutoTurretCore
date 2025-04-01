@@ -38,7 +38,7 @@ AnimSrcGraphFile {
        StartExpr "IsCommand(CMD_SHOOT)"
        BlendInTime 0
        BlendOutTime 0
-       IsReentrant 1
+       EnqueueMethod Ignore
       }
      }
     }

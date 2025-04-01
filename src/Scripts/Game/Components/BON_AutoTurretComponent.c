@@ -222,7 +222,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	void Aim(float timeSlice)
 	{
 		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] Aim: " + m_NearestTarget); 
+			Print("[ATC-DEBUG] Aim - m_NearestTarget: " + m_NearestTarget); 
 		#endif			
 		
 		m_fLerp += timeSlice * m_fRotationSpeed;
@@ -292,7 +292,9 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
 
 		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] Aim: " + m_fLerp); 
+			Print("[ATC-DEBUG] Aim - m_fLerp: " + m_fLerp); 
+			Print("[ATC-DEBUG] Aim - m_iSignalBody: " + m_iSignalBody + " | " + m_fNewBodyYaw); 
+			Print("[ATC-DEBUG] Aim - m_iSignalBarrel: " + m_iSignalBarrel + " | " + m_fNewBarrelPitch); 
 		#endif	
 		
 		if (m_fLerp == 1)
