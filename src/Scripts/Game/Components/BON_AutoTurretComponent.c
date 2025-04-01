@@ -220,10 +220,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	//! Server + Client only
 	void Aim(float timeSlice)
-	{
-		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] Aim - m_NearestTarget: " + m_NearestTarget); 
-		#endif			
+	{		
 		
 		m_fLerp += timeSlice * m_fRotationSpeed;
 		m_fLerp = Math.Clamp(m_fLerp, 0, 1);
@@ -292,9 +289,17 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
 
 		#ifdef BON_ATC_Debug
+			Print("[ATC-DEBUG] --- Aim ---"); 
+			Print("[ATC-DEBUG] Aim - m_NearestTarget: " + m_NearestTarget); 
 			Print("[ATC-DEBUG] Aim - m_fLerp: " + m_fLerp); 
 			Print("[ATC-DEBUG] Aim - m_iSignalBody: " + m_iSignalBody + " | " + m_fNewBodyYaw); 
 			Print("[ATC-DEBUG] Aim - m_iSignalBarrel: " + m_iSignalBarrel + " | " + m_fNewBarrelPitch); 
+			Print("[ATC-DEBUG] Aim - targetDir: " + targetDir); 
+			Print("[ATC-DEBUG] Aim - localTargetDir: " + localTargetDir); 
+			Print("[ATC-DEBUG] Aim - angles: " + angles); 
+			Print("[ATC-DEBUG] Aim - barrelOrigin: " + barrelOrigin); 
+			Print("[ATC-DEBUG] Aim - targetAimPoint: " + targetAimPoint); 
+			Print("[ATC-DEBUG] -----------"); 
 		#endif	
 		
 		if (m_fLerp == 1)
