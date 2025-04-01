@@ -58,16 +58,6 @@ GenericEntity {
   AnimationControllerComponent "{62ACAE2F976BB285}" {
    AnimGraph "{97FB2EE0B4F71FFA}anims/workspaces/AutoTurret/AutoTurretTemplate.agr"
    AnimInstance "{7A917B3BA8FE4D14}anims/workspaces/AutoTurret/AutoTurretTemplate.asi"
-   AnimVariables {
-    AnimationVariable "{62ACAE2F976BB28D}" {
-     VariableName "BodyRotation"
-     SignalName "BodyRotation"
-    }
-    AnimationVariable "{62ACAE2F976BB28A}" {
-     VariableName "BarrelRotation"
-     SignalName "BarrelRotation"
-    }
-   }
   }
   RplComponent "{62ACF1D12BA7808E}" {
   }

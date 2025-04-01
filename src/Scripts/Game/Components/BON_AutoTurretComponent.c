@@ -106,7 +106,6 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	protected IEntity m_LastTarget;
 	protected ref Faction m_Faction;
-	protected SignalsManagerComponent m_SignalsManager;
 	protected AnimationControllerComponent m_AnimationController;
 	protected PerceivableComponent m_TargetPerceivableComp;
 
@@ -220,8 +219,8 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	//! Server + Client only
 	void Aim(float timeSlice)
-	{		
-		
+	{
+
 		m_fLerp += timeSlice * m_fRotationSpeed;
 		m_fLerp = Math.Clamp(m_fLerp, 0, 1);
 
@@ -231,10 +230,10 @@ class BON_AutoTurretComponent : ScriptComponent
 			SetOnTarget(false);
 
 			m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, 0, m_fLerp);
-			m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
+			m_AnimationController.SetFloatVariable(m_iBodyRotationId, m_fNewBodyYaw);
 
 			m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, 0, m_fLerp);
-			m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
+			m_AnimationController.SetFloatVariable(m_iBarrelRotationId, m_fNewBarrelPitch);
 
 			if (m_fLerp == 1)
 			{
@@ -285,23 +284,26 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, -angles[0], m_fLerp);
 		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, angles[1], m_fLerp);
 
-		m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
-		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
+		//m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
+		//m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
+
+		m_AnimationController.SetFloatVariable(m_iBodyRotationId, m_fNewBodyYaw);
+		m_AnimationController.SetFloatVariable(m_iBarrelRotationId, m_fNewBarrelPitch);
 
 		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] --- Aim ---"); 
-			Print("[ATC-DEBUG] Aim - m_NearestTarget: " + m_NearestTarget); 
-			Print("[ATC-DEBUG] Aim - m_fLerp: " + m_fLerp); 
-			Print("[ATC-DEBUG] Aim - m_iSignalBody: " + m_iSignalBody + " | " + m_fNewBodyYaw); 
-			Print("[ATC-DEBUG] Aim - m_iSignalBarrel: " + m_iSignalBarrel + " | " + m_fNewBarrelPitch); 
-			Print("[ATC-DEBUG] Aim - targetDir: " + targetDir); 
-			Print("[ATC-DEBUG] Aim - localTargetDir: " + localTargetDir); 
-			Print("[ATC-DEBUG] Aim - angles: " + angles); 
-			Print("[ATC-DEBUG] Aim - barrelOrigin: " + barrelOrigin); 
-			Print("[ATC-DEBUG] Aim - targetAimPoint: " + targetAimPoint); 
-			Print("[ATC-DEBUG] -----------"); 
-		#endif	
-		
+			Print("[ATC-DEBUG] --- Aim ---");
+			Print("[ATC-DEBUG] Aim - m_NearestTarget: " + m_NearestTarget);
+			Print("[ATC-DEBUG] Aim - m_fLerp: " + m_fLerp);
+			Print("[ATC-DEBUG] Aim - m_iSignalBody: " + m_iSignalBody + " | " + m_fNewBodyYaw);
+			Print("[ATC-DEBUG] Aim - m_iSignalBarrel: " + m_iSignalBarrel + " | " + m_fNewBarrelPitch);
+			Print("[ATC-DEBUG] Aim - targetDir: " + targetDir);
+			Print("[ATC-DEBUG] Aim - localTargetDir: " + localTargetDir);
+			Print("[ATC-DEBUG] Aim - angles: " + angles);
+			Print("[ATC-DEBUG] Aim - barrelOrigin: " + barrelOrigin);
+			Print("[ATC-DEBUG] Aim - targetAimPoint: " + targetAimPoint);
+			Print("[ATC-DEBUG] -----------");
+		#endif
+
 		if (m_fLerp == 1)
 		{
 			SetOnTarget(true);
@@ -315,9 +317,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Checks a single target in valid target list
 	void CheckNextTarget()
 	{
-		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] CheckNextTarget()"); 
-		#endif
 		if (m_iCurrentTargetIndex >= m_iTargetCount)
 		{
 			m_iCurrentTargetIndex = 0;
@@ -381,10 +380,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Has to be alive + faction enemy + in target filter + in attack range
 	void GetValidTargets()
 	{
-		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] GetValidTargets()"); 
-		#endif
-		
 		m_aValidTargets.Clear();
 
 		array<IEntity> allTargets = {};
@@ -411,9 +406,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void AddNewTarget(IEntity ent, float distance)
 	{
-		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] AddNewTarget: " + ent + " | " + distance); 
-		#endif
 		BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(ent, distance);
 		bool inserted;
 
@@ -442,10 +434,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool LineOfSightCheck(IEntity ent)
 	{
-		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] LineOfSightCheck: " + ent); 
-		#endif
-		
 		if (!ent)
 			return false;
 
@@ -479,10 +467,6 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_LoSDebug = Shape.CreateArrow(muzzleMat[3], position, 0.1, COLOR_GREEN, ShapeFlags.NOZBUFFER);
 		}
 
-		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] LineOfSightCheck - traceDistance: " + traceDistance); 
-		#endif		
-		
 		return (traceDistance == 1 || param.TraceEnt == ent);
 	}
 
@@ -578,7 +562,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (m_NearestTarget && m_NearestTarget.FindComponent(MissileMoveComponent) && s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance)
 			TriggerProjectile(m_NearestTarget);
 
-
 		m_iCurrentMuzzle++;
 		if (m_iCurrentMuzzle >= m_ProjectileMuzzles.Count())
 			m_iCurrentMuzzle = 0;
@@ -660,17 +643,19 @@ class BON_AutoTurretComponent : ScriptComponent
 			system.Unregister(this);
 	}
 
+	int m_iBodyRotationId;
+	int m_iBarrelRotationId;
+
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
-		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] m_ProjectileMuzzles: " + m_ProjectileMuzzles.Count()); 
-		#endif
 		if (m_ProjectileMuzzles.IsEmpty())
 			return;
-		
+
 		foreach (PointInfo muzzle : m_ProjectileMuzzles)
+		{
 			muzzle.Init(owner);
+		}
 
 		if (!GetGame().InPlayMode())
 			return;
@@ -682,10 +667,8 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		m_AnimationController = AnimationControllerComponent.Cast(owner.FindComponent(AnimationControllerComponent));
 		m_iShootCmd = m_AnimationController.BindCommand("CMD_SHOOT");
-
-		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
-		m_iSignalBody = m_SignalsManager.AddOrFindSignal("BodyRotation", 0);
-		m_iSignalBarrel = m_SignalsManager.AddOrFindSignal("BarrelRotation", 0);
+		m_iBodyRotationId = m_AnimationController.BindFloatVariable("BodyRotation");
+		m_iBarrelRotationId = m_AnimationController.BindFloatVariable("BarrelRotation");
 
 		m_iBarrelBoneIndex = GetOwner().GetAnimation().GetBoneIndex(m_sBarrelBone);
 
@@ -699,10 +682,6 @@ class BON_AutoTurretComponent : ScriptComponent
 				m_bIsProjectileReplicated = (rplCompBase != null);
 				BaseContainer shellMoveComp = SCR_BaseContainerTools.FindComponentSource(m_ProjectileResource, ProjectileMoveComponent);
 				shellMoveComp.Get("InitSpeed", m_fProjectileSpeed);
-				
-				#ifdef BON_ATC_Debug
-					Print("[ATC-DEBUG] m_fProjectileSpeed: " + m_fProjectileSpeed); 
-				#endif
 			}
 		}
 
@@ -734,7 +713,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		if (!m_bDebug)
 			return;
-		
+
 		foreach (PointInfo muzzle : m_ProjectileMuzzles)
 		{
 			vector mat[4];
