@@ -55,9 +55,21 @@ GenericEntity {
    }
    UnitType VehicleUnarmored
   }
-  AnimationControllerComponent "{62ACAE2F976BB285}" {
+  BaseItemAnimationComponent "{62ACAE2F976BB285}" {
    AnimGraph "{97FB2EE0B4F71FFA}anims/workspaces/AutoTurret/AutoTurretTemplate.agr"
    AnimInstance "{7A917B3BA8FE4D14}anims/workspaces/AutoTurret/AutoTurretTemplate.asi"
+   AnimVariables {
+    AnimationVariable "{6503501730FBE87A}" {
+     VariableName "BodyRotation"
+     SignalName "BodyRotation"
+    }
+    AnimationVariable "{6503501733834966}" {
+     VariableName "BarrelRotation"
+     SignalName "BarrelRotation"
+    }
+   }
+   AlwaysActive 1
+   AutoVariablesBind 1
   }
   RplComponent "{62ACF1D12BA7808E}" {
   }

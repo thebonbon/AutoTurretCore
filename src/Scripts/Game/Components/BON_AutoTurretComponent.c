@@ -107,6 +107,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected ref Faction m_Faction;
 	protected AnimationControllerComponent m_AnimationController;
 	protected PerceivableComponent m_TargetPerceivableComp;
+	protected SignalsManagerComponent m_SignalsManager;
 
 	ref Resource m_ProjectileResource;
 	protected IEntitySource m_ProjectileSource;
@@ -228,11 +229,12 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			SetOnTarget(false);
 
-			m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, 0, m_fLerp);
-			m_AnimationController.SetFloatVariable(m_iBodyRotationId, m_fNewBodyYaw);
-
+			m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, 0, m_fLerp);			
 			m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, 0, m_fLerp);
-			m_AnimationController.SetFloatVariable(m_iBarrelRotationId, m_fNewBarrelPitch);
+			
+			m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
+			m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
+			
 
 			if (m_fLerp == 1)
 			{
@@ -283,8 +285,8 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, -angles[0], m_fLerp);
 		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, angles[1], m_fLerp);
 
-		m_AnimationController.SetFloatVariable(m_iBodyRotationId, m_fNewBodyYaw);
-		m_AnimationController.SetFloatVariable(m_iBarrelRotationId, m_fNewBarrelPitch);
+		m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
+		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
 
 		if (m_fLerp == 1)
 		{
@@ -625,9 +627,6 @@ class BON_AutoTurretComponent : ScriptComponent
 			system.Unregister(this);
 	}
 
-	int m_iBodyRotationId;
-	int m_iBarrelRotationId;
-
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
@@ -647,10 +646,12 @@ class BON_AutoTurretComponent : ScriptComponent
 		FactionAffiliationComponent factionAffiliation = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 		m_Faction = factionAffiliation.GetAffiliatedFaction();
 
-		m_AnimationController = AnimationControllerComponent.Cast(owner.FindComponent(AnimationControllerComponent));
+		m_AnimationController = BaseItemAnimationComponent.Cast(owner.FindComponent(BaseItemAnimationComponent));
 		m_iShootCmd = m_AnimationController.BindCommand("CMD_SHOOT");
-		m_iBodyRotationId = m_AnimationController.BindFloatVariable("BodyRotation");
-		m_iBarrelRotationId = m_AnimationController.BindFloatVariable("BarrelRotation");
+		
+		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
+		m_iSignalBody = m_SignalsManager.AddOrFindSignal("BodyRotation", 0);
+		m_iSignalBarrel = m_SignalsManager.AddOrFindSignal("BarrelRotation", 0);
 
 		m_iBarrelBoneIndex = GetOwner().GetAnimation().GetBoneIndex(m_sBarrelBone);
 
