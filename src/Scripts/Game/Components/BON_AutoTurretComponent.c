@@ -1,5 +1,4 @@
 //Made by TheBonBon :)
-//Use "-scrDefine BON_ATC_Debug" as startup parameter to debug ingame
 
 [ComponentEditorProps(category: "BON/Turrets", description: "Auto Aiming Turrets without AI Characters")]
 class BON_AutoTurretComponentClass : ScriptComponentClass
@@ -284,25 +283,8 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, -angles[0], m_fLerp);
 		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, angles[1], m_fLerp);
 
-		//m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
-		//m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
-
 		m_AnimationController.SetFloatVariable(m_iBodyRotationId, m_fNewBodyYaw);
 		m_AnimationController.SetFloatVariable(m_iBarrelRotationId, m_fNewBarrelPitch);
-
-		#ifdef BON_ATC_Debug
-			Print("[ATC-DEBUG] --- Aim ---");
-			Print("[ATC-DEBUG] Aim - m_NearestTarget: " + m_NearestTarget);
-			Print("[ATC-DEBUG] Aim - m_fLerp: " + m_fLerp);
-			Print("[ATC-DEBUG] Aim - m_iSignalBody: " + m_iSignalBody + " | " + m_fNewBodyYaw);
-			Print("[ATC-DEBUG] Aim - m_iSignalBarrel: " + m_iSignalBarrel + " | " + m_fNewBarrelPitch);
-			Print("[ATC-DEBUG] Aim - targetDir: " + targetDir);
-			Print("[ATC-DEBUG] Aim - localTargetDir: " + localTargetDir);
-			Print("[ATC-DEBUG] Aim - angles: " + angles);
-			Print("[ATC-DEBUG] Aim - barrelOrigin: " + barrelOrigin);
-			Print("[ATC-DEBUG] Aim - targetAimPoint: " + targetAimPoint);
-			Print("[ATC-DEBUG] -----------");
-		#endif
 
 		if (m_fLerp == 1)
 		{
