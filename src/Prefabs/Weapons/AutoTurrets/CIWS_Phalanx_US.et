@@ -5,7 +5,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    SoundPoints {
     SoundPointInfo Muzzle {
      PivotID "w_barrel"
-     Offset 0 0 4.6598
+     Offset 0 0 2.5
     }
    }
   }
@@ -30,15 +30,6 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
   MeshObject "{62ACAE2F976BB2AB}" {
    Object "{22231BFF749287E1}Assets/Weapons/AutoTurrets/CIWS/CIWS.xob"
   }
-  PerceivableComponent "{62C90A57DDAC34D4}" {
-   "Additional aim points" {
-    AimPoint "{62C90A57D1A114AF}" {
-     AimPointPosition PointInfo "{62C90A57EBF191BA}" {
-      PivotID "w_barrel"
-     }
-    }
-   }
-  }
   RigidBody "{62ACF1D3ED0F7C62}" {
    Gravity 0
    Static 1
@@ -62,6 +53,15 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    "Heavy damage threshold" 200000
    m_fBaseHealth 8000
    m_eMaterialSoundType BREAK_METAL
+  }
+  PerceivableComponent "{62C90A57DDAC34D4}" {
+   "Additional aim points" {
+    AimPoint "{62C90A57D1A114AF}" {
+     AimPointPosition PointInfo "{62C90A57EBF191BA}" {
+      PivotID "w_barrel"
+     }
+    }
+   }
   }
  }
  coords 135.251 1 129.893
