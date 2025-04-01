@@ -1,4 +1,5 @@
 //Made by TheBonBon :)
+//Use "-scrDefine BON_ATC_Debug" as startup parameter to debug ingame
 
 [ComponentEditorProps(category: "BON/Turrets", description: "Auto Aiming Turrets without AI Characters")]
 class BON_AutoTurretComponentClass : ScriptComponentClass
@@ -220,6 +221,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Server + Client only
 	void Aim(float timeSlice)
 	{
+		#ifdef BON_ATC_Debug
+			Print("[ATC-DEBUG] Aim: " + m_NearestTarget); 
+		#endif			
+		
 		m_fLerp += timeSlice * m_fRotationSpeed;
 		m_fLerp = Math.Clamp(m_fLerp, 0, 1);
 
@@ -286,6 +291,10 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
 
+		#ifdef BON_ATC_Debug
+			Print("[ATC-DEBUG] Aim: " + m_fLerp); 
+		#endif	
+		
 		if (m_fLerp == 1)
 		{
 			SetOnTarget(true);
@@ -299,6 +308,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Checks a single target in valid target list
 	void CheckNextTarget()
 	{
+		#ifdef BON_ATC_Debug
+			Print("[ATC-DEBUG] CheckNextTarget()"); 
+		#endif
 		if (m_iCurrentTargetIndex >= m_iTargetCount)
 		{
 			m_iCurrentTargetIndex = 0;
@@ -362,6 +374,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Has to be alive + faction enemy + in target filter + in attack range
 	void GetValidTargets()
 	{
+		#ifdef BON_ATC_Debug
+			Print("[ATC-DEBUG] GetValidTargets()"); 
+		#endif
+		
 		m_aValidTargets.Clear();
 
 		array<IEntity> allTargets = {};
@@ -388,6 +404,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void AddNewTarget(IEntity ent, float distance)
 	{
+		#ifdef BON_ATC_Debug
+			Print("[ATC-DEBUG] AddNewTarget: " + ent + " | " + distance); 
+		#endif
 		BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(ent, distance);
 		bool inserted;
 
@@ -416,6 +435,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool LineOfSightCheck(IEntity ent)
 	{
+		#ifdef BON_ATC_Debug
+			Print("[ATC-DEBUG] LineOfSightCheck: " + ent); 
+		#endif
+		
 		if (!ent)
 			return false;
 
@@ -449,6 +472,10 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_LoSDebug = Shape.CreateArrow(muzzleMat[3], position, 0.1, COLOR_GREEN, ShapeFlags.NOZBUFFER);
 		}
 
+		#ifdef BON_ATC_Debug
+			Print("[ATC-DEBUG] LineOfSightCheck - traceDistance: " + traceDistance); 
+		#endif		
+		
 		return (traceDistance == 1 || param.TraceEnt == ent);
 	}
 
@@ -629,6 +656,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
+		#ifdef BON_ATC_Debug
+			Print("[ATC-DEBUG] m_ProjectileMuzzles: " + m_ProjectileMuzzles.Count()); 
+		#endif
 		if (m_ProjectileMuzzles.IsEmpty())
 			return;
 		
@@ -662,6 +692,10 @@ class BON_AutoTurretComponent : ScriptComponent
 				m_bIsProjectileReplicated = (rplCompBase != null);
 				BaseContainer shellMoveComp = SCR_BaseContainerTools.FindComponentSource(m_ProjectileResource, ProjectileMoveComponent);
 				shellMoveComp.Get("InitSpeed", m_fProjectileSpeed);
+				
+				#ifdef BON_ATC_Debug
+					Print("[ATC-DEBUG] m_fProjectileSpeed: " + m_fProjectileSpeed); 
+				#endif
 			}
 		}
 
