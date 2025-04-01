@@ -15,7 +15,6 @@ class BON_GuidedProjectile : Projectile
 	RplId m_iTrackedTargetId;
 
 	IEntity m_TrackedTarget;
-	Physics m_Rb;
 	vector m_vAimOffset;
 	vector m_vLastDirToTarget;
 	
@@ -40,8 +39,8 @@ class BON_GuidedProjectile : Projectile
 		vector dirChangeRate = (dirToTarget - m_vLastDirToTarget) / timeSlice;
 		vector angularVelocity = Cross(dirToTarget, dirChangeRate);
 
-		m_Rb.SetVelocity(localFwd * m_fMoveSpeed);
-		m_Rb.SetAngularVelocity(angularVelocity * m_fGuidanceStrength);
+		GetPhysics().SetVelocity(localFwd * m_fMoveSpeed);
+		GetPhysics().SetAngularVelocity(angularVelocity * m_fGuidanceStrength);
 
 		m_vLastDirToTarget = dirToTarget;
 	}
@@ -83,7 +82,7 @@ class BON_GuidedProjectile : Projectile
 	void Launch(IEntity target)
 	{
 		m_TrackedTarget = target;
-		m_Rb.SetActive(ActiveState.ACTIVE);
+		GetPhysics().SetActive(ActiveState.ACTIVE);
 
 		PerceivableComponent targetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
 
@@ -100,20 +99,5 @@ class BON_GuidedProjectile : Projectile
 		m_vLastDirToTarget.Normalize();
 
 		SetEventMask(EntityEvent.FRAME);
-	}
-
-	//------------------------------------------------------------------------------------------------
-	override protected void EOnInit(IEntity owner)
-	{
-		if (!GetGame().InPlayMode())
-			return;
-
-		m_Rb = GetPhysics();
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void BON_GuidedProjectile(IEntitySource src, IEntity parent)
-	{
-		SetEventMask(EntityEvent.INIT);
 	}
 }
