@@ -502,7 +502,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		BaseTriggerComponent trigger = BaseTriggerComponent.Cast(projectile.FindComponent(BaseTriggerComponent));
 		trigger.SetLive();
-		trigger.OnUserTrigger(projectile);
+		trigger.OnUserTriggerOverrideInstigator(projectile, Instigator.CreateInstigator(GetOwner()));
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -542,8 +542,8 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_ProjectileMuzzles[m_iCurrentMuzzle].GetTransform(params.Transform);
 			ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_sMuzzleParticle, params);
 		}
-
-		if (m_NearestTarget && m_NearestTarget.FindComponent(MissileMoveComponent) && s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance)
+		
+		if (m_NearestTarget && m_NearestTarget.FindComponent(BaseTriggerComponent) && s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance)
 			TriggerProjectile(m_NearestTarget);
 
 		m_iCurrentMuzzle++;
