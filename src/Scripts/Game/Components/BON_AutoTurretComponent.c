@@ -10,7 +10,6 @@ class BON_AutoTurretComponentClass : ScriptComponentClass
 
 		requires.Insert(FactionAffiliationComponent);
 		requires.Insert(SignalsManagerComponent);
-		requires.Insert(AnimationControllerComponent);
 
 		return requires;
 	}
