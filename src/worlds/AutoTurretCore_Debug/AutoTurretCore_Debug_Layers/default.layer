@@ -1,8 +1,14 @@
 SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
-GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SAM_USSR.et" {
- coords 103.134 1 135.514
+GenericEntity : "{3B3574CAEA4AEAED}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_USSR.et" {
+ components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_TargetFlags 18
+   m_bDebug 1
+  }
+ }
+ coords 98.529 1 126.092
 }
 Vehicle UH1H1 : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
  coords 69.777 1 101.022

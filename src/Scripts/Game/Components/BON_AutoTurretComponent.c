@@ -62,6 +62,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
 	BON_TurretTargetFilterFlags m_TargetFlags;
 
+	[Attribute("0", UIWidgets.CheckBox, "Trigger projectile near target?", category: "Setup")]
+	bool m_bTriggerOnTarget;
+
 	[Attribute("1", UIWidgets.CheckBox, "Enable turret on spawn?", category: "Aiming")]
 	bool m_bActiveOnSpawn;
 
@@ -190,6 +193,15 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void LaunchProjectile(notnull IEntity rocket)
 	{
+		if (m_bTriggerOnTarget)
+		{
+			float timeToTarget;
+			float targetDistance = vector.Distance(GetOwner().GetOrigin(), m_NearestTarget.GetOrigin());
+			BallisticTable.GetHeightFromProjectile(targetDistance, timeToTarget, rocket);
+			timeToTarget += s_AIRandomGenerator.RandFloatXY(-0.2, 0.2);
+			GetGame().GetCallqueue().CallLater(TriggerProjectile, timeToTarget * 1000, false, rocket); //SetTimer on TimerTriggerComponent does not work :(
+		}
+
 		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(rocket);
 		if (guidedProjectile)
 		{
@@ -204,7 +216,8 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!moveComp)
 			return;
 
-		m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
+		if (m_AnimationController)
+			m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
 
 		moveComp.Launch(rocket.GetTransformAxis(2), vector.Zero, 1, rocket, GetOwner(), null, null, null);
 	}
@@ -219,7 +232,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Server + Client only
 	void Aim(float timeSlice)
 	{
-
 		m_fLerp += timeSlice * m_fRotationSpeed;
 		m_fLerp = Math.Clamp(m_fLerp, 0, 1);
 
@@ -228,12 +240,12 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			SetOnTarget(false);
 
-			m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, 0, m_fLerp);			
+			m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, 0, m_fLerp);
 			m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, 0, m_fLerp);
-			
+
 			m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
 			m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
-			
+
 
 			if (m_fLerp == 1)
 			{
@@ -261,7 +273,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		//Add Leading
 		float targetDistance = vector.Distance(barrelOrigin, targetAimPoint);
-		if (m_bLeading && m_NearestTarget.GetPhysics())
+		if (m_bLeading && m_fProjectileSpeed != -1 && m_NearestTarget.GetPhysics())
 		{
 			float timeToTarget = targetDistance / m_fProjectileSpeed;
 			targetAimPoint += m_NearestTarget.GetPhysics().GetVelocity() * timeToTarget;
@@ -523,10 +535,9 @@ class BON_AutoTurretComponent : ScriptComponent
 		spawnParams.TransformMode = ETransformMode.WORLD;
 		spawnParams.Transform = mat;
 
-		IEntity lastSpawnedProjectile;
 		if (!m_bIsProjectileReplicated || Replication.IsServer())
 		{
-			lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
+			IEntity lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
 			LaunchProjectile(lastSpawnedProjectile);
 		}
 
@@ -541,7 +552,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_ProjectileMuzzles[m_iCurrentMuzzle].GetTransform(params.Transform);
 			ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_sMuzzleParticle, params);
 		}
-		
+
 		if (m_NearestTarget && m_NearestTarget.FindComponent(BaseTriggerComponent) && s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance)
 			TriggerProjectile(m_NearestTarget);
 
@@ -647,7 +658,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		m_AnimationController = BaseItemAnimationComponent.Cast(owner.FindComponent(BaseItemAnimationComponent));
 		m_iShootCmd = m_AnimationController.BindCommand("CMD_SHOOT");
-		
+
 		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
 		m_iSignalBody = m_SignalsManager.AddOrFindSignal("BodyRotation", 0);
 		m_iSignalBarrel = m_SignalsManager.AddOrFindSignal("BarrelRotation", 0);
@@ -662,8 +673,8 @@ class BON_AutoTurretComponent : ScriptComponent
 				m_ProjectileSource = SCR_BaseContainerTools.FindEntitySource(m_ProjectileResource);
 				BaseContainer rplCompBase = SCR_BaseContainerTools.FindComponentSource(m_ProjectileResource, RplComponent);
 				m_bIsProjectileReplicated = (rplCompBase != null);
-				BaseContainer shellMoveComp = SCR_BaseContainerTools.FindComponentSource(m_ProjectileResource, ProjectileMoveComponent);
-				shellMoveComp.Get("InitSpeed", m_fProjectileSpeed);
+				BaseContainer projectileMoveComp = SCR_BaseContainerTools.FindComponentSource(m_ProjectileResource, ProjectileMoveComponent);
+				projectileMoveComp.Get("InitSpeed", m_fProjectileSpeed);
 			}
 		}
 
