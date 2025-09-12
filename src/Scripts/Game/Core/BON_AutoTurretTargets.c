@@ -1,19 +1,3 @@
-class BON_AutoTurretTargets
-{	
-	static ref array<IEntity> s_aTargetCharacters = {};
-	static ref array<IEntity> s_aTargetVehicles = {};
-	static ref array<IEntity> s_aTargetAircrafts = {};
-	static ref array<IEntity> s_aTargetProjectiles = {};
-}
-
-enum BON_TurretTargetFilterFlags
-{
-	CHARACTERS = 1 << 0,
-	VEHICLES = 1 << 1,
-	AIRCRAFTS = 1 << 2,
-	PROJECTILES = 1 << 3,
-}
-
 class BON_AutoTurretTarget
 {
 	IEntity m_Ent;
@@ -24,5 +8,48 @@ class BON_AutoTurretTarget
 	{
 		m_Ent = ent;
 		m_fDistance = distance;
+	}
+}
+
+class BON_AutoTurretGridMap : PointGridMap
+{
+	//------------------------------------------------------------------------------------------------
+	//! Finds all target in range and sorts by ascending distance. (Smaller first)
+	int FindSortedTargetsInRage(out notnull array<ref BON_AutoTurretTarget> sortedEntities, vector origin, float range, int mask = 0)
+	{
+		//Find all in range
+		GetGame().GetAutoTurretGrid().Update();
+		array<IEntity> entities = {};
+		int targetCount = GetGame().GetAutoTurretGrid().FindEntitiesInRange(entities, origin, range, mask);
+
+		//Sort by distance
+		foreach (IEntity target : entities)
+		{
+			float distance = vector.DistanceSq(origin, target.GetOrigin());
+			BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(target, distance);
+
+			//First entry
+			if (sortedEntities.IsEmpty())
+			{
+				sortedEntities.Insert(newTarget);
+				continue;
+			}
+
+			//Insert before
+			bool inserted = false;
+			foreach (int i, BON_AutoTurretTarget oldTarget : sortedEntities)
+			{
+				if (distance < oldTarget.m_fDistance)
+				{
+					sortedEntities.InsertAt(newTarget, i);
+					inserted = true;
+					break;
+				}
+			}
+			//Insert last
+			if (!inserted)
+				sortedEntities.Insert(newTarget);
+		}
+		return targetCount;
 	}
 }

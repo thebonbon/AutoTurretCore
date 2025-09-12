@@ -22,7 +22,7 @@ GenericEntity {
    m_fAttackInaccuracy 0
   }
   BON_AutoTurretTargetComponent "{62C91C0D0A7CBA50}" {
-   m_TargetFlags VEHICLES
+   m_TargetFlags 5
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
   }

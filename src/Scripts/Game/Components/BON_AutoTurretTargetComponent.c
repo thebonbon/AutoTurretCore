@@ -1,66 +1,58 @@
+enum BON_TurretTargetFilterFlags
+{
+	CHARACTERS = 1 << 1,
+	VEHICLES = 1 << 2,
+	AIRCRAFTS = 1 << 3,
+	PROJECTILES = 1 << 4,
+}
+
 [ComponentEditorProps(category: "GameScripted/Misc", description: "")]
 class BON_AutoTurretTargetComponentClass : ScriptComponentClass
-{
+{	
 }
 
 class BON_AutoTurretTargetComponent : ScriptComponent
 {
-	[Attribute(uiwidget: UIWidgets.ComboBox, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
+	[Attribute("0", UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
 	BON_TurretTargetFilterFlags m_TargetFlags;
-	
+		
 	//------------------------------------------------------------------------------------------------
 	override void EOnPhysicsActive(IEntity owner, bool activeState)
 	{
-		if (m_TargetFlags != BON_TurretTargetFilterFlags.PROJECTILES)
-			return;
-		
-		if (activeState)
-			BON_AutoTurretTargets.s_aTargetProjectiles.Insert(GetOwner());
-		else
-			BON_AutoTurretTargets.s_aTargetProjectiles.RemoveItem(GetOwner());
+		if (m_TargetFlags == BON_TurretTargetFilterFlags.PROJECTILES)
+			GetGame().GetAutoTurretGrid().Insert(owner, true, m_TargetFlags);
 	}
 	
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
-		switch (m_TargetFlags)
-		{
-			case BON_TurretTargetFilterFlags.VEHICLES:
-				BON_AutoTurretTargets.s_aTargetVehicles.Insert(owner);
-				break;
-			case BON_TurretTargetFilterFlags.AIRCRAFTS:
-				BON_AutoTurretTargets.s_aTargetAircrafts.Insert(owner);
-				break;
-			case BON_TurretTargetFilterFlags.CHARACTERS:
-				BON_AutoTurretTargets.s_aTargetCharacters.Insert(owner);
-				break;
-		}
-		
-		SoundComponent soundComp = SoundComponent.Cast(owner.FindComponent(SoundComponent));
-		if (soundComp)
-			soundComp.SoundEvent("SOUND_TARGET_BEEP");
+		GetGame().GetAutoTurretGrid().Insert(owner, true, m_TargetFlags);
 	}
 
 	//------------------------------------------------------------------------------------------------
 	override void OnPostInit(IEntity owner)
 	{
-		SetEventMask(owner, EntityEvent.INIT | EntityEvent.PHYSICSACTIVE);
+		SetEventMask(owner, EntityEvent.INIT);
 	}
-
+	
 	//------------------------------------------------------------------------------------------------
-	override void OnDelete(IEntity owner)
+	//! On Death remove self as target
+	override void EOnDeactivate(IEntity owner)
 	{
-		switch (m_TargetFlags)
-		{
-			case BON_TurretTargetFilterFlags.VEHICLES:
-				BON_AutoTurretTargets.s_aTargetVehicles.RemoveItem(owner);
-				break;
-			case BON_TurretTargetFilterFlags.AIRCRAFTS:
-				BON_AutoTurretTargets.s_aTargetAircrafts.RemoveItem(owner);
-				break;
-			case BON_TurretTargetFilterFlags.CHARACTERS:
-				BON_AutoTurretTargets.s_aTargetCharacters.RemoveItem(owner);
-				break;
-		}
+		GetGame().GetAutoTurretGrid().Remove(owner);
+	}
+}
+
+modded class ArmaReforgerScripted
+{
+	protected ref BON_AutoTurretGridMap m_AutoTurretGridMap;	
+	
+	//------------------------------------------------------------------------------------------------
+	BON_AutoTurretGridMap GetAutoTurretGrid()
+	{
+		if (!m_AutoTurretGridMap)
+			m_AutoTurretGridMap = new BON_AutoTurretGridMap();
+		
+		return m_AutoTurretGridMap;
 	}
 }
