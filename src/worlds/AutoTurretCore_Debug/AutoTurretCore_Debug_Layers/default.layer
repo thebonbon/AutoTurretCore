@@ -1,15 +1,32 @@
 SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
-GenericEntity : "{3B3574CAEA4AEAED}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_USSR.et" {
+Vehicle BOB : "{039615384D5685B3}Prefabs/MP/CombatOps/Vehicles/Cinematic_Flying_Mi8.et" {
+ components {
+  SCR_HelicopterCinematicFlyComponent "{665C8BD859E6EDAD}" {
+   m_fInitialForceMultiplier 50
+  }
+ }
+ coords -1112.472 0 794.996
+ angleY 93.776
+ EOnInit ""\
+ "		/* code here */"\
+ "	"
+}
+GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
  components {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_TargetFlags 18
+   m_TargetFlags 14
+   m_fMaxAttackSpeed 5
+   m_iAttackRange 5000
    m_bDebug 1
   }
  }
- coords 98.529 1 126.092
+ coords 383.768 0 -513.992
 }
-Vehicle UH1H1 : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
- coords 69.777 1 101.022
+GenericEntity : "{4B57C11AA5161760}Prefabs/Characters/Vests/Vest_PASGT/Vest_PASGT.et" {
+ coords 190.053 1 225.023
+}
+BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et" {
+ coords 76.455 1 92.7
 }

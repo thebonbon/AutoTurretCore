@@ -32,17 +32,38 @@ class BON_GuidedProjectile : Projectile
 	//------------------------------------------------------------------------------------------------
 	void SteerToTarget(float timeSlice)
 	{
-		vector localFwd = GetTransformAxis(2).Normalized();
-		vector dirToTarget = m_TrackedTarget.CoordToParent(m_vAimOffset) - GetOrigin();
+		vector missilePos = GetOrigin();
+		
+		vector targetPos = m_TrackedTarget.GetOrigin();
+		vector targetVel = m_TrackedTarget.GetPhysics().GetVelocity();
+		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
+		
+		if (targetDistance < 1)
+		{
+			BaseTriggerComponent triggerComp = BaseTriggerComponent.Cast(FindComponent(BaseTriggerComponent));
+			triggerComp.OnUserTrigger(this);
+		}
+		
+		float timeToTarget = targetDistance / m_fMoveSpeed;
+		
+		vector futureTargetPos = targetPos + targetVel * timeToTarget;
+		Shape.CreateSphere(COLOR_GREEN, ShapeFlags.ONCE | ShapeFlags.NOZWRITE, futureTargetPos, 0.5);
+		
+		vector dirToTarget = futureTargetPos - missilePos;
 		dirToTarget.Normalize();
-
-		vector dirChangeRate = (dirToTarget - m_vLastDirToTarget) / timeSlice;
-		vector angularVelocity = Cross(dirToTarget, dirChangeRate);
-
+		
+		vector localFwd = GetTransformAxis(2).Normalized();
+		
+		vector axis = Cross(localFwd, dirToTarget);
+		float dot = vector.Dot(localFwd, dirToTarget);
+		dot = Math.Clamp(dot, -1.0, 1.0);
+		float angleRad = Math.Acos(dot);
+		
+		vector angularVel = axis * angleRad * 100;
+		
 		GetPhysics().SetVelocity(localFwd * m_fMoveSpeed);
-		GetPhysics().SetAngularVelocity(angularVelocity * m_fGuidanceStrength);
+		GetPhysics().SetAngularVelocity(angularVel);
 
-		m_vLastDirToTarget = dirToTarget;
 	}
 
 	//------------------------------------------------------------------------------------------------

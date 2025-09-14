@@ -47,6 +47,6 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
  }
  coords 194.965 2.163 161.241
  ProjectileModel "{63A314D8B7899DBA}Assets/Weapons/Magazines/Missile_KR/Missile_KR.xob"
- m_fMoveSpeed 230
+ m_fMoveSpeed 80
  m_fGuidanceStrength 1.2
 }
