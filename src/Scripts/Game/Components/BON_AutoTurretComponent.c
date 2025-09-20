@@ -6,6 +6,13 @@ enum BON_ProjectileType
 	Shell		
 }
 
+enum BON_TurretFireMode
+{
+	Direct,
+	Guided,
+	Intercept	
+}
+
 [ComponentEditorProps(category: "BON/Turrets", description: "Auto Aiming Turrets without AI Characters")]
 class BON_AutoTurretComponentClass : ScriptComponentClass
 {
@@ -67,7 +74,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected vector m_vLimitVertical;
 
 	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
-	BON_TurretTargetFilterFlags m_TargetFlags;
+	BON_TurretTargetFilterFlags m_eTargetFlags;
 
 	[Attribute("0", UIWidgets.CheckBox, "Trigger projectile near target?", category: "Setup")]
 	bool m_bTriggerOnTarget;
@@ -87,12 +94,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Aiming")]
 	float m_fAttackInaccuracy;
 
-	[Attribute("1", UIWidgets.CheckBox, "Enable leading? (Shooting in front of the target to account for velocity)", category: "Aiming")]
-	bool m_bLeading;
-
-	[Attribute("1", UIWidgets.CheckBox, "Enable ballistics offset? (Shooting above the target to account for projectile ballistics)", category: "Aiming")]
-	bool m_bBallistics;
-
+	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | Guided: Follow the target (missiles only!) | Intercept: Lead the target to intercept at predicted position", enums: ParamEnumArray.FromEnum(BON_TurretFireMode), category: "Aiming")]
+	BON_TurretFireMode m_eFireMode;
+	
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
 
@@ -272,7 +276,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		//Add Leading
 		float targetDistance = vector.Distance(barrelOrigin, targetAimPoint);
-		if (m_bLeading && m_fProjectileSpeed != -1 && m_Target.GetPhysics())
+		if (m_eFireMode == BON_TurretFireMode.Intercept && m_fProjectileSpeed != -1 && m_Target.GetPhysics())
 		{
 			float timeToTarget = targetDistance / m_fProjectileSpeed;
 			targetAimPoint += m_Target.GetPhysics().GetVelocity() * timeToTarget;
@@ -280,7 +284,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		}
 
 		//Add Ballistics
-		if (m_bBallistics)
+		if (m_eFireMode == BON_TurretFireMode.Intercept)
 		{
 			float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, null, m_ProjectileSource);
 			targetAimPoint = targetAimPoint + vector.Up * heightOffset;
@@ -392,7 +396,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			if (m_fRocketGuidanceStrength != 0)
 				guidedProjectile.m_fGuidanceStrength = m_fRocketGuidanceStrength;
-			guidedProjectile.SetTargetAndLaunch(m_Target);
+			guidedProjectile.SetTargetAndLaunch(m_Target, m_eFireMode);
 			return;
 		}
 
@@ -428,6 +432,11 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!m_bIsProjectileReplicated || Replication.IsServer())
 		{
 			IEntity lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
+			if (!lastSpawnedProjectile)
+			{
+				Print("[AutoTurretCore] Error spawning: " + m_Projectile);
+				return;
+			}
 			LaunchProjectile(lastSpawnedProjectile);
 		}
 
@@ -458,7 +467,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		Shape.CreateSphere(COLOR_YELLOW, ShapeFlags.ONCE | ShapeFlags.WIREFRAME, GetOwner().GetOrigin(), GetAttackRange());
 
 		array<ref BON_AutoTurretTarget> sortedTargets = {};
-		GetGame().GetAutoTurretGrid().FindSortedTargetsInRage(sortedTargets, GetOwner().GetOrigin(), GetAttackRange(), m_TargetFlags);
+		GetGame().GetAutoTurretGrid().FindSortedTargetsInRage(sortedTargets, GetOwner().GetOrigin(), GetAttackRange(), m_eTargetFlags);
 
 		foreach (BON_AutoTurretTarget target : sortedTargets)
 		{
@@ -534,7 +543,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	IEntity FindTarget()
 	{
 		array<ref BON_AutoTurretTarget> sortedTargets = {};
-		GetGame().GetAutoTurretGrid().FindSortedTargetsInRage(sortedTargets, GetOwner().GetOrigin(), GetAttackRange(), m_TargetFlags);
+		GetGame().GetAutoTurretGrid().FindSortedTargetsInRage(sortedTargets, GetOwner().GetOrigin(), GetAttackRange(), m_eTargetFlags);
 
 		foreach (BON_AutoTurretTarget target : sortedTargets)
 		{

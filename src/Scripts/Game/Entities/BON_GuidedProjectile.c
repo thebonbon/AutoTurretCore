@@ -10,14 +10,14 @@ class BON_GuidedProjectile : Projectile
 
 	[Attribute()]
 	float m_fGuidanceStrength;
-
+	
 	[RplProp(onRplName: "OnTargetChanged")]
 	RplId m_iTrackedTargetId;
 
 	IEntity m_TrackedTarget;
 	vector m_vAimOffset;
 	vector m_vLastDirToTarget;
-	
+	BON_TurretFireMode m_eFireMode;
 	
 	//------------------------------------------------------------------------------------------------
 	void OnTargetChanged()
@@ -45,11 +45,18 @@ class BON_GuidedProjectile : Projectile
 		}
 		
 		float timeToTarget = targetDistance / m_fMoveSpeed;
+		vector newTargetPos;
+		if (m_eFireMode == BON_TurretFireMode.Intercept)
+		{
+			newTargetPos = targetPos + targetVel * timeToTarget;
+		}
+		else
+			newTargetPos = targetPos;
 		
-		vector futureTargetPos = targetPos + targetVel * timeToTarget;
-		Shape.CreateSphere(COLOR_GREEN, ShapeFlags.ONCE | ShapeFlags.NOZWRITE, futureTargetPos, 0.5);
+		//Shape.CreateSphere(COLOR_GREEN, ShapeFlags.ONCE | ShapeFlags.NOZWRITE, newTargetPos, 0.5);
 		
-		vector dirToTarget = futureTargetPos - missilePos;
+		
+		vector dirToTarget = newTargetPos - missilePos;
 		dirToTarget.Normalize();
 		
 		vector localFwd = GetTransformAxis(2).Normalized();
@@ -84,11 +91,12 @@ class BON_GuidedProjectile : Projectile
 	}
 
 	//------------------------------------------------------------------------------------------------
-	void SetTargetAndLaunch(IEntity target)
+	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode)
 	{
 		if (!target)
 			return;
-
+		m_eFireMode = fireMode;
+		
 		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
 		m_iTrackedTargetId = targetRplComp.Id();
 		Replication.BumpMe();

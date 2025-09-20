@@ -14,7 +14,7 @@ class BON_AutoTurretTargetsEditorAttribute : SCR_BaseMultiSelectPresetsEditorAtt
 		SCR_Enum.GetEnumValues(BON_TurretTargetFilterFlags, enumValues);
 		foreach (int value : enumValues)
 		{
-			AddOrderedState(SCR_Enum.HasPartialFlag(autoTurretComponent.m_TargetFlags, value));
+			AddOrderedState(SCR_Enum.HasPartialFlag(autoTurretComponent.m_eTargetFlags, value));
 		}
 
 		return SCR_BaseEditorAttributeVar.CreateVector(GetFlagVector());
@@ -34,9 +34,9 @@ class BON_AutoTurretTargetsEditorAttribute : SCR_BaseMultiSelectPresetsEditorAtt
 		foreach (int value : enumValues)
 		{
 			if (GetOrderedState())
-				autoTurretComponent.m_TargetFlags = SCR_Enum.SetFlag(autoTurretComponent.m_TargetFlags, value);
+				autoTurretComponent.m_eTargetFlags = SCR_Enum.SetFlag(autoTurretComponent.m_eTargetFlags, value);
 			else
-				autoTurretComponent.m_TargetFlags = SCR_Enum.RemoveFlag(autoTurretComponent.m_TargetFlags, value);
+				autoTurretComponent.m_eTargetFlags = SCR_Enum.RemoveFlag(autoTurretComponent.m_eTargetFlags, value);
 		}
 	}
 
@@ -228,5 +228,49 @@ class BON_AutoTurretRocketTriggerChanceEditorAttribute : SCR_BaseValueListEditor
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
 			autoTurretComponent.m_fProjectileTriggerChance = var.GetFloat();
+	}
+}
+
+[BaseContainerProps(), SCR_BaseEditorAttributeCustomTitle()]
+class BON_AutoTurretFireModeEditorAttribute : SCR_BaseFloatValueHolderEditorAttribute
+{
+	//------------------------------------------------------------------------------------------------
+	override SCR_BaseEditorAttributeVar ReadVariable(Managed item, SCR_AttributesManagerEditorComponent manager)
+	{
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (!autoTurretComponent)
+			return null;
+
+		return SCR_BaseEditorAttributeVar.CreateInt(autoTurretComponent.m_eFireMode);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	override int GetEntries(notnull array<ref SCR_BaseEditorAttributeEntry> outEntries)
+	{
+		m_aValues.Clear();
+		array<string> fireModes = {};
+		SCR_Enum.GetEnumNames(BON_TurretFireMode, fireModes);
+		
+		SCR_EditorAttributeFloatStringValueHolder value;
+		foreach (int i, string fireMode : fireModes)
+		{
+			value = new SCR_EditorAttributeFloatStringValueHolder();
+			value.SetName(fireMode);
+			value.SetFloatValue(i);
+			m_aValues.Insert(value);
+		}
+		outEntries.Insert(new SCR_BaseEditorAttributeFloatStringValues(m_aValues));
+		return outEntries.Count();
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
+	{
+		if (!var)
+			return;
+
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (autoTurretComponent)
+			autoTurretComponent.m_eFireMode = var.GetInt();
 	}
 }
