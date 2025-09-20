@@ -11,24 +11,21 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    m_ProjectileMuzzles {
     PointInfo "{64E290385340D7F3}" {
      PivotID "w_barrel"
-     Offset 1.5619 -0.3233 1.9185
-    }
-    PointInfo "{64E2903860C679FB}" {
-     PivotID "w_barrel"
-     Offset -1.5769 -0.3233 1.9185
+     Offset 0 0.1768 1.5194
     }
    }
-   m_TargetFlags 6
-   m_fMaxAttackSpeed 15
-   m_iAttackRange 2000
+   m_TargetFlags 14
+   m_fMaxAttackSpeed 5
+   m_iAttackRange 5000
    m_bLeading 0
    m_bBallistics 0
+   m_bDebug 1
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
    "faction affiliation" "US"
   }
   MeshObject "{62ACAE2F976BB2AB}" {
-   Object "{5977DE55E69EF71B}Assets/Weapons/AutoTurrets/SAM/SAM_Turret.xob"
+   Object "{DFCC947A6F488328}Assets/Weapons/AutoTurrets/RIM-116/Rim-116.xob"
   }
   SCR_DestructionMultiPhaseComponent "{62ACF1D12DE6C3BD}" {
    "Additional hit zones" {

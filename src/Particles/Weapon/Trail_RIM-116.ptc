@@ -1,0 +1,143 @@
+EffectDef {
+ Version 2
+ Emitters {
+  EmitterDef halo {
+   ShapeType Point
+   ShapeSize 0.05 0.05 0.05
+   MaxNum 1
+   BirthRate 1000
+   Offset 0 0 -0.45
+   Angles 0 0 0
+   LocalTransform 1
+   LodMin 0
+   LodMax 2
+   Material "{4392655F611C4B81}Particles/_Materials/Fire/Explosion_Base_03_Rocket.emat"
+   SizeMultiplier 0.25
+   SizeRND 0.1
+   RandomRotDir 0
+   RandomAngle 1
+   Velocity 0
+   AnimOnce 0
+   RandomFrame 1
+   Lifetime 0.03
+   LifetimeRND 0
+   Color {
+    0 1 1 1 1 1 1 1
+   }
+   EmittingTime 0.1
+  }
+  EmitterDef glow {
+   ShapeType Point
+   ShapeSize 0.05 0.05 0.05
+   MaxNum 1
+   BirthRate 5000
+   Offset 0 0 -1.1
+   Angles 90 0 0
+   LocalTransform 1
+   LodMin 0
+   LodMax 2
+   Material "{E6D017C82E09CA29}Particles/_Materials/Fire/Muzzle_Front.emat"
+   SizeMultiplier 2
+   SizeRND 0.3
+   ScaleX 0.3
+   RandomRotDir 0
+   BillboardingType LockedAxis
+   Velocity 0
+   AnimOnce 0
+   RandomFrame 1
+   Lifetime 0.03
+   LifetimeRND 0
+   Color {
+    0 1 0.804 0.08
+   }
+   EmittingTime 0.1
+   AlphaMast {
+    0 0.7
+   }
+  }
+  EmitterDef Smoke_static {
+   ShapeType Point
+   ShapeSize 0.05 0.05 0.05
+   MaxNum 1
+   BirthRate 5000
+   Offset 0 0 -1.6
+   Angles 90 0 0
+   LocalTransform 1
+   LodMin 0
+   LodMax 2
+   Material "{825F520C86D0DE46}Particles/_Materials/Gas/Smoke_Base_Pillar_05.emat"
+   SizeMultiplier 1.3
+   SizeRND 0.3
+   ScaleX 0.4
+   RandomRotDir 0
+   BillboardingType LockedAxis
+   FlipU Random
+   Velocity 5
+   AnimOnce 0
+   RandomFrame 1
+   Lifetime 0.03
+   LifetimeRND 0
+   Color {
+    0 0.05 0.05 0.05
+   }
+   Emissivity {
+    0 0
+   }
+   EmittingTime 0.1
+  }
+  EmitterDef Smoke_Trail {
+   ConeAngle 360 10 40
+   ConeAngleMinDist 180
+   MaxNum 1000
+   BirthRate 3
+   BirthRateRND 0
+   BirthRateVel 0.7
+   Offset 0 0 0
+   Angles 90 0 0
+   LocalTransform 0
+   LodMin 0
+   LodMax 2
+   Material "{B6B47613FF3B9485}Particles/_Materials/Gas/Smoke_heavy_white_sheet.emat"
+   SizeMultiplier 3
+   SizeRND 2.2
+   RotMultiplier 30
+   RotRND 60
+   RandomRotDir 1
+   RandomAngle 1
+   FlipU Random
+   Velocity 3
+   VelocityRND 0
+   VelAffect 0.02
+   AirResistance 0.05
+   AirResistanceRND 5
+   WindInfluence 0.5
+   ParentVelRelToAir 0
+   GravityMultiply 0.01
+   GravityMultiplyRND 0
+   AnimOnce 1
+   AnimFPS 30
+   LifetimeByAnim 0
+   RandomFrame 1
+   Lifetime 10
+   LifetimeRND 1.3
+   Color {
+    0 0.4851 0.4851 0.4851
+   }
+   Alpha {
+    0 0 0.042 0.8991 0.487 0.2513 1 0
+   }
+   RotationSpeed {
+    0 1 1 0.2
+   }
+   Size {
+    0 0.346 0.52 0.792 1 1
+   }
+   Repeat 0
+   AlphaMast {
+    0 0.7 0.3757 0.2727 1 0
+   }
+  }
+ }
+ LightClipEV -20
+ LightRadius 2
+}

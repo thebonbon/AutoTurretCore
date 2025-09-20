@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{45A83B4FC2CB4C00}Assets/Weapons/AutoTurrets/RIM-116/Data/Mat_Rim116.emat"
+ Configurations {
+  EMATResourceClass PC {
+  }
+  EMATResourceClass XBOX_ONE : PC {
+  }
+  EMATResourceClass XBOX_SERIES : PC {
+  }
+  EMATResourceClass PS4 : PC {
+  }
+  EMATResourceClass PS5 : PC {
+  }
+  EMATResourceClass HEADLESS : PC {
+  }
+ }
+}

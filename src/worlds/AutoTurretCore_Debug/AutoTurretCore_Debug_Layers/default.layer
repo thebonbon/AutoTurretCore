@@ -7,26 +7,31 @@ Vehicle BOB : "{039615384D5685B3}Prefabs/MP/CombatOps/Vehicles/Cinematic_Flying_
    m_fInitialForceMultiplier 50
   }
  }
- coords -1112.472 0 794.996
+ coords -1112.472 713.946 794.996
  angleY 93.776
  EOnInit ""\
  "		/* code here */"\
  "	"
 }
-GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
- components {
-  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_TargetFlags 14
-   m_fMaxAttackSpeed 5
-   m_iAttackRange 5000
-   m_bDebug 1
+$grp GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
+ {
+  components {
+   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+    m_sMuzzleParticle "{6C2D3E7434E3D254}Particles/Weapon/Muzzle_Rocket_Pod_M260_Front.ptc"
+    m_bActiveOnSpawn 0
+    m_eFireMode Intercept
+   }
   }
+  coords 109.531 1 75.869
  }
- coords 383.768 0 -513.992
-}
-GenericEntity : "{4B57C11AA5161760}Prefabs/Characters/Vests/Vest_PASGT/Vest_PASGT.et" {
- coords 190.053 1 225.023
-}
-BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et" {
- coords 76.455 1 92.7
+ {
+  components {
+   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+    m_sMuzzleParticle "{6C2D3E7434E3D254}Particles/Weapon/Muzzle_Rocket_Pod_M260_Front.ptc"
+    m_bActiveOnSpawn 0
+    m_eFireMode Guided
+   }
+  }
+  coords 105.155 1 75.869
+ }
 }

@@ -18,7 +18,7 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
    Enabled 0
   }
   MeshObject "{851AA4A2AE0A56BF}" {
-   Object "{63A314D8B7899DBA}Assets/Weapons/Magazines/Missile_KR/Missile_KR.xob"
+   Object "{7144B0ACBE74109B}Assets/Weapons/Ammo/Rockets/Hydra/Hydra70_M229.xob"
    RainOccluder 0
    WetnessOccluder 0
   }
@@ -41,12 +41,15 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
    AngularSleepingThreashold 1
    ResponseIndex "Normal"
   }
+  RocketTraceEffectComponent "{52CA7A152C8BCB83}" {
+   ParticleEffect "{F787631046AD31E1}Particles/Weapon/Trail_RIM-116.ptc"
+  }
   ActionsManagerComponent "{50F6614BA1D6E54A}" {
    Enabled 0
   }
  }
  coords 194.965 2.163 161.241
- ProjectileModel "{63A314D8B7899DBA}Assets/Weapons/Magazines/Missile_KR/Missile_KR.xob"
+ ProjectileModel "{7144B0ACBE74109B}Assets/Weapons/Ammo/Rockets/Hydra/Hydra70_M229.xob"
  m_fMoveSpeed 80
  m_fGuidanceStrength 1.2
 }
