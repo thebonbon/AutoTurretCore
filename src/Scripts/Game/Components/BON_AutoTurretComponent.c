@@ -3,14 +3,14 @@ enum BON_ProjectileType
 {
 	Bullet,
 	Missile,
-	Shell		
+	Shell
 }
 
 enum BON_TurretFireMode
 {
 	Direct,
 	Guided,
-	Intercept	
+	Intercept
 }
 
 [ComponentEditorProps(category: "BON/Turrets", description: "Auto Aiming Turrets without AI Characters")]
@@ -96,7 +96,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | Guided: Follow the target (missiles only!) | Intercept: Lead the target to intercept at predicted position", enums: ParamEnumArray.FromEnum(BON_TurretFireMode), category: "Aiming")]
 	BON_TurretFireMode m_eFireMode;
-	
+
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
 
@@ -105,7 +105,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 
 	protected float m_fAttackSpeed = 0;
-	protected float m_fMaxSearchTime = 1;	
+	protected float m_fMaxSearchTime = 0.1;
 	protected float m_fSearchTimer = 0;
 	protected int m_iCurrentMuzzle;
 	bool m_bActive = false;
@@ -138,7 +138,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	bool m_bOnTarget;
 	protected IEntity m_Target;
 	ref Shape m_LoSDebug;
-	
+
 	protected BON_ProjectileType m_ProjectileType = BON_ProjectileType.Bullet;
 
 	//------------------------------------------------------------------------------------------------
@@ -289,7 +289,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, null, m_ProjectileSource);
 			targetAimPoint = targetAimPoint + vector.Up * heightOffset;
 		}
-		
+
 		vector muzzleFwd = barrelMat[2].Normalized();
 		vector dir = vector.Direction(GetOwner().GetOrigin(), targetAimPoint);
 		Shape.CreateArrow(GetOwner().GetOrigin(), GetOwner().GetOrigin() + dir, 0.1, COLOR_GREEN, ShapeFlags.ONCE);
@@ -721,22 +721,22 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_bIsProjectileReplicated = (rplCompBase != null);
 		BaseContainer projectileMoveComp = SCR_BaseContainerTools.FindComponentSource(projectileResource, ProjectileMoveComponent);
 		projectileMoveComp.Get("InitSpeed", m_fProjectileSpeed);
-		
+
 		//Projectile type (Default: bullet)
 		BaseContainer missileMoveComp = SCR_BaseContainerTools.FindComponentSource(projectileResource, MissileMoveComponent);
 		if (missileMoveComp)
-			 m_ProjectileType = BON_ProjectileType.Missile;
+			m_ProjectileType = BON_ProjectileType.Missile;
 		else
 		{
 			BaseContainer shellMoveComp = SCR_BaseContainerTools.FindComponentSource(projectileResource, ShellMoveComponent);
 			if (shellMoveComp)
 				m_ProjectileType = BON_ProjectileType.Shell;
 		}
-		
+
 		ConnectToAutoTurretSystem();
 		m_bActive = m_bActiveOnSpawn;
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	override void OnPostInit(IEntity owner)
 	{

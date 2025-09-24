@@ -14,11 +14,9 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
      Offset 0 0.1768 1.5194
     }
    }
-   m_TargetFlags 14
    m_fMaxAttackSpeed 5
    m_iAttackRange 5000
-   m_bLeading 0
-   m_bBallistics 0
+   m_eFireMode Intercept
    m_bDebug 1
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {

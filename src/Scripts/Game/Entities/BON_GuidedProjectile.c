@@ -10,7 +10,7 @@ class BON_GuidedProjectile : Projectile
 
 	[Attribute()]
 	float m_fGuidanceStrength;
-	
+
 	[RplProp(onRplName: "OnTargetChanged")]
 	RplId m_iTrackedTargetId;
 
@@ -18,7 +18,7 @@ class BON_GuidedProjectile : Projectile
 	vector m_vAimOffset;
 	vector m_vLastDirToTarget;
 	BON_TurretFireMode m_eFireMode;
-	
+
 	//------------------------------------------------------------------------------------------------
 	void OnTargetChanged()
 	{
@@ -33,17 +33,18 @@ class BON_GuidedProjectile : Projectile
 	void SteerToTarget(float timeSlice)
 	{
 		vector missilePos = GetOrigin();
-		
+
 		vector targetPos = m_TrackedTarget.GetOrigin();
 		vector targetVel = m_TrackedTarget.GetPhysics().GetVelocity();
 		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
-		
-		if (targetDistance < 1)
+
+		if (targetDistance < 5)
 		{
 			BaseTriggerComponent triggerComp = BaseTriggerComponent.Cast(FindComponent(BaseTriggerComponent));
 			triggerComp.OnUserTrigger(this);
+			return;
 		}
-		
+
 		float timeToTarget = targetDistance / m_fMoveSpeed;
 		vector newTargetPos;
 		if (m_eFireMode == BON_TurretFireMode.Intercept)
@@ -52,22 +53,21 @@ class BON_GuidedProjectile : Projectile
 		}
 		else
 			newTargetPos = targetPos;
-		
+
 		//Shape.CreateSphere(COLOR_GREEN, ShapeFlags.ONCE | ShapeFlags.NOZWRITE, newTargetPos, 0.5);
-		
-		
+
 		vector dirToTarget = newTargetPos - missilePos;
 		dirToTarget.Normalize();
-		
+
 		vector localFwd = GetTransformAxis(2).Normalized();
-		
+
 		vector axis = Cross(localFwd, dirToTarget);
 		float dot = vector.Dot(localFwd, dirToTarget);
 		dot = Math.Clamp(dot, -1.0, 1.0);
 		float angleRad = Math.Acos(dot);
-		
-		vector angularVel = axis * angleRad * 100;
-		
+
+		vector angularVel = axis * angleRad * m_fGuidanceStrength;
+
 		GetPhysics().SetVelocity(localFwd * m_fMoveSpeed);
 		GetPhysics().SetAngularVelocity(angularVel);
 
@@ -96,7 +96,7 @@ class BON_GuidedProjectile : Projectile
 		if (!target)
 			return;
 		m_eFireMode = fireMode;
-		
+
 		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
 		m_iTrackedTargetId = targetRplComp.Id();
 		Replication.BumpMe();
