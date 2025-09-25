@@ -17,8 +17,7 @@ GenericEntity {
    m_sShootSound "SOUND_SHOT"
    m_sBodyBone "w_body"
    m_sBarrelBone "w_barrel"
-   m_vLimitHorizontal -360 360 0
-   m_TargetFlags 0
+   m_vLimitHorizontal -180 180 0
    m_fAttackInaccuracy 0
   }
   BON_AutoTurretTargetComponent "{62C91C0D0A7CBA50}" {

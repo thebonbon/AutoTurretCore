@@ -46,6 +46,7 @@ class BON_AutoTurretComponentClass : ScriptComponentClass
 
 class BON_AutoTurretComponent : ScriptComponent
 {
+	//--- SETUP ---
 	[Attribute("", UIWidgets.ResourcePickerThumbnail, "Projectile to shoot (Currently only works with Missles)", "et", category: "Setup")]
 	ResourceName m_Projectile;
 
@@ -67,10 +68,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("w_barrel", UIWidgets.Auto, "", category: "Setup")]
 	protected string m_sBarrelBone;
 
-	[Attribute("0 360", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
+	[Attribute("0 360 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
 	protected vector m_vLimitHorizontal;
 
-	[Attribute("0 90", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
+	[Attribute("0 90 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
 	protected vector m_vLimitVertical;
 
 	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
@@ -78,7 +79,8 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	[Attribute("0", UIWidgets.CheckBox, "Trigger projectile near target?", category: "Setup")]
 	bool m_bTriggerOnTarget;
-
+	
+	//--- AIMING ---
 	[Attribute("1", UIWidgets.CheckBox, "Enable turret on spawn?", category: "Aiming")]
 	bool m_bActiveOnSpawn;
 
@@ -97,6 +99,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | Guided: Follow the target (missiles only!) | Intercept: Lead the target to intercept at predicted position", enums: ParamEnumArray.FromEnum(BON_TurretFireMode), category: "Aiming")]
 	BON_TurretFireMode m_eFireMode;
 
+	//--- MISC ---
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
 
@@ -142,18 +145,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected BON_ProjectileType m_ProjectileType = BON_ProjectileType.Bullet;
 
 	//------------------------------------------------------------------------------------------------
-	int GetAttackRange()
-	{
-		return Math.Sqrt(m_iAttackRange);
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void SetAttackRange(int range)
-	{
-		m_iAttackRange = Math.Pow(range, 2);
-	}
-
-	//------------------------------------------------------------------------------------------------
 	void ToggleActive()
 	{
 		m_bActive = !m_bActive;
@@ -162,12 +153,6 @@ class BON_AutoTurretComponent : ScriptComponent
 			ConnectToAutoTurretSystem();
 		else
 			DisconnectFromAutoTurretSystem();
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void SetOnTarget(bool newValue)
-	{
-		m_bOnTarget = newValue;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -241,14 +226,13 @@ class BON_AutoTurretComponent : ScriptComponent
 		//Back to rest position
 		if (!m_Target)
 		{
-			SetOnTarget(false);
+			m_bOnTarget = false;
 
 			m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, 0, m_fLerp);
 			m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, 0, m_fLerp);
 
 			m_SignalsManager.SetSignalValue(m_iSignalBody, m_fNewBodyYaw);
 			m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fNewBarrelPitch);
-
 
 			if (m_fLerp == 1)
 			{
@@ -310,7 +294,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		if (m_fLerp == 1)
 		{
-			SetOnTarget(true);
+			m_bOnTarget = true;
 			m_fLerp = 0;
 			m_fCurrentBodyYaw = m_fNewBodyYaw;
 			m_fCurrentBarrelPitch = m_fNewBarrelPitch;
@@ -464,10 +448,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void ShowDebug()
 	{
-		Shape.CreateSphere(COLOR_YELLOW, ShapeFlags.ONCE | ShapeFlags.WIREFRAME, GetOwner().GetOrigin(), GetAttackRange());
+		Shape.CreateSphere(COLOR_YELLOW, ShapeFlags.ONCE | ShapeFlags.WIREFRAME, GetOwner().GetOrigin(), m_iAttackRange);
 
 		array<ref BON_AutoTurretTarget> sortedTargets = {};
-		GetGame().GetAutoTurretGrid().FindSortedTargetsInRage(sortedTargets, GetOwner().GetOrigin(), GetAttackRange(), m_eTargetFlags);
+		GetGame().GetAutoTurretGrid().FindSortedTargetsInRage(GetOwner(), sortedTargets, GetOwner().GetOrigin(), m_iAttackRange, m_eTargetFlags);
 
 		foreach (BON_AutoTurretTarget target : sortedTargets)
 		{
@@ -543,12 +527,21 @@ class BON_AutoTurretComponent : ScriptComponent
 	IEntity FindTarget()
 	{
 		array<ref BON_AutoTurretTarget> sortedTargets = {};
-		GetGame().GetAutoTurretGrid().FindSortedTargetsInRage(sortedTargets, GetOwner().GetOrigin(), GetAttackRange(), m_eTargetFlags);
+		GetGame().GetAutoTurretGrid().FindSortedTargetsInRage(GetOwner(), sortedTargets, GetOwner().GetOrigin(), m_iAttackRange, m_eTargetFlags);
 
 		foreach (BON_AutoTurretTarget target : sortedTargets)
 		{
-			if (target.m_Ent.GetName() == "BOB")
-				return target.m_Ent;
+			//In Aim limits
+			vector dirToTarget = (target.m_Ent.GetOrigin() - GetOwner().GetOrigin()).Normalized();
+			vector angles = SCR_Math3D.FixEulerVector180(dirToTarget.VectorToAngles());
+			
+	        bool inHorizontal = angles[1] >= m_vLimitHorizontal[0] && angles[1] <= m_vLimitHorizontal[1];
+	        bool inVertical   = angles[0] >= m_vLimitVertical[0] && angles[0] <= m_vLimitVertical[1];
+				Print(angles);
+			
+			if (!inHorizontal || !inVertical)
+				return null;
+			
 			if (LineOfSightTo(target.m_Ent) && IsEnemyAndAlive(target.m_Ent))
 				return target.m_Ent;
 		}
@@ -615,8 +608,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		//Simple distance check first
 		float targetDist = vector.Distance(GetOwner().GetOrigin(), m_Target.GetOrigin());
-		int attackRange = GetAttackRange();
-		if (targetDist > attackRange)
+		if (targetDist > m_iAttackRange)
 			return false;
 
 		//If still in range raycast
@@ -699,8 +691,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!GetGame().InPlayMode())
 			return;
 
-		SetAttackRange(m_iAttackRange);
-
 		FactionAffiliationComponent factionAffiliation = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 		m_Faction = factionAffiliation.GetAffiliatedFaction();
 
@@ -760,7 +750,13 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		if (!m_bDebug)
 			return;
-
+		
+		CreateCircleSlice(owner.GetOrigin(), -owner.GetTransformAxis(0).Normalized(), owner.GetTransformAxis(2).Normalized(),
+			m_vLimitVertical[0], m_vLimitVertical[1], 5, Color.RED, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
+		
+		CreateCircleSlice(owner.GetOrigin(), -owner.GetTransformAxis(1).Normalized(), owner.GetTransformAxis(2).Normalized(),
+			m_vLimitHorizontal[0], m_vLimitHorizontal[1], 5, Color.BLUE, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
+		
 		foreach (PointInfo muzzle : m_ProjectileMuzzles)
 		{
 			vector mat[4];

@@ -13,9 +13,6 @@ Vehicle BOB : "{039615384D5685B3}Prefabs/MP/CombatOps/Vehicles/Cinematic_Flying_
  "		/* code here */"\
  "	"
 }
-GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
- coords 116.663 1 73.379
-}
 BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et" {
  coords 106.905 1 82.075
 }

@@ -91,7 +91,7 @@ class BON_AutoTurretRangeEditorAttribute : SCR_BaseValueListEditorAttribute
 		if (!autoTurretComponent)
 			return null;
 
-		return SCR_BaseEditorAttributeVar.CreateInt(autoTurretComponent.GetAttackRange());
+		return SCR_BaseEditorAttributeVar.CreateInt(autoTurretComponent.m_iAttackRange);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ class BON_AutoTurretRangeEditorAttribute : SCR_BaseValueListEditorAttribute
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
-			autoTurretComponent.SetAttackRange(var.GetInt());
+			autoTurretComponent.m_iAttackRange = var.GetInt();
 	}
 }
 
