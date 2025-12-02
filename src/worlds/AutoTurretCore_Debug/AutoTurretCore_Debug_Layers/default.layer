@@ -8,11 +8,20 @@ Vehicle BOB : "{039615384D5685B3}Prefabs/MP/CombatOps/Vehicles/Cinematic_Flying_
   }
  }
  coords -1112.472 713.946 794.996
- angleY 93.776
+ angles 0 93.776 0
  EOnInit ""\
  "		/* code here */"\
  "	"
 }
-BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et" {
- coords 106.905 1 82.075
+GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
+ coords 156.567 1 75.946
+}
+GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
+ components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_vLimitVertical -25 85 0
+   m_bDebug 1
+  }
+ }
+ coords 117.828 1 76.014
 }

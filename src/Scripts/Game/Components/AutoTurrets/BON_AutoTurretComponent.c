@@ -1,11 +1,3 @@
-//Made by TheBonBon :)
-enum BON_ProjectileType
-{
-	Bullet,
-	Missile,
-	Shell
-}
-
 enum BON_TurretFireMode
 {
 	Direct,
@@ -68,10 +60,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("w_barrel", UIWidgets.Auto, "", category: "Setup")]
 	protected string m_sBarrelBone;
 
-	[Attribute("0 360 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
+	[Attribute("-180 180 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
 	protected vector m_vLimitHorizontal;
 
-	[Attribute("0 90 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
+	[Attribute("-25 85 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
 	protected vector m_vLimitVertical;
 
 	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
@@ -79,7 +71,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	[Attribute("0", UIWidgets.CheckBox, "Trigger projectile near target?", category: "Setup")]
 	bool m_bTriggerOnTarget;
-	
+
 	//--- AIMING ---
 	[Attribute("1", UIWidgets.CheckBox, "Enable turret on spawn?", category: "Aiming")]
 	bool m_bActiveOnSpawn;
@@ -118,7 +110,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected PerceivableComponent m_TargetPerceivableComp;
 	protected SignalsManagerComponent m_SignalsManager;
 
-	protected IEntitySource m_ProjectileSource;
 	protected int m_iSignalBody;
 	protected int m_iSignalBarrel;
 	protected int m_iShootCmd;
@@ -142,8 +133,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected IEntity m_Target;
 	ref Shape m_LoSDebug;
 
-	protected BON_ProjectileType m_ProjectileType = BON_ProjectileType.Bullet;
-
 	//------------------------------------------------------------------------------------------------
 	void ToggleActive()
 	{
@@ -153,67 +142,6 @@ class BON_AutoTurretComponent : ScriptComponent
 			ConnectToAutoTurretSystem();
 		else
 			DisconnectFromAutoTurretSystem();
-	}
-
-	//------------------------------------------------------------------------------------------------
-	bool CalculateDistanceCompensation(float distToTgtHoriz, float distToTgtVert, notnull IEntitySource entitySrc, notnull array<float> initSpeedCoeffs, out float outAimOffsetVert, out int outInitSpeedId)
-	{
-		// Bail if distance is 0, this makes no sense, and might cause exception
-		if (distToTgtHoriz <= 0)
-		{
-			outAimOffsetVert = 0;
-			outInitSpeedId = -1;
-			return false;
-		}
-
-		// Try all variants of initial speed coefficients, until we find the one which can both hit target and is within turret's aiming limits
-		bool canHitTarget = false;
-		float aimOffsetVert = 0;
-		int initSpeedId = -1;
-		for (int i = 0; i < initSpeedCoeffs.Count(); i++)
-		{
-			float initialSpeedCoefficient = initSpeedCoeffs[i];
-
-			float flightTime;
-			bool ballisticsGood = BallisticTable.GetAimHeightOfProjectileAltitudeFromSource(distToTgtHoriz, aimOffsetVert, flightTime, entitySrc, distToTgtVert, initialSpeedCoefficient);
-			if (!ballisticsGood)
-			{
-				aimOffsetVert = BallisticTable.GetHeightFromProjectileSource(distToTgtHoriz, flightTime, entitySrc, initSpeedCoef: initialSpeedCoefficient, bDirectFire: false);
-				ballisticsGood = flightTime > 0;
-			}
-
-			// Can't hit it - try next one
-			if (!ballisticsGood)
-				continue;
-
-			canHitTarget = true;
-			initSpeedId = i;
-			break;
-		}
-
-		outAimOffsetVert = aimOffsetVert;
-		outInitSpeedId = initSpeedId;
-
-		return canHitTarget;
-	}
-
-	//------------------------------------------------------------------------------------------------
-	// Returns true if ammo supports initial speed configurations
-	bool GetAmmoInitialSpeedCoefficients(ResourceName ammoResourceName, notnull array<float> outCoefficients)
-	{
-		// This can be potentially interfaced with other types of ammo which support different configurations
-		outCoefficients.Clear();
-
-		int defaultConfigId;
-		array<float> initSpeedCoefficients = SCR_MortarShellGadgetComponent.GetPrefabInitSpeedCoef(ammoResourceName, defaultConfigId);
-
-		if (initSpeedCoefficients && !initSpeedCoefficients.IsEmpty())
-		{
-			outCoefficients.Copy(initSpeedCoefficients);
-			return true;
-		}
-
-		return false;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -245,7 +173,6 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		//Inital source and target points
 		vector targetAimPoint = m_Target.GetOrigin();
-
 		vector barrelMat[4];
 		GetOwner().GetAnimation().GetBoneMatrix(m_iBarrelBoneIndex, barrelMat);
 		vector barrelOrigin = GetOwner().CoordToParent(barrelMat[3]);
@@ -255,27 +182,33 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			array<vector> aimPoints();
 			m_TargetPerceivableComp.GetAimpoints(aimPoints);
-			targetAimPoint = aimPoints[0];
+			if (!aimPoints.IsEmpty())
+				targetAimPoint = aimPoints[0];
 		}
 
-		//Add Leading
-		float targetDistance = vector.Distance(barrelOrigin, targetAimPoint);
-		if (m_eFireMode == BON_TurretFireMode.Intercept && m_fProjectileSpeed != -1 && m_Target.GetPhysics())
-		{
-			float timeToTarget = targetDistance / m_fProjectileSpeed;
-			targetAimPoint += m_Target.GetPhysics().GetVelocity() * timeToTarget;
-			targetDistance = vector.Distance(barrelOrigin, targetAimPoint); //Re-calculate distance for leading point
-		}
-
-		//Add Ballistics
+		Resource projectileResource = Resource.Load(m_Projectile);
+		IEntitySource projectileSource = SCR_BaseContainerTools.FindEntitySource(projectileResource);
 		if (m_eFireMode == BON_TurretFireMode.Intercept)
 		{
-			float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, null, m_ProjectileSource);
-			targetAimPoint = targetAimPoint + vector.Up * heightOffset;
+			float timeToTarget;
+			float targetDistance = vector.Distance(barrelOrigin, targetAimPoint);
+			float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource);
+
+			if (m_Target.GetPhysics())
+			{
+				//Add Leading
+				targetAimPoint += m_Target.GetPhysics().GetVelocity() * timeToTarget;
+				targetDistance = vector.Distance(barrelOrigin, targetAimPoint);
+				heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource);
+			}
+
+			//Add Ballistics
+			targetAimPoint[1] = targetAimPoint[1] + heightOffset;
 		}
 
 		vector muzzleFwd = barrelMat[2].Normalized();
 		vector dir = vector.Direction(GetOwner().GetOrigin(), targetAimPoint);
+
 		Shape.CreateArrow(GetOwner().GetOrigin(), GetOwner().GetOrigin() + dir, 0.1, COLOR_GREEN, ShapeFlags.ONCE);
 		Shape.CreateArrow(GetOwner().GetOrigin(), GetOwner().GetOrigin() + muzzleFwd * 10, 0.1, COLOR_YELLOW, ShapeFlags.ONCE);
 		Shape.CreateSphere(COLOR_RED, ShapeFlags.ONCE | ShapeFlags.NOZWRITE, targetAimPoint, 0.25);
@@ -283,8 +216,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		//Set Signals
 		vector targetDir = targetAimPoint - barrelOrigin;
 		vector localTargetDir = GetOwner().VectorToLocal(targetDir);
-		vector angles = localTargetDir.VectorToAngles();
-		angles = SCR_Math3D.FixEulerVector180(angles);
+		vector angles = SCR_Math3D.FixEulerVector180(localTargetDir.VectorToAngles());
 
 		m_fNewBodyYaw = Math.Lerp(m_fCurrentBodyYaw, -angles[0], m_fLerp);
 		m_fNewBarrelPitch = Math.Lerp(m_fCurrentBarrelPitch, angles[1], m_fLerp);
@@ -304,6 +236,11 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool IsEnemyAndAlive(IEntity ent)
 	{
+		#ifdef WORKBENCH
+		if (ent.GetName() == "BOB")
+			return true;
+		#endif
+
 		if (Projectile.Cast(ent))
 			return true;
 
@@ -417,10 +354,8 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			IEntity lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
 			if (!lastSpawnedProjectile)
-			{
-				Print("[AutoTurretCore] Error spawning: " + m_Projectile);
 				return;
-			}
+
 			LaunchProjectile(lastSpawnedProjectile);
 		}
 
@@ -457,7 +392,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			Shape.CreateSphere(COLOR_BLUE, ShapeFlags.ONCE | ShapeFlags.WIREFRAME | ShapeFlags.NOZBUFFER, target.m_Ent.GetOrigin(), 0.2);
 		}
-
 
 		if (!m_Target)
 			return;
@@ -501,7 +435,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	void SetNewTarget(IEntity target)
 	{
 		m_Target = target;
-		Print("NEW TARGET: " + target);
 		if (target)
 		{
 			RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
@@ -534,16 +467,15 @@ class BON_AutoTurretComponent : ScriptComponent
 			//In Aim limits
 			vector dirToTarget = (target.m_Ent.GetOrigin() - GetOwner().GetOrigin()).Normalized();
 			vector angles = SCR_Math3D.FixEulerVector180(dirToTarget.VectorToAngles());
-			
-	        bool inHorizontal = angles[1] >= m_vLimitHorizontal[0] && angles[1] <= m_vLimitHorizontal[1];
-	        bool inVertical   = angles[0] >= m_vLimitVertical[0] && angles[0] <= m_vLimitVertical[1];
-				Print(angles);
-			
-			if (!inHorizontal || !inVertical)
-				return null;
-			
+
+
+			bool inHorizontal = angles[1] >= m_vLimitHorizontal[0] && angles[1] <= m_vLimitHorizontal[1];
+			bool inVertical = -angles[0] >= m_vLimitVertical[0] && angles[0] <= m_vLimitVertical[1];
+			Print(inHorizontal && inVertical);
 			if (LineOfSightTo(target.m_Ent) && IsEnemyAndAlive(target.m_Ent))
 				return target.m_Ent;
+			else
+				Print("no los or enemy");
 		}
 
 		return null;
@@ -592,10 +524,6 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		if (!param.TraceEnt)
 			return false;
-
-		//Check if inv item
-		InventoryItemComponent itemComp = InventoryItemComponent.Cast(param.TraceEnt.FindComponent(InventoryItemComponent));
-		return (itemComp && itemComp.GetParentSlot()); //Has parent slot, must be equipped somewhere by someone -> shoot it >:D
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -706,22 +634,11 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!projectileResource)
 			return;
 
-		m_ProjectileSource = SCR_BaseContainerTools.FindEntitySource(projectileResource);
+
 		BaseContainer rplCompBase = SCR_BaseContainerTools.FindComponentSource(projectileResource, RplComponent);
 		m_bIsProjectileReplicated = (rplCompBase != null);
 		BaseContainer projectileMoveComp = SCR_BaseContainerTools.FindComponentSource(projectileResource, ProjectileMoveComponent);
 		projectileMoveComp.Get("InitSpeed", m_fProjectileSpeed);
-
-		//Projectile type (Default: bullet)
-		BaseContainer missileMoveComp = SCR_BaseContainerTools.FindComponentSource(projectileResource, MissileMoveComponent);
-		if (missileMoveComp)
-			m_ProjectileType = BON_ProjectileType.Missile;
-		else
-		{
-			BaseContainer shellMoveComp = SCR_BaseContainerTools.FindComponentSource(projectileResource, ShellMoveComponent);
-			if (shellMoveComp)
-				m_ProjectileType = BON_ProjectileType.Shell;
-		}
 
 		ConnectToAutoTurretSystem();
 		m_bActive = m_bActiveOnSpawn;
@@ -750,13 +667,21 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		if (!m_bDebug)
 			return;
-		
-		CreateCircleSlice(owner.GetOrigin(), -owner.GetTransformAxis(0).Normalized(), owner.GetTransformAxis(2).Normalized(),
+		Animation ownerAnim = owner.GetAnimation();
+		vector boneMat[4];
+		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBodyBone), boneMat);
+		vector barrelMat[4];
+		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBarrelBone), barrelMat);
+
+		boneMat[3] = owner.CoordToParent(boneMat[3]);
+		barrelMat[3] = owner.CoordToParent(barrelMat[3]);
+
+		CreateCircleSlice(barrelMat[3], -owner.GetTransformAxis(0).Normalized(), owner.GetTransformAxis(2).Normalized(),
 			m_vLimitVertical[0], m_vLimitVertical[1], 5, Color.RED, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
-		
-		CreateCircleSlice(owner.GetOrigin(), -owner.GetTransformAxis(1).Normalized(), owner.GetTransformAxis(2).Normalized(),
+
+		CreateCircleSlice(boneMat[3], -owner.GetTransformAxis(1).Normalized(), owner.GetTransformAxis(2).Normalized(),
 			m_vLimitHorizontal[0], m_vLimitHorizontal[1], 5, Color.BLUE, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
-		
+
 		foreach (PointInfo muzzle : m_ProjectileMuzzles)
 		{
 			vector mat[4];

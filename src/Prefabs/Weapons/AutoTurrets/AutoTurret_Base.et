@@ -48,7 +48,7 @@ GenericEntity {
   PerceivableComponent "{62C90A57DDAC34D4}" {
    "Additional aim points" {
     AimPoint "{62C90A57D1A114AF}" {
-     AimPointPosition PointInfo "{62C90A57EBF191BA}" {
+     AimPointPosition AttachPoint "{62C90A57EBF191BA}" {
      }
     }
    }

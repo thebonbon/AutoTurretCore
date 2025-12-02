@@ -1,13 +1,25 @@
 class BON_AutoTurretTarget
 {
 	IEntity m_Ent;
+	RplId m_iRplId;
 	float m_fDistance;
+	vector m_vAimpoint;
 
 	//------------------------------------------------------------------------------------------------
 	void BON_AutoTurretTarget(IEntity ent, float distance)
 	{
 		m_Ent = ent;
 		m_fDistance = distance;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	bool IsValid()
+	{
+		DamageManagerComponent dmgManager = DamageManagerComponent.Cast(m_Ent.FindComponent(DamageManagerComponent));
+		if (!dmgManager || dmgManager.IsDestroyed())
+			return false;
+
+		return true;
 	}
 }
 
@@ -27,9 +39,11 @@ class BON_AutoTurretGridMap : PointGridMap
 		{
 			if (owner == target)
 				continue;
-			
+
 			float distance = vector.DistanceSq(origin, target.GetOrigin());
 			BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(target, distance);
+			if (!newTarget.IsValid())
+				continue;
 
 			//First entry
 			if (sortedEntities.IsEmpty())
