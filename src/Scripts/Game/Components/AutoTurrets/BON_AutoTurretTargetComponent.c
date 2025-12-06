@@ -15,7 +15,7 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 {
 	[Attribute("0", UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
 	BON_TurretTargetFilterFlags m_TargetFlags;
-		
+	
 	//------------------------------------------------------------------------------------------------
 	override void EOnPhysicsActive(IEntity owner, bool activeState)
 	{

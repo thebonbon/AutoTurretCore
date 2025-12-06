@@ -16,6 +16,9 @@ class BON_AutoTurretSystem : GameSystem
 			if (component)
 				component.OnUpdate(timeSlice);
 		}
+		
+		//Also update the global target gridmap
+		GetGame().GetAutoTurretGrid().Update();
 	}
 
 	//------------------------------------------------------------------------------------------------

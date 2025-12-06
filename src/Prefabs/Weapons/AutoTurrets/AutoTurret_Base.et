@@ -1,6 +1,13 @@
 GenericEntity {
  ID "62ACAE2FAC6D2BB1"
  components {
+  EventHandlerManagerComponent "{6704ECCD6612FF03}" {
+   EventHandlers {
+    BaseEventHandler "{6704ECCD66D94538}" {
+     EventName "OnDestroyed"
+    }
+   }
+  }
   SignalsManagerComponent "{62ACAE2F976BB347}" {
   }
   SoundComponent "{62ACAE2F976BB3F9}" {

@@ -61,7 +61,7 @@ class BON_GuidedProjectile : Projectile
 
 		vector localFwd = GetTransformAxis(2).Normalized();
 
-		vector axis = Cross(localFwd, dirToTarget);
+		vector axis = SCR_Math3D.Cross(localFwd, dirToTarget);
 		float dot = vector.Dot(localFwd, dirToTarget);
 		dot = Math.Clamp(dot, -1.0, 1.0);
 		float angleRad = Math.Acos(dot);
@@ -78,16 +78,6 @@ class BON_GuidedProjectile : Projectile
 	{
 		if (m_TrackedTarget)
 			SteerToTarget(timeSlice);
-	}
-
-	//------------------------------------------------------------------------------------------------
-	vector Cross(vector a, vector b)
-	{
-		return Vector(
-			a[1] * b[2] - a[2] * b[1],
-			a[2] * b[0] - a[0] * b[2],
-			a[0] * b[1] - a[1] * b[0]
-		);
 	}
 
 	//------------------------------------------------------------------------------------------------

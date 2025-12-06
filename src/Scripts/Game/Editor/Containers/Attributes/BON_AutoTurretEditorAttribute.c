@@ -14,7 +14,7 @@ class BON_AutoTurretTargetsEditorAttribute : SCR_BaseMultiSelectPresetsEditorAtt
 		SCR_Enum.GetEnumValues(BON_TurretTargetFilterFlags, enumValues);
 		foreach (int value : enumValues)
 		{
-			AddOrderedState(SCR_Enum.HasPartialFlag(autoTurretComponent.m_eTargetFlags, value));
+			AddOrderedState(SCR_Enum.HasPartialFlag(autoTurretComponent.GetTargetFlags(), value));
 		}
 
 		return SCR_BaseEditorAttributeVar.CreateVector(GetFlagVector());
@@ -34,9 +34,9 @@ class BON_AutoTurretTargetsEditorAttribute : SCR_BaseMultiSelectPresetsEditorAtt
 		foreach (int value : enumValues)
 		{
 			if (GetOrderedState())
-				autoTurretComponent.m_eTargetFlags = SCR_Enum.SetFlag(autoTurretComponent.m_eTargetFlags, value);
+				autoTurretComponent.SetTargetFlags(SCR_Enum.SetFlag(autoTurretComponent.GetTargetFlags(), value));
 			else
-				autoTurretComponent.m_eTargetFlags = SCR_Enum.RemoveFlag(autoTurretComponent.m_eTargetFlags, value);
+				autoTurretComponent.SetTargetFlags(SCR_Enum.RemoveFlag(autoTurretComponent.GetTargetFlags(), value));
 		}
 	}
 
@@ -91,7 +91,7 @@ class BON_AutoTurretRangeEditorAttribute : SCR_BaseValueListEditorAttribute
 		if (!autoTurretComponent)
 			return null;
 
-		return SCR_BaseEditorAttributeVar.CreateInt(autoTurretComponent.m_iAttackRange);
+		return SCR_BaseEditorAttributeVar.CreateInt(autoTurretComponent.m_TargetingComp.m_iSearchRadius);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ class BON_AutoTurretRangeEditorAttribute : SCR_BaseValueListEditorAttribute
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
-			autoTurretComponent.m_iAttackRange = var.GetInt();
+			autoTurretComponent.m_TargetingComp.m_iSearchRadius = var.GetInt();
 	}
 }
 
