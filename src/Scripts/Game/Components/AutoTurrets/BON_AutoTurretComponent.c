@@ -404,6 +404,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		
 		m_AnimationController = BaseItemAnimationComponent.Cast(owner.FindComponent(BaseItemAnimationComponent));
 		m_iShootCmd = m_AnimationController.BindCommand("CMD_SHOOT");
+		
 		m_iBarrelBoneIndex = GetOwner().GetAnimation().GetBoneIndex(m_sBarrelBone);
 
 		Resource projectileResource = Resource.Load(m_Projectile);

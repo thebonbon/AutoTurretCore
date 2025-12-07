@@ -6,13 +6,14 @@ class BON_AutoTurretTargetingComponentClass : ScriptComponentClass
 class BON_AutoTurretTargetingComponent : ScriptComponent
 {
 	
-	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
+	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Targeting")]
 	BON_TurretTargetFilterFlags m_eTargetFlags;
 	
-	[Attribute("500", UIWidgets.Auto, "Attack range (m)", category: "Aiming")]
+	[Attribute("500", UIWidgets.Auto, "Radius to scan / attack targets (m)", category: "Targeting")]
 	int m_iSearchRadius;
 	
-	protected float m_fMaxSearchTime = 0.1;
+	[Attribute("1", UIWidgets.Auto, "Time to scan for new targets (s)", category: "Targeting")]
+	protected float m_fMaxSearchTime;
 	
 	protected float m_fSearchTimer = 0;
 	protected BON_AutoTurretAimingComponent m_AimingComp;

@@ -13,9 +13,6 @@ Vehicle BOB : "{039615384D5685B3}Prefabs/MP/CombatOps/Vehicles/Cinematic_Flying_
  "		/* code here */"\
  "	"
 }
-SCR_ChimeraCharacter : "{137268B4342A794E}Prefabs/Characters/Campaign/Final/BLUFOR/US_army/GreenBerets/Campaign_US_Player_SF_Rifleman.et" {
- coords 147.533 1 84.237
-}
 GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
  components {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
@@ -29,9 +26,7 @@ GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
     }
    }
   }
-  FactionAffiliationComponent "{62ACAE2F976BB213}" {
-   "faction affiliation" "USSR"
-  }
  }
- coords 156.567 1 75.946
+ coords 156.567 1 74.965
+ angles 0 90 0
 }

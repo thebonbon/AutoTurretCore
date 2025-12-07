@@ -1,9 +1,9 @@
 enum BON_TurretAimState
 {
-    IDLE,
-    ROTATING_TO_TARGET,
-    ON_TARGET,
-    RETURNING_TO_IDLE
+	IDLE,
+	ROTATING_TO_TARGET,
+	ON_TARGET,
+	RETURNING_TO_IDLE
 }
 
 [ComponentEditorProps(category: "GameScripted/Misc", description: "")]
@@ -18,40 +18,31 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 	[Attribute("-25 85 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
 	protected vector m_vLimitVertical;
-	
+
 	[Attribute("1", UIWidgets.Auto, desc: "", category: "Setup")]
 	float m_fRotationSpeed;
-	
+
 	SignalsManagerComponent m_SignalsManager;
 	int m_iSignalBody;
 	int m_iSignalBarrel;
-	
-	
+
+
 	BON_TurretAimState m_eAimState = BON_TurretAimState.IDLE;
 	vector m_vCurrentAngles;
 	vector m_vTargetAngles;
-	
+
 	//------------------------------------------------------------------------------------------------
 	bool IsWithinLimitsAngle(vector angles)
 	{
 		float yaw = angles[0];
-		float pitch = angles[1];	
-			
+		float pitch = angles[1];
+
 		bool inHorizontal = Math.IsInRange(yaw, m_vLimitHorizontal[0], m_vLimitHorizontal[1]);
 		bool inVertical = Math.IsInRange(pitch, m_vLimitVertical[0], m_vLimitVertical[1]);
-		
+
 		return (inHorizontal && inVertical);
 	}
-	
-	//------------------------------------------------------------------------------------------------
-	bool IsWithinLimitsPos(vector targetPosition)
-	{
-		vector dir = targetPosition - GetOwner().GetOrigin();
-		vector angles = dir.VectorToAngles().MapAngles();
-		
-		return IsWithinLimitsAngle(angles);					
-	}
-	
+
 	/*
 	//------------------------------------------------------------------------------------------------
 	vector ComputeLead()
@@ -63,7 +54,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		Resource projectileResource = Resource.Load(m_Projectile);
 		IEntitySource projectileSource = SCR_BaseContainerTools.FindEntitySource(projectileResource);
-		
+
 		if (m_eFireMode == BON_TurretFireMode.Intercept)
 		{
 			float timeToTarget;
@@ -87,74 +78,69 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool IsOnTarget()
 	{
-		return false;
-		return vector.DistanceSq(m_vCurrentAngles, m_vTargetAngles) <= 2;
+		return vector.Distance(m_vCurrentAngles, m_vTargetAngles) <= 2;
 	}
-	
-	
+
+
 	//------------------------------------------------------------------------------------------------
 	//! Server + Client
 	//! Called from main AutoTurretComponent
 	void OnUpdate(BON_AutoTurretTarget target, float timeSlice)
 	{
 		DebugTextWorldSpace.Create(GetOwner().GetWorld(), typename.EnumToString(BON_TurretAimState, m_eAimState),
-		 DebugTextFlags.ONCE | DebugTextFlags.CENTER | DebugTextFlags.FACE_CAMERA, GetOwner().GetOrigin()[0], GetOwner().GetOrigin()[1] + 5, GetOwner().GetOrigin()[2]
+		DebugTextFlags.ONCE | DebugTextFlags.CENTER | DebugTextFlags.FACE_CAMERA, GetOwner().GetOrigin()[0], GetOwner().GetOrigin()[1] + 5, GetOwner().GetOrigin()[2]
 		);
-		 
-		
+
+
 		switch (m_eAimState)
 		{
-			case BON_TurretAimState.IDLE:			
+			case BON_TurretAimState.IDLE:
 				if (target)
 					m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
 				break;
-			
-			case BON_TurretAimState.ROTATING_TO_TARGET:
-				vector dir = target.m_Ent.GetOrigin() - GetOwner().GetOrigin();
-				vector angles = dir.VectorToAngles().MapAngles();
 
+			case BON_TurretAimState.ROTATING_TO_TARGET:
+				vector angles = SCR_Math3D.GetLocalAngles(GetOwner(), target.m_Ent);
 				RotateTo(angles, timeSlice);
-						
+
 				if (IsOnTarget())
 					m_eAimState = BON_TurretAimState.ON_TARGET;
-				
+
 				if (!target)
 					m_eAimState = BON_TurretAimState.RETURNING_TO_IDLE;
-			
+
 			case BON_TurretAimState.ON_TARGET:
 				if (!target)
 					m_eAimState = BON_TurretAimState.RETURNING_TO_IDLE;
+				if (!IsOnTarget())
+					m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
 				break;
-			
+
 			case BON_TurretAimState.RETURNING_TO_IDLE:
 				RotateTo(vector.Zero, timeSlice);
-			
+
 				if (target)
 					m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
 				else if (IsOnTarget())
 					m_eAimState = BON_TurretAimState.IDLE;
-			
 				break;
 		}
-		
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	//! Rotate to desired angles
 	void RotateTo(vector targetAngles, float timeSlice)
 	{
 		if (!IsWithinLimitsAngle(targetAngles))
 			return;
-	
+
 		m_vTargetAngles = targetAngles;
-		
-		//Works with Lerp cause it uses delta..
-		m_vCurrentAngles = SCR_Math3D.LerpAngle(m_vCurrentAngles, targetAngles, m_fRotationSpeed * timeSlice);
-		
+		m_vCurrentAngles = SCR_Math3D.LerpAngle(m_vCurrentAngles, m_vTargetAngles, m_fRotationSpeed * timeSlice);
+
 		m_SignalsManager.SetSignalValue(m_iSignalBody, -m_vCurrentAngles[0]);
-		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);		
-	}	
-	
+		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);
+	}
+
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
