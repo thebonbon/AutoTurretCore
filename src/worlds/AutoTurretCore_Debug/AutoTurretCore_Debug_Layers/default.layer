@@ -14,13 +14,15 @@ Vehicle BOB : "{039615384D5685B3}Prefabs/MP/CombatOps/Vehicles/Cinematic_Flying_
  "	"
 }
 SCR_ChimeraCharacter : "{137268B4342A794E}Prefabs/Characters/Campaign/Final/BLUFOR/US_army/GreenBerets/Campaign_US_Player_SF_Rifleman.et" {
- coords 155.1 1 87.762
+ coords 147.533 1 84.237
 }
 GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
  components {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    components {
     BON_AutoTurretAimingComponent "{670CB067D2C43437}" {
+     m_vLimitHorizontal -90 90 0
+     m_fRotationSpeed 2
     }
     BON_AutoTurretTargetingComponent "{670CB067D05746A0}" {
      m_eTargetFlags CHARACTERS
@@ -32,12 +34,4 @@ GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
   }
  }
  coords 156.567 1 75.946
-}
-GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
- components {
-  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_bDebug 1
-  }
- }
- coords 117.828 1 76.014
 }

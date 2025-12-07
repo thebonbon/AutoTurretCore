@@ -12,15 +12,14 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	[Attribute("500", UIWidgets.Auto, "Attack range (m)", category: "Aiming")]
 	int m_iSearchRadius;
 	
-	//TODO: ATTRIVUTE THIS
 	protected float m_fMaxSearchTime = 0.1;
 	
 	protected float m_fSearchTimer = 0;
-	protected BON_AutoTurretAimingComponent m_aimingComp;
+	protected BON_AutoTurretAimingComponent m_AimingComp;
 	protected Faction m_Faction;
 	
 	protected ref BON_AutoTurretTarget m_CurrentTarget;
-	BON_AutoTurretComponent m_MainTurretComp;
+	protected BON_AutoTurretComponent m_MainTurretComp;
 	
 	//------------------------------------------------------------------------------------------------
 	bool IsEnemy(IEntity ent)
@@ -44,7 +43,6 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		return targetFaction.IsFactionEnemy(m_Faction);
 	}
 
-		
 	//------------------------------------------------------------------------------------------------
 	bool LineOfSightTo(BON_AutoTurretTarget target)
 	{
@@ -62,13 +60,6 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		param.LayerMask = EPhysicsLayerPresets.Projectile;
 		float traceDistance = GetOwner().GetWorld().TraceMove(param, null);
 
-		/*if (m_bDebug)
-		{
-			vector position = (param.End - param.Start) * traceDistance + param.Start;
-			m_LoSDebug = Shape.CreateArrow(muzzleMat[3], position, 0.1, COLOR_GREEN, ShapeFlags.NOZBUFFER);
-		}*/
-
-		//Full distance or trace hit the target entity
 		return (traceDistance == 1) || (param.TraceEnt == target.m_Ent);
 	}
 
@@ -81,7 +72,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 
 		foreach (BON_AutoTurretTarget target : sortedTargets)
 		{
-			//if (m_aimingComp.IsWithinLimits(target.GetAimPoint()) && LineOfSightTo(target))
+			//if (m_AimingComp.IsWithinLimits(target.GetAimPoint()) && LineOfSightTo(target))
 			if (LineOfSightTo(target))
 				return target;
 		}
@@ -127,7 +118,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	override void EOnInit(IEntity owner)
 	{
 		m_MainTurretComp = BON_AutoTurretComponent.Cast(owner.FindComponent(BON_AutoTurretComponent));
-		m_aimingComp = BON_AutoTurretAimingComponent.Cast(owner.FindComponent(BON_AutoTurretAimingComponent));
+		m_AimingComp = BON_AutoTurretAimingComponent.Cast(owner.FindComponent(BON_AutoTurretAimingComponent));
 		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 		m_Faction = factionComp.GetAffiliatedFaction();
 	}

@@ -349,6 +349,8 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void OnUpdate(float timeSlice)
 	{
+		BON_AutoTurretTarget target = m_TargetingComp.FindTarget();
+		m_AimingComp.OnUpdate(target, timeSlice);
 		
 		/*
 		if (!m_bActive)
@@ -400,16 +402,9 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_AimingComp = BON_AutoTurretAimingComponent.Cast(owner.FindComponent(BON_AutoTurretAimingComponent));
 		m_TargetingComp = BON_AutoTurretTargetingComponent.Cast(owner.FindComponent(BON_AutoTurretTargetingComponent));
 		
-		FactionAffiliationComponent factionAffiliation = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
-		m_Faction = factionAffiliation.GetAffiliatedFaction();
-
 		m_AnimationController = BaseItemAnimationComponent.Cast(owner.FindComponent(BaseItemAnimationComponent));
 		m_iShootCmd = m_AnimationController.BindCommand("CMD_SHOOT");
 		m_iBarrelBoneIndex = GetOwner().GetAnimation().GetBoneIndex(m_sBarrelBone);
-
-		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
-		m_iSignalBody = m_SignalsManager.AddOrFindSignal("BodyRotation", 0);
-		m_iSignalBarrel = m_SignalsManager.AddOrFindSignal("BarrelRotation", 0);
 
 		Resource projectileResource = Resource.Load(m_Projectile);
 		if (!projectileResource)

@@ -19,6 +19,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("-25 85 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
 	protected vector m_vLimitVertical;
 	
+	[Attribute("1", UIWidgets.Auto, desc: "", category: "Setup")]
 	float m_fRotationSpeed;
 	
 	SignalsManagerComponent m_SignalsManager;
@@ -31,14 +32,24 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	vector m_vTargetAngles;
 	
 	//------------------------------------------------------------------------------------------------
-	bool IsWithinLimits(vector targetPosition)
+	bool IsWithinLimitsAngle(vector angles)
 	{
-		vector angles = SCR_Math3D.AnglesFromTo(GetOwner().GetOrigin(), targetPosition);
-
-		bool inVertical = -angles[0] >= m_vLimitVertical[0] && angles[0] <= m_vLimitVertical[1];
-		bool inHorizontal = angles[1] >= m_vLimitHorizontal[0] && angles[1] <= m_vLimitHorizontal[1];
+		float yaw = angles[0];
+		float pitch = angles[1];	
+			
+		bool inHorizontal = Math.IsInRange(yaw, m_vLimitHorizontal[0], m_vLimitHorizontal[1]);
+		bool inVertical = Math.IsInRange(pitch, m_vLimitVertical[0], m_vLimitVertical[1]);
 		
-		return (inHorizontal && inVertical);			
+		return (inHorizontal && inVertical);
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	bool IsWithinLimitsPos(vector targetPosition)
+	{
+		vector dir = targetPosition - GetOwner().GetOrigin();
+		vector angles = dir.VectorToAngles().MapAngles();
+		
+		return IsWithinLimitsAngle(angles);					
 	}
 	
 	/*
@@ -76,6 +87,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool IsOnTarget()
 	{
+		return false;
 		return vector.DistanceSq(m_vCurrentAngles, m_vTargetAngles) <= 2;
 	}
 	
@@ -85,6 +97,11 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//! Called from main AutoTurretComponent
 	void OnUpdate(BON_AutoTurretTarget target, float timeSlice)
 	{
+		DebugTextWorldSpace.Create(GetOwner().GetWorld(), typename.EnumToString(BON_TurretAimState, m_eAimState),
+		 DebugTextFlags.ONCE | DebugTextFlags.CENTER | DebugTextFlags.FACE_CAMERA, GetOwner().GetOrigin()[0], GetOwner().GetOrigin()[1] + 5, GetOwner().GetOrigin()[2]
+		);
+		 
+		
 		switch (m_eAimState)
 		{
 			case BON_TurretAimState.IDLE:			
@@ -93,7 +110,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 				break;
 			
 			case BON_TurretAimState.ROTATING_TO_TARGET:
-				vector angles = SCR_Math3D.AnglesFromTo(GetOwner().GetOrigin(), target.GetAimPoint());
+				vector dir = target.m_Ent.GetOrigin() - GetOwner().GetOrigin();
+				vector angles = dir.VectorToAngles().MapAngles();
+
 				RotateTo(angles, timeSlice);
 						
 				if (IsOnTarget())
@@ -124,19 +143,24 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//! Rotate to desired angles
 	void RotateTo(vector targetAngles, float timeSlice)
 	{
-		//if (!IsWithinLimits(targetPosition))
-		//			return;
+		if (!IsWithinLimitsAngle(targetAngles))
+			return;
 	
-		m_vTargetAngles = targetAngles;	
-		m_vCurrentAngles = SCR_Math3D.MoveTowards(m_vCurrentAngles, targetAngles, timeSlice * m_fRotationSpeed);		
+		m_vTargetAngles = targetAngles;
 		
-		m_SignalsManager.SetSignalValue(m_iSignalBody, m_vCurrentAngles[0]);
+		//Works with Lerp cause it uses delta..
+		m_vCurrentAngles = SCR_Math3D.LerpAngle(m_vCurrentAngles, targetAngles, m_fRotationSpeed * timeSlice);
+		
+		m_SignalsManager.SetSignalValue(m_iSignalBody, -m_vCurrentAngles[0]);
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);		
 	}	
 	
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
+		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
+		m_iSignalBody = m_SignalsManager.AddOrFindSignal("BodyRotation", 0);
+		m_iSignalBarrel = m_SignalsManager.AddOrFindSignal("BarrelRotation", 0);
 	}
 
 	//------------------------------------------------------------------------------------------------
