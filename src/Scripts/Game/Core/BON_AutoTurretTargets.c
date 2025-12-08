@@ -31,6 +31,7 @@ class BON_AutoTurretTarget
 	}
 	
 	//------------------------------------------------------------------------------------------------
+	//! Returns if entity was deleted or destroyed
 	bool IsValid()
 	{
 		if (!m_Ent)
@@ -42,8 +43,6 @@ class BON_AutoTurretTarget
 
 		return true;
 	}
-	
-
 }
 
 class BON_AutoTurretGridMap : PointGridMap

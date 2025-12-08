@@ -349,19 +349,8 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void OnUpdate(float timeSlice)
 	{
-		BON_AutoTurretTarget target = m_TargetingComp.FindTarget();
+		BON_AutoTurretTarget target = m_TargetingComp.GetTarget();
 		m_AimingComp.OnUpdate(target, timeSlice);
-		
-		/*
-		if (!m_bActive)
-			return;
-
-		if (Replication.IsServer())
-			OnUpdateServer(timeSlice);
-
-		if (RplSession.Mode() != RplMode.Dedicated)
-			OnUpdateClient(timeSlice);
-		*/
 	}
 	
 	//------------------------------------------------------------------------------------------------

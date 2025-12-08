@@ -43,6 +43,15 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		return (inHorizontal && inVertical);
 	}
 
+	//------------------------------------------------------------------------------------------------
+	bool IsWithinLimitsPos(vector targetPosition)
+	{
+		vector dir = targetPosition - GetOwner().GetOrigin();
+		vector angles = dir.VectorToAngles().MapAngles();
+
+		return IsWithinLimitsAngle(angles);
+	}
+
 	/*
 	//------------------------------------------------------------------------------------------------
 	vector ComputeLead()
@@ -78,6 +87,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool IsOnTarget()
 	{
+		return false;
 		return vector.Distance(m_vCurrentAngles, m_vTargetAngles) <= 2;
 	}
 
@@ -88,43 +98,90 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	void OnUpdate(BON_AutoTurretTarget target, float timeSlice)
 	{
 		DebugTextWorldSpace.Create(GetOwner().GetWorld(), typename.EnumToString(BON_TurretAimState, m_eAimState),
-		DebugTextFlags.ONCE | DebugTextFlags.CENTER | DebugTextFlags.FACE_CAMERA, GetOwner().GetOrigin()[0], GetOwner().GetOrigin()[1] + 5, GetOwner().GetOrigin()[2]
+			DebugTextFlags.ONCE | DebugTextFlags.CENTER | DebugTextFlags.FACE_CAMERA,
+			GetOwner().GetOrigin()[0], GetOwner().GetOrigin()[1] + 5, GetOwner().GetOrigin()[2]
 		);
-
 
 		switch (m_eAimState)
 		{
 			case BON_TurretAimState.IDLE:
-				if (target)
-					m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
+				HandleIdle(target);
 				break;
 
 			case BON_TurretAimState.ROTATING_TO_TARGET:
-				vector angles = SCR_Math3D.GetLocalAngles(GetOwner(), target.m_Ent);
-				RotateTo(angles, timeSlice);
-
-				if (IsOnTarget())
-					m_eAimState = BON_TurretAimState.ON_TARGET;
-
-				if (!target)
-					m_eAimState = BON_TurretAimState.RETURNING_TO_IDLE;
+				HandleRotatingToTarget(target, timeSlice);
+				break;
 
 			case BON_TurretAimState.ON_TARGET:
-				if (!target)
-					m_eAimState = BON_TurretAimState.RETURNING_TO_IDLE;
-				if (!IsOnTarget())
-					m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
+				HandleOnTarget(target);
 				break;
 
 			case BON_TurretAimState.RETURNING_TO_IDLE:
-				RotateTo(vector.Zero, timeSlice);
-
-				if (target)
-					m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
-				else if (IsOnTarget())
-					m_eAimState = BON_TurretAimState.IDLE;
+				HandleReturningToIdle(target, timeSlice);
 				break;
 		}
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void HandleIdle(BON_AutoTurretTarget target)
+	{
+		if (target)
+			m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
+		
+		//Maybe idle rotate here..
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void HandleRotatingToTarget(BON_AutoTurretTarget target, float timeSlice)
+	{
+		if (!target)
+		{
+			m_eAimState = BON_TurretAimState.RETURNING_TO_IDLE;
+			return;
+		}
+
+		if (IsOnTarget())
+		{
+			m_eAimState = BON_TurretAimState.ON_TARGET;
+			return;
+		}
+
+		vector angles = SCR_Math3D.GetLocalAngles(GetOwner(), target.m_Ent);
+		RotateTo(angles, timeSlice);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void HandleOnTarget(BON_AutoTurretTarget target)
+	{
+		if (!target)
+		{
+			m_eAimState = BON_TurretAimState.RETURNING_TO_IDLE;
+			return;
+		}
+		
+		if (!IsOnTarget())
+		{
+			m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
+			return;
+		}
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void HandleReturningToIdle(BON_AutoTurretTarget target, float timeSlice)
+	{
+		if (target) //Got new target while returning to idle
+		{
+			m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
+			return;
+		}
+		
+		if (IsOnTarget()) //Is in idle pos
+		{
+			m_eAimState = BON_TurretAimState.IDLE;
+			return;
+		}
+		
+		RotateTo(vector.Zero, timeSlice);
 	}
 
 	//------------------------------------------------------------------------------------------------
