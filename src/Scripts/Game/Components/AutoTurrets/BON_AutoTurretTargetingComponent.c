@@ -14,7 +14,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	[Attribute("2", UIWidgets.Auto, "Time to scan for new targets (s)", category: "Targeting")]
 	protected float m_fMaxSearchTime;
 
-	
+
 	protected float m_fSearchTimer = 0;
 	protected BON_AutoTurretAimingComponent m_AimingComp;
 	protected Faction m_Faction;
@@ -64,7 +64,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		//Max distance or hit entity directly
 		if (traceDistance == 1 || param.TraceEnt == target.m_Ent)
 			return true;
-		
+
 		//Hit entity but its an equipment of the target (e.g vest, helmet etc..)
 		InventoryItemComponent itemComp = InventoryItemComponent.Cast(param.TraceEnt.FindComponent(InventoryItemComponent));
 		return (itemComp && itemComp.GetParentSlot());
@@ -91,14 +91,14 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	{
 		return m_CurrentTarget;
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	bool CleanupTarget()
 	{
-	    m_CurrentTarget = null;
-	    return false;
+		m_CurrentTarget = null;
+		return false;
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	bool CheckTarget()
 	{

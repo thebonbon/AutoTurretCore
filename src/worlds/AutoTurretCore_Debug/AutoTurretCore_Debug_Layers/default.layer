@@ -24,9 +24,18 @@ GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
     }
     BON_AutoTurretTargetingComponent "{670CB067D05746A0}" {
      m_eTargetFlags CHARACTERS
+     m_fMaxSearchTime 3
     }
    }
   }
  }
  coords 156.567 1 74.965
+}
+$grp StaticModelEntity : "{CAF8666F26CEB7AD}Prefabs/Structures/BuildingParts/Entry/ConcreteStairs_02_Narrow.et" {
+ {
+  coords 151.94 4.115 74.234
+ }
+ {
+  coords 151.94 7.45 68.809
+ }
 }
