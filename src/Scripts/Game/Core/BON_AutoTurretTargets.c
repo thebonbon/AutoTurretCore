@@ -5,29 +5,30 @@ class BON_AutoTurretTarget
 	
 	IEntity m_Ent;
 	RplId m_iRplId;
-	vector m_vAimpoint;
-
+	PerceivableComponent m_PerceivableComp;
+	
 	//------------------------------------------------------------------------------------------------
 	void BON_AutoTurretTarget(IEntity ent, float distance)
 	{
 		m_Ent = ent;
 		m_fDistance = distance;
-		m_vAimpoint = ent.GetOrigin();
 		
-		PerceivableComponent perceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
-		if (perceivableComp)
-		{
-			array<vector> aimPoints();
-			perceivableComp.GetAimpoints(aimPoints);
-			if (!aimPoints.IsEmpty())
-				m_vAimpoint = aimPoints[0];
-		}
+		m_PerceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
 	}
 	
 	//------------------------------------------------------------------------------------------------
 	vector GetAimPoint()
 	{
-		return m_Ent.CoordToParent(m_vAimpoint);
+		vector aimPoint = m_Ent.GetOrigin();
+		if (m_PerceivableComp)
+		{			
+			array<vector> aimPoints();
+			m_PerceivableComp.GetAimpoints(aimPoints); //World pos
+			if (!aimPoints.IsEmpty())
+				aimPoint = aimPoints[0];
+		}
+		
+		return aimPoint;
 	}
 	
 	//------------------------------------------------------------------------------------------------

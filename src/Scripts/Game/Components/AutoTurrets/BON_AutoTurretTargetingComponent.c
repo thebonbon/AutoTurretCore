@@ -14,6 +14,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	[Attribute("2", UIWidgets.Auto, "Time to scan for new targets (s)", category: "Targeting")]
 	protected float m_fMaxSearchTime;
 
+	
 	protected float m_fSearchTimer = 0;
 	protected BON_AutoTurretAimingComponent m_AimingComp;
 	protected Faction m_Faction;
@@ -60,7 +61,13 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		param.LayerMask = EPhysicsLayerPresets.Projectile;
 		float traceDistance = GetOwner().GetWorld().TraceMove(param, null);
 
-		return (traceDistance == 1) || (param.TraceEnt == target.m_Ent);
+		//Max distance or hit entity directly
+		if (traceDistance == 1 || param.TraceEnt == target.m_Ent)
+			return true;
+		
+		//Hit entity but its an equipment of the target (e.g vest, helmet etc..)
+		InventoryItemComponent itemComp = InventoryItemComponent.Cast(param.TraceEnt.FindComponent(InventoryItemComponent));
+		return (itemComp && itemComp.GetParentSlot());
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -72,7 +79,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 
 		foreach (BON_AutoTurretTarget target : sortedTargets)
 		{
-			if (m_AimingComp.IsWithinLimitsPos(target.GetAimPoint()) && LineOfSightTo(target))
+			if (m_AimingComp.IsWithinLimitsPos(target) && LineOfSightTo(target))
 				return target;
 		}
 
@@ -98,7 +105,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		if (!m_CurrentTarget || !m_CurrentTarget.IsValid())
 			return CleanupTarget();
 
-		if (!m_AimingComp.IsWithinLimitsPos(m_CurrentTarget.GetAimPoint()))
+		if (!m_AimingComp.IsWithinLimitsPos(m_CurrentTarget))
 			return CleanupTarget();
 
 		if (!LineOfSightTo(m_CurrentTarget))

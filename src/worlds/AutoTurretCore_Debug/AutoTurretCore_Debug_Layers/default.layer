@@ -20,6 +20,7 @@ GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
     BON_AutoTurretAimingComponent "{670CB067D2C43437}" {
      m_vLimitHorizontal -90 90 0
      m_fRotationSpeed 2
+     m_bDebug 1
     }
     BON_AutoTurretTargetingComponent "{670CB067D05746A0}" {
      m_eTargetFlags CHARACTERS
@@ -28,5 +29,4 @@ GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
   }
  }
  coords 156.567 1 74.965
- angles 0 90 0
 }

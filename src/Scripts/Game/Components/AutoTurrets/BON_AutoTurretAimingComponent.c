@@ -22,6 +22,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("1", UIWidgets.Auto, desc: "", category: "Setup")]
 	float m_fRotationSpeed;
 
+	[Attribute("false", UIWidgets.CheckBox, "Show Aiming debug?", category: "Debug")]
+	protected bool m_bDebug;
+	
 	SignalsManagerComponent m_SignalsManager;
 	int m_iSignalBody;
 	int m_iSignalBarrel;
@@ -40,14 +43,16 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		bool inHorizontal = Math.IsInRange(yaw, m_vLimitHorizontal[0], m_vLimitHorizontal[1]);
 		bool inVertical = Math.IsInRange(pitch, m_vLimitVertical[0], m_vLimitVertical[1]);
 
+		return true;
 		return (inHorizontal && inVertical);
 	}
 
 	//------------------------------------------------------------------------------------------------
-	bool IsWithinLimitsPos(vector targetPosition)
+	bool IsWithinLimitsPos(BON_AutoTurretTarget target)
 	{
-		vector dir = targetPosition - GetOwner().GetOrigin();
-		vector angles = dir.VectorToAngles().MapAngles();
+		vector mat[4];
+		GetOwner().GetTransform(mat);
+		vector angles = SCR_Math3D.GetLocalAngles(mat, target.GetAimPoint());
 
 		return IsWithinLimitsAngle(angles);
 	}
@@ -90,7 +95,6 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		return false;
 		return vector.Distance(m_vCurrentAngles, m_vTargetAngles) <= 2;
 	}
-
 
 	//------------------------------------------------------------------------------------------------
 	//! Server + Client
@@ -146,7 +150,20 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			return;
 		}
 
-		vector angles = SCR_Math3D.GetLocalAngles(GetOwner(), target.m_Ent);
+		vector mat[4];
+		GetOwner().GetTransform(mat);
+		vector angles = SCR_Math3D.GetLocalAngles(mat, target.GetAimPoint());
+		vector dir = angles.AnglesToVector().Normalized();
+		
+#ifdef WORKBENCH
+		if (m_bDebug)
+		{
+			Shape.CreateArrow(mat[3], mat[3] + dir * 5, 1, Color.BLUE, ShapeFlags.ONCE);
+			Shape.CreateSphere(Color.GREEN, ShapeFlags.ONCE, target.m_Ent.GetOrigin(), 0.1);
+			Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, target.GetAimPoint(), 0.11);
+		}
+#endif
+		
 		RotateTo(angles, timeSlice);
 	}
 

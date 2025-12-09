@@ -13,16 +13,13 @@ modded class SCR_Math3D
 	}
 
 	//------------------------------------------------------------------------------------------------
-	static vector GetLocalAngles(IEntity from, IEntity to)
+	static vector GetLocalAngles(vector fromMat[4], vector toPos)
 	{
-		vector dirWorld = to.GetOrigin() - from.GetOrigin();
+		vector dirWorld = toPos - fromMat[3];
 		dirWorld.Normalize();
-				
-		vector mat[3];
-		from.GetTransform(mat);
 		
 		vector dirLocal;
-		Math3D.MatrixInvMultiply3(mat, dirWorld, dirLocal);
+		Math3D.MatrixInvMultiply3(fromMat, dirWorld, dirLocal);
 		
 		return dirLocal.VectorToAngles().MapAngles();
 	}
