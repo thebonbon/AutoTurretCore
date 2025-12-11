@@ -51,7 +51,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 			return false;
 
 		vector muzzleMat[4];
-		m_MainTurretComp.GetCurrentMuzzle().GetTransform(muzzleMat);
+		m_AimingComp.GetBarrelTransform(muzzleMat);
 
 		TraceParam param = new TraceParam();
 		param.Start = muzzleMat[3];

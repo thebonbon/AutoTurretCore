@@ -43,6 +43,60 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	vector m_vCurrentAngles;
 	vector m_vTargetAngles;
 
+	//TODO
+	/*
+	//------------------------------------------------------------------------------------------------
+	void SetNewTarget(IEntity target)
+	{
+		m_Target = target;
+		if (target)
+		{
+			RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
+			m_iNearestTargetId = targetRplComp.Id();
+			m_TargetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
+		}
+		else
+		{
+			m_iNearestTargetId = -1;
+			m_TargetPerceivableComp = null;
+		}
+
+		Replication.BumpMe(); //Triggers OnTargetChanged()
+
+		//Apply current rotation
+		m_fCurrentBodyYaw = m_fNewBodyYaw;
+		m_fCurrentBarrelPitch = m_fNewBarrelPitch;
+		m_fLerp = 0;
+		
+	}
+	
+	
+	//------------------------------------------------------------------------------------------------
+	void OnTargetChanged()
+	{
+		if (m_iNearestTargetId == -1)
+		{
+			m_Target = null;
+			m_TargetPerceivableComp = null;
+		}
+		else
+		{
+			RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(m_iNearestTargetId));
+			if (rplComponent)
+			{
+				m_Target = rplComponent.GetEntity();
+				m_TargetPerceivableComp = PerceivableComponent.Cast(rplComponent.GetEntity().FindComponent(PerceivableComponent));
+			}
+			else
+			{
+
+				Print("[AutoTurretCore] Failed to get rplComponent for ID: " + m_iNearestTargetId, LogLevel.WARNING);
+				m_Target = null;
+			}
+	}
+	*/
+	
+	
 	//------------------------------------------------------------------------------------------------
 	bool IsWithinLimitsAngle(vector angles)
 	{
@@ -97,10 +151,16 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		return vector.Zero;
 	}
 	*/
+	
+	//------------------------------------------------------------------------------------------------
+	bool ReadyToFire()
+	{
+		return (m_eAimState == BON_TurretAimState.ROTATING_TO_TARGET && IsOnTarget());
+	}
+	
 	//------------------------------------------------------------------------------------------------
 	bool IsOnTarget()
 	{
-		return false;
 		return vector.Distance(m_vCurrentAngles, m_vTargetAngles) <= 2;
 	}
 
@@ -242,5 +302,42 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	override void OnPostInit(IEntity owner)
 	{
 		SetEventMask(owner, EntityEvent.INIT);
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void GetBodyTransform(out vector mat[4])
+	{
+		Animation ownerAnim = GetOwner().GetAnimation();
+		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBodyBone), mat);
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void GetBarrelTransform(out vector mat[4])
+	{
+		Animation ownerAnim = GetOwner().GetAnimation();
+		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBarrelBone), mat);
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	override event void _WB_AfterWorldUpdate(IEntity owner, float timeSlice)
+	{
+		if (!m_bDebug)
+			return;
+		
+		Animation ownerAnim = owner.GetAnimation();
+		vector boneMat[4];
+		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBodyBone), boneMat);
+		vector barrelMat[4];
+		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBarrelBone), barrelMat);
+
+		boneMat[3] = owner.CoordToParent(boneMat[3]);
+		barrelMat[3] = owner.CoordToParent(barrelMat[3]);
+
+		CreateCircleSlice(barrelMat[3], -owner.GetTransformAxis(0).Normalized(), owner.GetTransformAxis(2).Normalized(),
+			m_vLimitVertical[0], m_vLimitVertical[1], 5, Color.RED, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
+
+		CreateCircleSlice(boneMat[3], -owner.GetTransformAxis(1).Normalized(), owner.GetTransformAxis(2).Normalized(),
+			m_vLimitHorizontal[0], m_vLimitHorizontal[1], 5, Color.BLUE, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
+
 	}
 }

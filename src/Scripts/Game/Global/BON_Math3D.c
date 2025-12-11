@@ -23,4 +23,24 @@ modded class SCR_Math3D
 		
 		return dirLocal.VectorToAngles().MapAngles();
 	}
+	
+	//------------------------------------------------------------------------------------------------
+	static vector GetRandomVector(float min, float max)
+	{
+		vector result;
+		result[0] = s_AIRandomGenerator.RandFloatXY(min, max);
+		result[1] = s_AIRandomGenerator.RandFloatXY(min, max);
+		result[2] = s_AIRandomGenerator.RandFloatXY(min, max);
+		
+		return result;		
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	static void AddRandomVectorToMat(inout vector mat[4], float min, float max)
+	{
+		vector randomVector = SCR_Math3D.GetRandomVector(min, max);
+		vector randomMat[3];
+		Math3D.AnglesToMatrix(randomVector, randomMat);
+		Math3D.MatrixMultiply3(mat, randomMat, mat);
+	}
 }

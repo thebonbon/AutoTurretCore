@@ -53,13 +53,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("5", UIWidgets.Auto, "Every shot has this % chance to explode the projectile (missile) its shooting at", "0 100 1", category: "Setup")]
 	int m_fProjectileTriggerChance;
 
-	[Attribute("w_body", UIWidgets.Auto, "", category: "Setup")]
-	protected string m_sBodyBone;
-
-	[Attribute("w_barrel", UIWidgets.Auto, "", category: "Setup")]
-	protected string m_sBarrelBone;
-
-
 
 	[Attribute("0", UIWidgets.CheckBox, "Trigger projectile near target?", category: "Setup")]
 	bool m_bTriggerOnTarget;
@@ -71,8 +64,8 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("1", UIWidgets.Auto, "Rotation Speed. Higher = faster. 0 = no rotation", "0 inf 1", category: "Aiming")]
 	float m_fRotationSpeed;
 
-	[Attribute("1", UIWidgets.Auto, "Attack cooldown (s). Lower = faster", "0 inf 1", category: "Aiming")]
-	float m_fMaxAttackSpeed;
+	[Attribute("1", UIWidgets.Auto, "Time between attacks (s). Lower = faster", "0 inf 0.1", category: "Aiming")]
+	float m_fAttackDelay;
 
 
 	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Aiming")]
@@ -85,11 +78,11 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
 
-	[RplProp(onRplName: "OnTargetChanged")]
+	//[RplProp(onRplName: "OnTargetChanged")]
 	RplId m_iNearestTargetId;
 
 
-	protected float m_fAttackSpeed = 0;
+	protected float m_fAttackTimer;
 	protected int m_iCurrentMuzzle;
 	bool m_bActive = false;
 
@@ -101,7 +94,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected int m_iSignalBarrel;
 	protected int m_iShootCmd;
 	protected int m_iBodyVar;
-	protected TNodeId m_iBarrelBoneIndex;
 	protected float m_fProjectileSpeed;
 	protected float m_iAttacksOnTarget;
 	protected bool m_bIsProjectileReplicated;
@@ -117,10 +109,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected float m_fCurrentBarrelPitch;
 
 	bool m_bOnTarget;
-	protected IEntity m_Target;
+	protected ref BON_AutoTurretTarget m_Target;
 	ref Shape m_LoSDebug;
 	
-	
+	SoundComponent m_SoundComponent;	
 	BON_AutoTurretAimingComponent m_AimingComp;
 	BON_AutoTurretTargetingComponent m_TargetingComp;
 
@@ -146,14 +138,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		return m_TargetingComp.m_eTargetFlags;
 	}
-	
-	//------------------------------------------------------------------------------------------------
-	PointInfo GetCurrentMuzzle()
-	{
-		return m_ProjectileMuzzles[m_iCurrentMuzzle];
-	}
-	
-	
+		
 	//------------------------------------------------------------------------------------------------
 	void TriggerProjectile(IEntity projectile)
 	{
@@ -173,55 +158,96 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	void LaunchProjectile(notnull IEntity projectile)
+	void SetTriggerOnTarget(IEntity projectile)
 	{
-		if (m_bTriggerOnTarget)
-		{
-			float timeToTarget;
-			float targetDistance = vector.Distance(GetOwner().GetOrigin(), m_Target.GetOrigin());
-			BallisticTable.GetHeightFromProjectile(targetDistance, timeToTarget, projectile);
+		float timeToTarget;
+		float targetDistance = vector.Distance(GetOwner().GetOrigin(), m_Target.GetAimPoint());
+		BallisticTable.GetHeightFromProjectile(targetDistance, timeToTarget, projectile);
 
-			if (timeToTarget > 0)
-			{
-				timeToTarget += s_AIRandomGenerator.RandFloatXY(-0.2, 0.2);
-				GetGame().GetCallqueue().CallLater(TriggerProjectile, timeToTarget * 1000, false, projectile); //SetTimer on TimerTriggerComponent does not work :(
-			}
-		}
-
+		if (timeToTarget <= 0)
+			return;
+		
+		timeToTarget += s_AIRandomGenerator.RandFloatXY(-0.2, 0.2);
+		//SetTimer on TimerTriggerComponent does not work :(
+		GetGame().GetCallqueue().CallLater(TriggerProjectile, timeToTarget * 1000, false, projectile); 
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void LaunchProjectile(IEntity projectile)
+	{
+		if (!projectile)
+			return;
+		
 		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(projectile);
 		if (guidedProjectile)
 		{
 			if (m_fRocketGuidanceStrength != 0)
 				guidedProjectile.m_fGuidanceStrength = m_fRocketGuidanceStrength;
-			guidedProjectile.SetTargetAndLaunch(m_Target, m_eFireMode);
+			guidedProjectile.SetTargetAndLaunch(m_Target.m_Ent, m_eFireMode);
 			return;
 		}
 
 		ProjectileMoveComponent moveComp = ProjectileMoveComponent.Cast(projectile.FindComponent(ProjectileMoveComponent));
 		if (moveComp)
 			moveComp.Launch(projectile.GetTransformAxis(2).Normalized(), vector.Zero, 1, projectile, GetOwner(), null, null, null);
-
-		if (m_AnimationController)
-			m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
 	}
 
 	//------------------------------------------------------------------------------------------------
+	void PlayShootSound()
+	{
+		if (m_SoundComponent)
+			m_SoundComponent.SoundEvent(m_sShootSound);
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void SpawnMuzzleParticle(vector muzzleMat[4])
+	{
+		if (!m_sMuzzleParticle)
+			return;
+		
+		ParticleEffectEntitySpawnParams params();
+		params.TransformMode = ETransformMode.WORLD;
+		params.Transform = muzzleMat;
+		ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_sMuzzleParticle, params);
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void GetNextMuzzleTransform(out vector muzzleMat[4])
+	{
+		PointInfo currentMuzzle = m_ProjectileMuzzles[m_iCurrentMuzzle];
+		currentMuzzle.GetTransform(muzzleMat);
+		
+		m_iCurrentMuzzle++;
+		if (m_iCurrentMuzzle >= m_ProjectileMuzzles.Count())
+			m_iCurrentMuzzle = 0;
+	}
+	
+	//------------------------------------------------------------------------------------------------
 	void Fire()
 	{
-		if (!m_Target)
-			return;
-
 		vector muzzleMat[4];
-		m_ProjectileMuzzles[m_iCurrentMuzzle].GetTransform(muzzleMat);
-		vector inaccuracyAngles = Vector(
-				s_AIRandomGenerator.RandFloatXY(-m_fAttackInaccuracy, m_fAttackInaccuracy),
-				s_AIRandomGenerator.RandFloatXY(-m_fAttackInaccuracy, m_fAttackInaccuracy),
-				s_AIRandomGenerator.RandFloatXY(-m_fAttackInaccuracy, m_fAttackInaccuracy)
-		);
-		vector inaccuracyMat[3];
-		Math3D.AnglesToMatrix(inaccuracyAngles, inaccuracyMat);
-		Math3D.MatrixMultiply3(muzzleMat, inaccuracyMat, muzzleMat);
-
+		GetNextMuzzleTransform(muzzleMat);
+		SCR_Math3D.AddRandomVectorToMat(muzzleMat, -m_fAttackInaccuracy, m_fAttackInaccuracy);
+		
+		IEntity projectile = SpawnProjectile(muzzleMat, m_Target);
+		SpawnMuzzleParticle(muzzleMat);
+		PlayShootSound();		
+		
+		if (m_AnimationController)
+			m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
+		
+		if (m_bTriggerOnTarget)
+			SetTriggerOnTarget(projectile);
+		
+		//TOOD: Maybe first few bullets never hit? To prevent first one to hit. Or increase chance every bullet up to max
+		bool triggerTargetProjectile = s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance;
+		if (triggerTargetProjectile && m_Target.m_Ent.FindComponent(BaseTriggerComponent))
+			TriggerProjectile(m_Target.m_Ent);
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	IEntity SpawnProjectile(vector muzzleMat[4], BON_AutoTurretTarget target)
+	{		
 		EntitySpawnParams spawnParams();
 		spawnParams.TransformMode = ETransformMode.WORLD;
 		spawnParams.Transform = muzzleMat;
@@ -229,128 +255,27 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!m_bIsProjectileReplicated || Replication.IsServer())
 		{
 			IEntity lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
-			if (!lastSpawnedProjectile)
-				return;
-
-			LaunchProjectile(lastSpawnedProjectile);
+			if (lastSpawnedProjectile)
+				LaunchProjectile(lastSpawnedProjectile);
+			
+			return lastSpawnedProjectile;
 		}
-
-		SoundComponent soundComponent = SoundComponent.Cast(GetOwner().FindComponent(SoundComponent));
-		if (soundComponent)
-			soundComponent.SoundEvent(m_sShootSound);
-
-		if (m_sMuzzleParticle)
-		{
-			ParticleEffectEntitySpawnParams params();
-			params.TransformMode = ETransformMode.WORLD;
-			params.Transform = muzzleMat;
-			ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_sMuzzleParticle, params);
-		}
-
-		bool triggerProjectile = s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance;
-		if (m_Target.FindComponent(BaseTriggerComponent) && triggerProjectile)
-			TriggerProjectile(m_Target);
-
-		m_iCurrentMuzzle++;
-		if (m_iCurrentMuzzle >= m_ProjectileMuzzles.Count())
-			m_iCurrentMuzzle = 0;
+		
+		return null;
 	}
 
-	
-	//------------------------------------------------------------------------------------------------
-	void OnTargetChanged()
-	{
-		/*
-		if (m_iNearestTargetId == -1)
-		{
-			m_Target = null;
-			m_TargetPerceivableComp = null;
-		}
-		else
-		{
-			RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(m_iNearestTargetId));
-			if (rplComponent)
-			{
-				m_Target = rplComponent.GetEntity();
-				m_TargetPerceivableComp = PerceivableComponent.Cast(rplComponent.GetEntity().FindComponent(PerceivableComponent));
-			}
-			else
-			{
-
-				Print("[AutoTurretCore] Failed to get rplComponent for ID: " + m_iNearestTargetId, LogLevel.WARNING);
-				m_Target = null;
-			}
-		}*/
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void SetNewTarget(IEntity target)
-	{
-		/*
-		m_Target = target;
-		if (target)
-		{
-			RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
-			m_iNearestTargetId = targetRplComp.Id();
-			m_TargetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
-		}
-		else
-		{
-			m_iNearestTargetId = -1;
-			m_TargetPerceivableComp = null;
-		}
-
-		Replication.BumpMe(); //Triggers OnTargetChanged()
-
-		//Apply current rotation
-		m_fCurrentBodyYaw = m_fNewBodyYaw;
-		m_fCurrentBarrelPitch = m_fNewBarrelPitch;
-		m_fLerp = 0;
-		*/
-	}
-
-
-
-	
-
-	//------------------------------------------------------------------------------------------------
-	void OnUpdateServer(float timeSlice)
-	{
-		/*
-		m_fSearchTimer -= timeSlice;
-		if (m_fSearchTimer > 0)
-			return;
-
-		m_fSearchTimer = m_fMaxSearchTime;
-
-		//No or invalid target -> Find new one
-		if (!m_Target || !CheckCurrentTarget())
-			SetNewTarget(FindTarget());
-		*/
-	}
-
-	/*
-	//------------------------------------------------------------------------------------------------
-	void OnUpdateClient(float timeSlice)
-	{
-		if (m_bDebug)
-			ShowDebug();
-
-		Aim(timeSlice);
-
-		m_fAttackSpeed -= timeSlice;
-		if (m_fAttackSpeed <= 0 && m_bOnTarget)
-		{
-			Fire();
-			m_fAttackSpeed = m_fMaxAttackSpeed;
-		}
-	}
-	*/
 	//------------------------------------------------------------------------------------------------
 	void OnUpdate(float timeSlice)
 	{
-		BON_AutoTurretTarget target = m_TargetingComp.GetTarget();
-		m_AimingComp.OnUpdate(target, timeSlice);
+		m_Target = m_TargetingComp.GetTarget();
+		m_AimingComp.OnUpdate(m_Target, timeSlice);
+		
+		m_fAttackTimer -= timeSlice;
+		if (m_fAttackTimer <= 0 && m_AimingComp.ReadyToFire() && m_Target)
+		{
+			Fire();
+			m_fAttackTimer = m_fAttackDelay;
+		}
 	}
 	
 	//------------------------------------------------------------------------------------------------
@@ -371,7 +296,6 @@ class BON_AutoTurretComponent : ScriptComponent
 			system.Unregister(this);
 	}
 
-	
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
@@ -385,21 +309,16 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		if (!GetGame().InPlayMode())
 			return;
-
 		
-		
+		m_SoundComponent = SoundComponent.Cast(GetOwner().FindComponent(SoundComponent));		
 		m_AimingComp = BON_AutoTurretAimingComponent.Cast(owner.FindComponent(BON_AutoTurretAimingComponent));
-		m_TargetingComp = BON_AutoTurretTargetingComponent.Cast(owner.FindComponent(BON_AutoTurretTargetingComponent));
-		
+		m_TargetingComp = BON_AutoTurretTargetingComponent.Cast(owner.FindComponent(BON_AutoTurretTargetingComponent));		
 		m_AnimationController = BaseItemAnimationComponent.Cast(owner.FindComponent(BaseItemAnimationComponent));
-		m_iShootCmd = m_AnimationController.BindCommand("CMD_SHOOT");
-		
-		m_iBarrelBoneIndex = GetOwner().GetAnimation().GetBoneIndex(m_sBarrelBone);
+		m_iShootCmd = m_AnimationController.BindCommand("CMD_SHOOT");		
 
 		Resource projectileResource = Resource.Load(m_Projectile);
 		if (!projectileResource)
 			return;
-
 
 		BaseContainer rplCompBase = SCR_BaseContainerTools.FindComponentSource(projectileResource, RplComponent);
 		m_bIsProjectileReplicated = (rplCompBase != null);
@@ -427,28 +346,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		DisconnectFromAutoTurretSystem();
 	}
-/*
+
 	//------------------------------------------------------------------------------------------------
 	override event void _WB_AfterWorldUpdate(IEntity owner, float timeSlice)
 	{
-
-		if (!m_bDebug)
-			return;
-		Animation ownerAnim = owner.GetAnimation();
-		vector boneMat[4];
-		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBodyBone), boneMat);
-		vector barrelMat[4];
-		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBarrelBone), barrelMat);
-
-		boneMat[3] = owner.CoordToParent(boneMat[3]);
-		barrelMat[3] = owner.CoordToParent(barrelMat[3]);
-
-		CreateCircleSlice(barrelMat[3], -owner.GetTransformAxis(0).Normalized(), owner.GetTransformAxis(2).Normalized(),
-			m_vLimitVertical[0], m_vLimitVertical[1], 5, Color.RED, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
-
-		CreateCircleSlice(boneMat[3], -owner.GetTransformAxis(1).Normalized(), owner.GetTransformAxis(2).Normalized(),
-			m_vLimitHorizontal[0], m_vLimitHorizontal[1], 5, Color.BLUE, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
-
 		foreach (PointInfo muzzle : m_ProjectileMuzzles)
 		{
 			vector mat[4];
@@ -456,5 +357,4 @@ class BON_AutoTurretComponent : ScriptComponent
 			Shape.CreateSphere(Color.RED, ShapeFlags.ONCE | ShapeFlags.WIREFRAME, mat[3], 0.075);
 		}
 	}
-	*/
 }

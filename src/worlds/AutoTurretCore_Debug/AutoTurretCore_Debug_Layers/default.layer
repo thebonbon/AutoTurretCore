@@ -18,7 +18,6 @@ GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    components {
     BON_AutoTurretAimingComponent "{670CB067D2C43437}" {
-     m_vLimitHorizontal -90 90 0
      m_fRotationSpeed 2
      m_bDebug 1
     }
@@ -29,13 +28,8 @@ GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
    }
   }
  }
- coords 156.567 1 74.965
+ coords 151.661 1 71.621
 }
-$grp StaticModelEntity : "{CAF8666F26CEB7AD}Prefabs/Structures/BuildingParts/Entry/ConcreteStairs_02_Narrow.et" {
- {
-  coords 151.94 4.115 74.234
- }
- {
-  coords 151.94 7.45 68.809
- }
+GenericEntity : "{D584F2FFFDC7DE49}Prefabs/Weapons/Warheads/Warhead_Shell_HE.et" {
+ coords 149.318 1 79.049
 }
