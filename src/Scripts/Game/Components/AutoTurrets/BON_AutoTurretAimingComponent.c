@@ -132,7 +132,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		float timeToTarget;
 		float targetDistance = vector.Distance(barrelOrigin, m_Target.GetAimPoint());
-		float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource, 1, false);
+		float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource);
 
 		Physics targetRB = m_Target.m_Ent.GetPhysics();
 		
@@ -141,7 +141,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			//Add Leading
 			predictedLeadingOffset = targetRB.GetVelocity() * timeToTarget;
 			targetDistance = vector.Distance(barrelOrigin, m_Target.GetAimPoint() + predictedLeadingOffset);
-			heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource, 1, false);
+			heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource);
 		}
 
 		//Add Ballistics
@@ -161,11 +161,11 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool IsOnTarget()
 	{
-		const float ANGLE_TOLERANCE = 0.5; // degrees
+		const float ANGLE_TOLERANCE = 0.75; // degrees
 
 		vector current = SCR_Math3D.FixEulerVector180(m_vCurrentAngles);
 		vector target = SCR_Math3D.FixEulerVector180(m_vTargetAngles);
-
+		
 		return Math.AbsFloat(current[0] - target[0]) < ANGLE_TOLERANCE
 			&& Math.AbsFloat(current[1] - target[1]) < ANGLE_TOLERANCE;
 	}
