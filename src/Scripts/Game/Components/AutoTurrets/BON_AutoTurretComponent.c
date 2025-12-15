@@ -53,25 +53,20 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("5", UIWidgets.Auto, "Every shot has this % chance to explode the projectile (missile) its shooting at", "0 100 1", category: "Setup")]
 	int m_fProjectileTriggerChance;
 
-
 	[Attribute("0", UIWidgets.CheckBox, "Trigger projectile near target?", category: "Setup")]
 	bool m_bTriggerOnTarget;
 
-	//--- AIMING ---
-	[Attribute("1", UIWidgets.CheckBox, "Enable turret on spawn?", category: "Aiming")]
+	[Attribute("1", UIWidgets.CheckBox, "Enable turret on spawn?", category: "Setup")]
 	bool m_bActiveOnSpawn;
 
-	[Attribute("1", UIWidgets.Auto, "Rotation Speed. Higher = faster. 0 = no rotation", "0 inf 1", category: "Aiming")]
-	float m_fRotationSpeed;
-
-	[Attribute("1", UIWidgets.Auto, "Time between attacks (s). Lower = faster", "0 inf 0.1", category: "Aiming")]
+	//--- SHOOTING ---
+	[Attribute("1", UIWidgets.Auto, "Time / Cooldown between attacks (s). Lower = faster", "0 inf 0.1", category: "Muzzle")]
 	float m_fAttackDelay;
 
-
-	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Aiming")]
+	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Muzzle")]
 	float m_fAttackInaccuracy;
 
-	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | Guided: Follow the target (missiles only!) | Intercept: Lead the target to intercept at predicted position", enums: ParamEnumArray.FromEnum(BON_TurretFireMode), category: "Aiming")]
+	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | \ Guided: Follow the target (missiles only!) | Intercept: Lead the target to intercept at predicted position", enums: ParamEnumArray.FromEnum(BON_TurretFireMode), category: "Muzzle")]
 	BON_TurretFireMode m_eFireMode;
 
 	//--- MISC ---
@@ -271,7 +266,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_AimingComp.OnUpdate(m_Target, timeSlice);
 		
 		m_fAttackTimer -= timeSlice;
-		if (m_fAttackTimer <= 0 && m_AimingComp.ReadyToFire() && m_Target)
+		if (m_fAttackTimer <= 0 && m_AimingComp.CanFire())
 		{
 			Fire();
 			m_fAttackTimer = m_fAttackDelay;

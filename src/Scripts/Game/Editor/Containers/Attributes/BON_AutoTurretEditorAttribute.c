@@ -166,7 +166,7 @@ class BON_AutoTurretRotationSpeedEditorAttribute : SCR_BaseValueListEditorAttrib
 		if (!autoTurretComponent)
 			return null;
 
-		return SCR_BaseEditorAttributeVar.CreateFloat(autoTurretComponent.m_fRotationSpeed);
+		return SCR_BaseEditorAttributeVar.CreateFloat(autoTurretComponent.m_AimingComp.m_fRotationSpeed);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -177,7 +177,7 @@ class BON_AutoTurretRotationSpeedEditorAttribute : SCR_BaseValueListEditorAttrib
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
-			autoTurretComponent.m_fRotationSpeed = var.GetFloat();
+			autoTurretComponent.m_AimingComp.m_fRotationSpeed = var.GetFloat();
 	}
 }
 

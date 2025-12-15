@@ -21,10 +21,13 @@ GenericEntity {
    }
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   components {
+    BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
+    }
+    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
+    }
+   }
    m_sShootSound "SOUND_SHOT"
-   m_sBodyBone "w_body"
-   m_sBarrelBone "w_barrel"
-   m_vLimitHorizontal -180 180 0
    m_fAttackInaccuracy 0
   }
   BON_AutoTurretTargetComponent "{62C91C0D0A7CBA50}" {
