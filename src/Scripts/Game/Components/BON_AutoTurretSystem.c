@@ -3,6 +3,13 @@ class BON_AutoTurretSystem : GameSystem
 	protected ref array<BON_AutoTurretComponent> m_aTurretManagers = {};
 
 	//------------------------------------------------------------------------------------------------
+	//! Pause if game is paused
+	override bool ShouldBePaused() 
+	{
+		return true;
+	}
+	
+	//------------------------------------------------------------------------------------------------
 	protected override void OnUpdate(ESystemPoint point)
 	{
 		float timeSlice;
