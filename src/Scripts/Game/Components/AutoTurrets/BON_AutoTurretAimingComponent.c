@@ -35,7 +35,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	int m_iSignalBarrel;
 
 	protected TNodeId m_iBarrelBoneIndex;
-
+	BON_AutoTurretComponent m_TurretComp
 	ref BON_AutoTurretTarget m_Target;
 	BON_TurretAimState m_eAimState = BON_TurretAimState.IDLE;
 	vector m_vCurrentAngles;
@@ -117,38 +117,40 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		return IsWithinLimitsAngle(angles);
 	}
 
-	/*
 	//------------------------------------------------------------------------------------------------
+	//! Lead offset needed to hit target
 	vector ComputeLead()
 	{
-		vector muzzleFwd = barrelMat[2].Normalized();
+		vector predictedLeadingOffset;
+
 		vector barrelMat[4];
-		GetOwner().GetAnimation().GetBoneMatrix(m_iBarrelBoneIndex, barrelMat);
+		GetBarrelTransform(barrelMat);
 		vector barrelOrigin = GetOwner().CoordToParent(barrelMat[3]);
 
-		Resource projectileResource = Resource.Load(m_Projectile);
+		Resource projectileResource = Resource.Load(m_TurretComp.m_Projectile);
 		IEntitySource projectileSource = SCR_BaseContainerTools.FindEntitySource(projectileResource);
 
-		if (m_eFireMode == BON_TurretFireMode.Intercept)
+		float timeToTarget;
+		float targetDistance = vector.Distance(barrelOrigin, m_Target.GetAimPoint());
+		float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource, 1, false);
+
+		Physics targetRB = m_Target.m_Ent.GetPhysics();
+		
+		if (targetRB)
 		{
-			float timeToTarget;
-			float targetDistance = vector.Distance(barrelOrigin, targetAimPoint);
-			float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource);
-
-			if (m_Target.GetPhysics())
-			{
-				//Add Leading
-				targetAimPoint += m_Target.GetPhysics().GetVelocity() * timeToTarget;
-				targetDistance = vector.Distance(barrelOrigin, targetAimPoint);
-				heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource);
-			}
-
-			//Add Ballistics
-			targetAimPoint[1] = targetAimPoint[1] + heightOffset;
+			//Add Leading
+			predictedLeadingOffset = targetRB.GetVelocity() * timeToTarget;
+			targetDistance = vector.Distance(barrelOrigin, m_Target.GetAimPoint() + predictedLeadingOffset);
+			heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource, 1, false);
 		}
-		return vector.Zero;
+
+		//Add Ballistics
+		predictedLeadingOffset[1] = predictedLeadingOffset[1] + heightOffset;
+		Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, m_Target.GetAimPoint() + predictedLeadingOffset, 10);
+		Shape.CreateSphere(Color.YELLOW, ShapeFlags.ONCE, m_Target.GetAimPoint(), 1);
+		
+		return predictedLeadingOffset;
 	}
-	*/
 
 	//------------------------------------------------------------------------------------------------
 	bool CanFire()
@@ -159,11 +161,11 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool IsOnTarget()
 	{
-		const float ANGLE_TOLERANCE = 2; // degrees
+		const float ANGLE_TOLERANCE = 0.5; // degrees
 
 		vector current = SCR_Math3D.FixEulerVector180(m_vCurrentAngles);
 		vector target = SCR_Math3D.FixEulerVector180(m_vTargetAngles);
-		
+
 		return Math.AbsFloat(current[0] - target[0]) < ANGLE_TOLERANCE
 			&& Math.AbsFloat(current[1] - target[1]) < ANGLE_TOLERANCE;
 	}
@@ -182,9 +184,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	void HandleRotatingToTarget(float timeSlice)
 	{
 		vector desiredAngles;
-				
+
 		if (m_Target)
-		{		
+		{
 			vector barrelMat[4];
 			GetOwner().GetAnimation().GetBoneMatrix(m_iBarrelBoneIndex, barrelMat); //Local mat
 			vector barrelOrigin = GetOwner().CoordToParent(barrelMat[3]); //World mat
@@ -192,7 +194,8 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			GetOwner().GetTransform(barrelMat); //Override mat
 			barrelMat[3] = barrelOrigin; //Add origin back
 
-			desiredAngles = SCR_Math3D.GetLocalAngles(barrelMat, m_Target.GetAimPoint());		
+			vector leadPoint = m_Target.GetAimPoint() + ComputeLead();
+			desiredAngles = SCR_Math3D.GetLocalAngles(barrelMat, leadPoint);
 		}
 		else
 		{
@@ -201,14 +204,14 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		}
 
 		RotateTo(desiredAngles, timeSlice);
-		
+
 		//Rotated to Idle pos
 		if (!m_Target && IsOnTarget())
 		{
 			m_eAimState = BON_TurretAimState.IDLE;
 		}
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	//! Rotate to desired angles within limits
 	void RotateTo(vector targetAngles, float timeSlice)
@@ -231,13 +234,13 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			DebugTextFlags.ONCE | DebugTextFlags.CENTER | DebugTextFlags.FACE_CAMERA,
 			GetOwner().GetOrigin()[0], GetOwner().GetOrigin()[1] + 5, GetOwner().GetOrigin()[2]
 		);
-		
+
 		vector dir = m_vTargetAngles.AnglesToVector().Normalized();
 		vector barrelMat[4];
 		GetBarrelTransform(barrelMat);
-				
+
 		Shape.CreateArrow(barrelMat[3], barrelMat[3] + dir * 5, 0.25, Color.BLUE, ShapeFlags.ONCE);
-		
+
 		if (m_Target)
 		{
 			Shape.CreateSphere(Color.GREEN, ShapeFlags.ONCE, m_Target.m_Ent.GetOrigin(), 0.1);
@@ -245,7 +248,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		}
 	}
 	#endif
-	
+
 	//------------------------------------------------------------------------------------------------
 	//! Server + Client
 	//! Called from main AutoTurretComponent
@@ -263,6 +266,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 				HandleRotatingToTarget(timeSlice);
 				break;
 		}
+
 		#ifdef WORKBENCH
 		if (m_bDebug)
 			ShowDebug();
@@ -273,6 +277,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	override void EOnInit(IEntity owner)
 	{
 		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
+		m_TurretComp = BON_AutoTurretComponent.Cast(owner.FindComponent(BON_AutoTurretComponent));
 		m_iSignalBody = m_SignalsManager.AddOrFindSignal("BodyRotation", 0);
 		m_iSignalBarrel = m_SignalsManager.AddOrFindSignal("BarrelRotation", 0);
 
