@@ -146,9 +146,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		//Add Ballistics
 		predictedLeadingOffset[1] = predictedLeadingOffset[1] + heightOffset;
-		Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, m_Target.GetAimPoint() + predictedLeadingOffset, 10);
-		Shape.CreateSphere(Color.YELLOW, ShapeFlags.ONCE, m_Target.GetAimPoint(), 1);
-		
+				
 		return predictedLeadingOffset;
 	}
 
@@ -254,6 +252,10 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//! Called from main AutoTurretComponent
 	void OnUpdate(BON_AutoTurretTarget target, float timeSlice)
 	{
+		// Prevent firing on stale idle angles
+		if (target != m_Target)
+			m_vTargetAngles = Vector(-1, -1, -1);
+		
 		m_Target = target;
 
 		switch (m_eAimState)
