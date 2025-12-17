@@ -23,25 +23,12 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	protected BON_AutoTurretComponent m_MainTurretComp;
 
 	//------------------------------------------------------------------------------------------------
-	bool IsEnemy(IEntity ent)
+	bool IsEnemy(BON_AutoTurretTarget target)
 	{
-		#ifdef WORKBENCH
-		if (ent.GetName() == "BOB")
-			return true;
-		#endif
-
-		if (Projectile.Cast(ent))
-			return true;
-
-		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(ent.FindComponent(FactionAffiliationComponent));
-		if (!factionComp)
+		if (!target.m_Faction)
 			return false;
-
-		Faction targetFaction = factionComp.GetAffiliatedFaction();
-		if (!targetFaction)
-			return false;
-
-		return targetFaction.IsFactionEnemy(m_Faction);
+		
+		return target.m_Faction.IsFactionEnemy(m_Faction);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -79,7 +66,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 
 		foreach (BON_AutoTurretTarget target : sortedTargets)
 		{
-			if (m_AimingComp.IsWithinLimitsPos(target) && LineOfSightTo(target))
+			if (m_AimingComp.IsWithinLimitsPos(target) && IsEnemy(target) && LineOfSightTo(target))
 				return target;
 		}
 
