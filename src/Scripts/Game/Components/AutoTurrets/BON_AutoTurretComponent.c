@@ -81,7 +81,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected int m_iCurrentMuzzle;
 	bool m_bActive = false;
 
-	protected ref Faction m_Faction;
+	protected Faction m_Faction;
 	protected AnimationControllerComponent m_AnimationController;
 	protected SignalsManagerComponent m_SignalsManager;
 
@@ -247,16 +247,23 @@ class BON_AutoTurretComponent : ScriptComponent
 		spawnParams.TransformMode = ETransformMode.WORLD;
 		spawnParams.Transform = muzzleMat;
 
+		IEntity lastSpawnedProjectile;
+		
 		if (!m_bIsProjectileReplicated || Replication.IsServer())
 		{
-			IEntity lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
-			if (lastSpawnedProjectile)
-				LaunchProjectile(lastSpawnedProjectile);
+			lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
+			if (!lastSpawnedProjectile)
+				return null;
 			
-			return lastSpawnedProjectile;
+			//Update projectile faction of IFF
+			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(lastSpawnedProjectile.FindComponent(BON_AutoTurretTargetComponent));
+			if (targetComp)
+				targetComp.m_Faction = m_Faction;
+			
+			LaunchProjectile(lastSpawnedProjectile);
 		}
 		
-		return null;
+		return lastSpawnedProjectile;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -305,6 +312,10 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!GetGame().InPlayMode())
 			return;
 		
+		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
+		if (factionComp)
+			m_Faction = factionComp.GetAffiliatedFaction();
+
 		m_SoundComponent = SoundComponent.Cast(GetOwner().FindComponent(SoundComponent));		
 		m_AimingComp = BON_AutoTurretAimingComponent.Cast(owner.FindComponent(BON_AutoTurretAimingComponent));
 		m_TargetingComp = BON_AutoTurretTargetingComponent.Cast(owner.FindComponent(BON_AutoTurretTargetingComponent));		

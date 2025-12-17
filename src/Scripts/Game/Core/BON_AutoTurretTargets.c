@@ -6,12 +6,14 @@ class BON_AutoTurretTarget
 	IEntity m_Ent;
 	RplId m_iRplId;
 	PerceivableComponent m_PerceivableComp;
+	Faction m_Faction;
 
 	//------------------------------------------------------------------------------------------------
-	void BON_AutoTurretTarget(IEntity ent, float distance)
+	void BON_AutoTurretTarget(IEntity ent, float distance, Faction faction)
 	{
 		m_Ent = ent;
 		m_fDistance = distance;
+		m_Faction = faction;
 
 		m_PerceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
 	}
@@ -56,18 +58,20 @@ class BON_AutoTurretGridMap : PointGridMap
 		array<IEntity> entities = {};
 		GetGame().GetAutoTurretGrid().FindEntitiesInRange(entities, origin, range, mask);
 
-		//Sort by distance
 		foreach (IEntity candidate : entities)
 		{
 			if (owner == candidate)
 				continue;
 
 			float distance = vector.DistanceSq(origin, candidate.GetOrigin());
-			BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(candidate, distance);
+			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(candidate.FindComponent(BON_AutoTurretTargetComponent));
+				
+			BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(candidate, distance, targetComp.m_Faction);
 			if (newTarget.IsValid())
 				sortedTargets.Insert(newTarget);
-		}
-		sortedTargets.Sort(); //Sorted by distance, smallest first
+		}		
+				
+		sortedTargets.Sort(); //Sorted by m_fDistance, smallest first
 
 		return sortedTargets.Count();
 	}
