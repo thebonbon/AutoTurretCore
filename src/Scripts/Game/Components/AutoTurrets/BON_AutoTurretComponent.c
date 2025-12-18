@@ -38,16 +38,19 @@ class BON_AutoTurretComponentClass : ScriptComponentClass
 class BON_AutoTurretComponent : ScriptComponent
 {
 	//--- SETUP ---
-	[Attribute("", UIWidgets.ResourcePickerThumbnail, "Projectile to shoot (Currently only works with Missles)", "et", category: "Setup")]
+	[Attribute("", UIWidgets.ResourcePickerThumbnail, "Projectile to shoot", "et", category: "Setup")]
 	ResourceName m_Projectile;
+	
+	[Attribute(desc: "PointInfo: Projectile spawn positions (loops automatically)", category: "Setup")]
+	protected ref array<ref PointInfo> m_ProjectileSpawnPositions;
+	
+	[Attribute("", UIWidgets.ResourcePickerThumbnail, "Particle effect to play", "ptc", category: "Setup")]
+	ResourceName m_MuzzleParticle;
+	
+	[Attribute(desc: "Effect positions (count and order needs to be the same as ProjectileSpawnPositions)", category: "Setup")]
+	protected ref array<ref PointInfo> m_EffectPositions;
 
-	[Attribute("", UIWidgets.ResourcePickerThumbnail, "Muzzle particle effect", "ptc", category: "Setup")]
-	protected ResourceName m_sMuzzleParticle;
-
-	[Attribute(desc: "Turret muzzles (Projectile spawn pos) E.g one for each barrel", category: "Setup")]
-	protected ref array<ref PointInfo> m_ProjectileMuzzles;
-
-	[Attribute("SOUND_SHOT", UIWidgets.Auto, "", category: "Setup")]
+	[Attribute("SOUND_SHOT", UIWidgets.Auto, "Sound Name set in SoundComponent", category: "Setup")]
 	string m_sShootSound;
 
 	[Attribute("5", UIWidgets.Auto, "Every shot has this % chance to explode the projectile (missile) its shooting at", "0 100 1", category: "Setup")]
@@ -196,36 +199,32 @@ class BON_AutoTurretComponent : ScriptComponent
 	
 	//------------------------------------------------------------------------------------------------
 	void SpawnMuzzleParticle(vector muzzleMat[4])
-	{
-		if (!m_sMuzzleParticle)
-			return;
-		
+	{				
 		ParticleEffectEntitySpawnParams params();
 		params.TransformMode = ETransformMode.WORLD;
 		params.Transform = muzzleMat;
-		ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_sMuzzleParticle, params);
+		ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_MuzzleParticle, params);
 	}
 	
 	//------------------------------------------------------------------------------------------------
-	void GetNextMuzzleTransform(out vector muzzleMat[4])
+	void GetMuzzleTransform(out vector spawnMat[4], out vector effectMat[4])
 	{
-		PointInfo currentMuzzle = m_ProjectileMuzzles[m_iCurrentMuzzle];
-		currentMuzzle.GetTransform(muzzleMat);
-		
-		m_iCurrentMuzzle++;
-		if (m_iCurrentMuzzle >= m_ProjectileMuzzles.Count())
-			m_iCurrentMuzzle = 0;
+		PointInfo spawnPosition = m_ProjectileSpawnPositions[m_iCurrentMuzzle];
+		PointInfo effectPosition = m_EffectPositions[m_iCurrentMuzzle];
+		spawnPosition.GetTransform(spawnMat);
+		effectPosition.GetTransform(effectMat);
 	}
 	
 	//------------------------------------------------------------------------------------------------
 	void Fire()
 	{
 		vector muzzleMat[4];
-		GetNextMuzzleTransform(muzzleMat);
+		vector effectMat[4];
+		GetMuzzleTransform(muzzleMat, effectMat);		
 		SCR_Math3D.AddRandomVectorToMat(muzzleMat, -m_fAttackInaccuracy, m_fAttackInaccuracy);
 		
 		IEntity projectile = SpawnProjectile(muzzleMat, m_Target);
-		SpawnMuzzleParticle(muzzleMat);
+		SpawnMuzzleParticle(effectMat);
 		PlayShootSound();		
 		
 		if (m_AnimationController)
@@ -238,6 +237,11 @@ class BON_AutoTurretComponent : ScriptComponent
 		bool triggerTargetProjectile = s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance;
 		if (triggerTargetProjectile && m_Target.m_Ent.FindComponent(BaseTriggerComponent))
 			TriggerProjectile(m_Target.m_Ent);
+		
+		//Increase muzzle index
+		m_iCurrentMuzzle++;
+		if (m_iCurrentMuzzle >= m_ProjectileSpawnPositions.Count())
+			m_iCurrentMuzzle = 0;
 	}
 	
 	//------------------------------------------------------------------------------------------------
@@ -269,6 +273,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void OnUpdate(float timeSlice)
 	{
+		if (!m_bActive)
+			return;
+		
 		m_Target = m_TargetingComp.GetTarget();
 		m_AimingComp.OnUpdate(m_Target, timeSlice);
 		
@@ -301,12 +308,17 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
-		if (m_ProjectileMuzzles.IsEmpty() || !m_Projectile)
+		if (m_ProjectileSpawnPositions.IsEmpty() || !m_Projectile)
 			return;
 
-		foreach (PointInfo muzzle : m_ProjectileMuzzles)
+		foreach (PointInfo spawnPos : m_ProjectileSpawnPositions)
 		{
-			muzzle.Init(owner);
+			spawnPos.Init(owner);
+		}
+		
+		foreach (PointInfo effectPos : m_EffectPositions)
+		{
+			effectPos.Init(owner);
 		}
 
 		if (!GetGame().InPlayMode())
@@ -356,10 +368,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override event void _WB_AfterWorldUpdate(IEntity owner, float timeSlice)
 	{
-		foreach (PointInfo muzzle : m_ProjectileMuzzles)
+		foreach (PointInfo spawnPos : m_ProjectileSpawnPositions)
 		{
 			vector mat[4];
-			muzzle.GetTransform(mat);
+			spawnPos.GetTransform(mat);
 			Shape.CreateSphere(Color.RED, ShapeFlags.ONCE | ShapeFlags.WIREFRAME, mat[3], 0.075);
 		}
 	}

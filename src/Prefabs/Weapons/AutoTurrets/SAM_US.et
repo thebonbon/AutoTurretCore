@@ -8,14 +8,20 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    m_Projectile "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et"
-   m_ProjectileMuzzles {
-    PointInfo "{64E290385340D7F3}" {
+   m_ProjectileSpawnPositions {
+    PointInfo "{67248446C2004E3A}" {
      PivotID "w_barrel"
-     Offset 0 0.1768 1.5194
+     Offset 0 0.16 1.5
     }
    }
-   m_fMaxAttackSpeed 5
-   m_iAttackRange 5000
+   m_MuzzleParticle "{9BAE936C6A1D8A0D}Particles/Muzzle_RIM_116_Back.ptc"
+   m_EffectPositions {
+    PointInfo "{6724844462A1D7F0}" {
+     PivotID "w_barrel"
+     Offset 0 0.16 -1.5269
+     Angles 180 0 0
+    }
+   }
    m_eFireMode Intercept
    m_bDebug 1
   }
