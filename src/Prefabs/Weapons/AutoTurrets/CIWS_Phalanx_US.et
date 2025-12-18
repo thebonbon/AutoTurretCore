@@ -17,6 +17,13 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
      Offset 0 0.0615 2.4334
     }
    }
+   m_MuzzleParticle "{C6C9B60060A01334}Particles/CIWS_Muzzle.ptc"
+   m_EffectPositions {
+    PointInfo "{6724844B33DB3C27}" {
+     PivotID "w_barrel"
+     Offset 0 0.0615 2.4334
+    }
+   }
    m_fAttackInaccuracy 0.17
    m_eFireMode Intercept
   }
