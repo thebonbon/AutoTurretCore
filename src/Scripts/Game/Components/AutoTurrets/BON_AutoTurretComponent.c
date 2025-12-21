@@ -1,7 +1,7 @@
 enum BON_TurretFireMode
 {
 	Direct,
-	Guided,
+	Follow,
 	Intercept
 }
 
@@ -13,8 +13,8 @@ class BON_AutoTurretComponentClass : ScriptComponentClass
 	{
 		array<typename> requires = {};
 
-		//requires.Insert(BON_AutoTurretTargetingComponent);
-		//requires.Insert(BON_AutoTurretAimingComponent);
+		requires.Insert(BON_AutoTurretTargetingComponent);
+		requires.Insert(BON_AutoTurretAimingComponent);
 
 		return requires;
 	}
@@ -40,20 +40,20 @@ class BON_AutoTurretComponent : ScriptComponent
 	//--- SETUP ---
 	[Attribute("", UIWidgets.ResourcePickerThumbnail, "Projectile to shoot", "et", category: "Setup")]
 	ResourceName m_Projectile;
-	
+
 	[Attribute(desc: "PointInfo: Projectile spawn positions (loops automatically)", category: "Setup")]
 	protected ref array<ref PointInfo> m_ProjectileSpawnPositions;
-	
+
 	[Attribute("", UIWidgets.ResourcePickerThumbnail, "Particle effect to play", "ptc", category: "Setup")]
 	ResourceName m_MuzzleParticle;
-	
+
 	[Attribute(desc: "Effect positions (count and order needs to be the same as ProjectileSpawnPositions)", category: "Setup")]
 	protected ref array<ref PointInfo> m_EffectPositions;
 
 	[Attribute("SOUND_SHOT", UIWidgets.Auto, "Sound Name set in SoundComponent", category: "Setup")]
 	string m_sShootSound;
 
-	[Attribute("5", UIWidgets.Auto, "Every shot has this % chance to explode the projectile (missile) its shooting at", "0 100 1", category: "Setup")]
+	[Attribute("5", UIWidgets.Auto, "Every shot has this chance (%) to explode the projectile its shooting at", "0 100 1", category: "Setup")]
 	int m_fProjectileTriggerChance;
 
 	[Attribute("0", UIWidgets.CheckBox, "Trigger projectile near target?", category: "Setup")]
@@ -79,40 +79,23 @@ class BON_AutoTurretComponent : ScriptComponent
 	//[RplProp(onRplName: "OnTargetChanged")]
 	RplId m_iNearestTargetId;
 
-
-	protected float m_fAttackTimer;
-	protected int m_iCurrentMuzzle;
-	bool m_bActive = false;
-
-	protected Faction m_Faction;
 	protected AnimationControllerComponent m_AnimationController;
-	protected SignalsManagerComponent m_SignalsManager;
-
-	protected int m_iSignalBody;
-	protected int m_iSignalBarrel;
-	protected int m_iShootCmd;
-	protected int m_iBodyVar;
-	protected float m_fProjectileSpeed;
-	protected float m_iAttacksOnTarget;
-	protected bool m_bIsProjectileReplicated;
-	float m_fRocketGuidanceStrength = 0;
-
-	protected int m_iTargetCount;
-	protected int m_iCurrentTargetIndex;
-
-	protected float m_fLerp;
-	protected float m_fNewBodyYaw;
-	protected float m_fNewBarrelPitch;
-	protected float m_fCurrentBodyYaw;
-	protected float m_fCurrentBarrelPitch;
-
-	bool m_bOnTarget;
-	protected ref BON_AutoTurretTarget m_Target;
-	ref Shape m_LoSDebug;
-	
-	SoundComponent m_SoundComponent;	
+	protected SoundComponent m_SoundComponent;
 	BON_AutoTurretAimingComponent m_AimingComp;
 	BON_AutoTurretTargetingComponent m_TargetingComp;
+
+	protected Faction m_Faction;
+	protected ref BON_AutoTurretTarget m_Target;
+	protected int m_iShootCmd;
+	protected float m_fProjectileSpeed;
+	protected bool m_bIsProjectileReplicated;
+	protected float m_fAttackTimer;
+	protected int m_iCurrentMuzzle;
+
+	//GM Settings
+	float m_fRocketGuidanceStrength = 0;
+	bool m_bActive = false;
+
 
 	//------------------------------------------------------------------------------------------------
 	void ToggleActive()
@@ -130,13 +113,13 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		m_TargetingComp.m_eTargetFlags = newFlags;
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	BON_TurretTargetFilterFlags GetTargetFlags()
 	{
 		return m_TargetingComp.m_eTargetFlags;
 	}
-		
+
 	//------------------------------------------------------------------------------------------------
 	void TriggerProjectile(IEntity projectile)
 	{
@@ -164,30 +147,47 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		if (timeToTarget <= 0)
 			return;
-		
+
 		timeToTarget += s_AIRandomGenerator.RandFloatXY(-0.2, 0.2);
 		//SetTimer on TimerTriggerComponent does not work :(
-		GetGame().GetCallqueue().CallLater(TriggerProjectile, timeToTarget * 1000, false, projectile); 
+		GetGame().GetCallqueue().CallLater(TriggerProjectile, timeToTarget * 1000, false, projectile);
 	}
-	
+
+	//------------------------------------------------------------------------------------------------
+	//! Follow or Intercept (Missile)
+	void LaunchGuided(BON_GuidedProjectile guidedProjectile)
+	{
+		//Override guidance strength (set via GM)
+		if (m_fRocketGuidanceStrength != 0)
+				guidedProjectile.m_fGuidanceStrength = m_fRocketGuidanceStrength;
+		
+		guidedProjectile.SetTargetAndLaunch(m_Target.m_Ent, m_eFireMode);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Direct (Missile / Bullet)
+	void LaunchDirect(IEntity projectile)
+	{
+		if (m_eFireMode != BON_TurretFireMode.Direct)
+			Print("[ATC] Guided/Intercept fire mode requires projectiles of type BON_GuidedProjectile! Switching to direct mode..", LogLevel.WARNING);
+
+		ProjectileMoveComponent moveComp = ProjectileMoveComponent.Cast(projectile.FindComponent(ProjectileMoveComponent));
+		if (moveComp)
+			moveComp.Launch(projectile.GetTransformAxis(2).Normalized(), vector.Zero, 1, projectile, GetOwner(), null, null, null);
+	}
+
 	//------------------------------------------------------------------------------------------------
 	void LaunchProjectile(IEntity projectile)
 	{
 		if (!projectile)
 			return;
-		
-		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(projectile);
-		if (guidedProjectile)
-		{
-			if (m_fRocketGuidanceStrength != 0)
-				guidedProjectile.m_fGuidanceStrength = m_fRocketGuidanceStrength;
-			guidedProjectile.SetTargetAndLaunch(m_Target.m_Ent, m_eFireMode);
-			return;
-		}
 
-		ProjectileMoveComponent moveComp = ProjectileMoveComponent.Cast(projectile.FindComponent(ProjectileMoveComponent));
-		if (moveComp)
-			moveComp.Launch(projectile.GetTransformAxis(2).Normalized(), vector.Zero, 1, projectile, GetOwner(), null, null, null);
+		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(projectile);
+
+		if (guidedProjectile)
+			LaunchGuided(guidedProjectile);
+		else
+			LaunchDirect(projectile);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -196,16 +196,16 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (m_SoundComponent)
 			m_SoundComponent.SoundEvent(m_sShootSound);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void SpawnMuzzleParticle(vector muzzleMat[4])
-	{				
+	{
 		ParticleEffectEntitySpawnParams params();
 		params.TransformMode = ETransformMode.WORLD;
 		params.Transform = muzzleMat;
 		ParticleEffectEntity particleEmitter = ParticleEffectEntity.SpawnParticleEffect(m_MuzzleParticle, params);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void GetMuzzleTransform(out vector spawnMat[4], out vector effectMat[4])
 	{
@@ -214,59 +214,58 @@ class BON_AutoTurretComponent : ScriptComponent
 		spawnPosition.GetTransform(spawnMat);
 		effectPosition.GetTransform(effectMat);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void Fire()
 	{
 		vector muzzleMat[4];
 		vector effectMat[4];
-		GetMuzzleTransform(muzzleMat, effectMat);		
+		GetMuzzleTransform(muzzleMat, effectMat);
 		SCR_Math3D.AddRandomVectorToMat(muzzleMat, -m_fAttackInaccuracy, m_fAttackInaccuracy);
-		
+
 		IEntity projectile = SpawnProjectile(muzzleMat, m_Target);
+		LaunchProjectile(projectile);
 		SpawnMuzzleParticle(effectMat);
-		PlayShootSound();		
-		
+		PlayShootSound();
+
 		if (m_AnimationController)
 			m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
-		
+
 		if (m_bTriggerOnTarget)
 			SetTriggerOnTarget(projectile);
-		
+
 		//TOOD: Maybe first few bullets never hit? To prevent first one to hit. Or increase chance every bullet up to max
 		bool triggerTargetProjectile = s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance;
 		if (triggerTargetProjectile && m_Target.m_Ent.FindComponent(BaseTriggerComponent))
 			TriggerProjectile(m_Target.m_Ent);
-		
+
 		//Increase muzzle index
 		m_iCurrentMuzzle++;
 		if (m_iCurrentMuzzle >= m_ProjectileSpawnPositions.Count())
 			m_iCurrentMuzzle = 0;
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	IEntity SpawnProjectile(vector muzzleMat[4], BON_AutoTurretTarget target)
-	{		
+	{
 		EntitySpawnParams spawnParams();
 		spawnParams.TransformMode = ETransformMode.WORLD;
 		spawnParams.Transform = muzzleMat;
 
 		IEntity lastSpawnedProjectile;
-		
+
 		if (!m_bIsProjectileReplicated || Replication.IsServer())
 		{
 			lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
 			if (!lastSpawnedProjectile)
 				return null;
-			
+
 			//Update projectile faction of IFF
 			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(lastSpawnedProjectile.FindComponent(BON_AutoTurretTargetComponent));
 			if (targetComp)
 				targetComp.m_Faction = m_Faction;
-			
-			LaunchProjectile(lastSpawnedProjectile);
 		}
-		
+
 		return lastSpawnedProjectile;
 	}
 
@@ -275,10 +274,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		if (!m_bActive)
 			return;
-		
+
 		m_Target = m_TargetingComp.GetTarget();
 		m_AimingComp.OnUpdate(m_Target, timeSlice);
-		
+
 		m_fAttackTimer -= timeSlice;
 		if (m_fAttackTimer <= 0 && m_AimingComp.CanFire())
 		{
@@ -286,7 +285,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_fAttackTimer = m_fAttackDelay;
 		}
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	protected void ConnectToAutoTurretSystem()
 	{
@@ -315,7 +314,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			spawnPos.Init(owner);
 		}
-		
+
 		foreach (PointInfo effectPos : m_EffectPositions)
 		{
 			effectPos.Init(owner);
@@ -323,16 +322,16 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		if (!GetGame().InPlayMode())
 			return;
-		
-		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
-		if (factionComp)
-			m_Faction = factionComp.GetAffiliatedFaction();
 
-		m_SoundComponent = SoundComponent.Cast(GetOwner().FindComponent(SoundComponent));		
+		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
+		m_Faction = factionComp.GetAffiliatedFaction();
+
+		m_SoundComponent = SoundComponent.Cast(GetOwner().FindComponent(SoundComponent));
 		m_AimingComp = BON_AutoTurretAimingComponent.Cast(owner.FindComponent(BON_AutoTurretAimingComponent));
-		m_TargetingComp = BON_AutoTurretTargetingComponent.Cast(owner.FindComponent(BON_AutoTurretTargetingComponent));		
+		m_TargetingComp = BON_AutoTurretTargetingComponent.Cast(owner.FindComponent(BON_AutoTurretTargetingComponent));
 		m_AnimationController = BaseItemAnimationComponent.Cast(owner.FindComponent(BaseItemAnimationComponent));
-		m_iShootCmd = m_AnimationController.BindCommand("CMD_SHOOT");		
+
+		m_iShootCmd = m_AnimationController.BindCommand("CMD_SHOOT");
 
 		Resource projectileResource = Resource.Load(m_Projectile);
 		if (!projectileResource)
@@ -343,8 +342,9 @@ class BON_AutoTurretComponent : ScriptComponent
 		BaseContainer projectileMoveComp = SCR_BaseContainerTools.FindComponentSource(projectileResource, ProjectileMoveComponent);
 		projectileMoveComp.Get("InitSpeed", m_fProjectileSpeed);
 
-		ConnectToAutoTurretSystem();
 		m_bActive = m_bActiveOnSpawn;
+		if (m_bActive)
+			ConnectToAutoTurretSystem();
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -368,6 +368,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override event void _WB_AfterWorldUpdate(IEntity owner, float timeSlice)
 	{
+		if (!m_bDebug)
+			return;
+
 		foreach (PointInfo spawnPos : m_ProjectileSpawnPositions)
 		{
 			vector mat[4];

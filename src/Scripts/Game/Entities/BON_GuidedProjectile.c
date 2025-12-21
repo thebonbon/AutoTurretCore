@@ -5,10 +5,10 @@ class BON_GuidedProjectileClass : ProjectileClass
 
 class BON_GuidedProjectile : Projectile
 {
-	[Attribute()]
+	[Attribute(defvalue: "1", desc: "Move Speed", params: "0 inf 0.01")]
 	float m_fMoveSpeed;
 
-	[Attribute()]
+	[Attribute(defvalue: "0", desc: "Guidance Strength, how fast to turn towards target", params: "0 inf 0.01")]
 	float m_fGuidanceStrength;
 
 	[RplProp(onRplName: "OnTargetChanged")]
@@ -32,8 +32,6 @@ class BON_GuidedProjectile : Projectile
 	//------------------------------------------------------------------------------------------------
 	void SteerToTarget(float timeSlice)
 	{
-		vector missilePos = GetOrigin();
-
 		vector targetPos = m_TrackedTarget.GetOrigin();
 		vector targetVel = m_TrackedTarget.GetPhysics().GetVelocity();
 		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
@@ -56,7 +54,7 @@ class BON_GuidedProjectile : Projectile
 
 		//Shape.CreateSphere(COLOR_GREEN, ShapeFlags.ONCE | ShapeFlags.NOZWRITE, newTargetPos, 0.5);
 
-		vector dirToTarget = newTargetPos - missilePos;
+		vector dirToTarget = newTargetPos - GetOrigin();
 		dirToTarget.Normalize();
 
 		vector localFwd = GetTransformAxis(2).Normalized();
@@ -80,11 +78,25 @@ class BON_GuidedProjectile : Projectile
 			SteerToTarget(timeSlice);
 	}
 
+
+	//------------------------------------------------------------------------------------------------
+	void Launch(IEntity target)
+	{
+		m_TrackedTarget = target;
+		GetPhysics().SetActive(ActiveState.ACTIVE);
+
+		m_vLastDirToTarget = target.GetOrigin() - GetOrigin();
+		m_vLastDirToTarget.Normalize();
+
+		SetEventMask(EntityEvent.FRAME);
+	}
+	
 	//------------------------------------------------------------------------------------------------
 	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode)
-	{
+	{		
 		if (!target)
 			return;
+		
 		m_eFireMode = fireMode;
 
 		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
@@ -95,28 +107,5 @@ class BON_GuidedProjectile : Projectile
 		missileMove.Launch(vector.Zero, vector.Zero, 0, this, null, null, null, null);
 
 		Launch(target);
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void Launch(IEntity target)
-	{
-		m_TrackedTarget = target;
-		GetPhysics().SetActive(ActiveState.ACTIVE);
-
-		PerceivableComponent targetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
-
-		if (targetPerceivableComp)
-		{
-			array<vector> aimPoints();
-			targetPerceivableComp.GetAimpoints(aimPoints);
-			m_vAimOffset = target.CoordToLocal(aimPoints[0]);
-		}
-		else
-			m_vAimOffset = Vector(0, 2, 0);
-
-		m_vLastDirToTarget = target.CoordToParent(m_vAimOffset) - GetOrigin();
-		m_vLastDirToTarget.Normalize();
-
-		SetEventMask(EntityEvent.FRAME);
 	}
 }
