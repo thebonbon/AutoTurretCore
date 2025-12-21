@@ -3,7 +3,10 @@ AnimSrcGraphFile {
   AnimSrcGraphSheet Master {
    Nodes {
     AnimSrcNodeProcTransform "Proc Rotation 34305" {
-     EditorPos 363 249.3
+     Tags {
+      "TagItemUpdateColliders"
+     }
+     EditorPos 363.127 249.066
      Child "Bind Pose 42109"
      Expression "1"
      Bones {
@@ -21,11 +24,11 @@ AnimSrcGraphFile {
      }
     }
     AnimSrcNodeBindPose "Bind Pose 42109" {
-     EditorPos 363 250.4
+     EditorPos 363.127 250.166
      BoneMask "body"
     }
     AnimSrcNodeSource Shoot {
-     EditorPos 365.9 249.2
+     EditorPos 366.027 248.966
      Source "turret.Default.shoot"
      Interpolate 0
     }
