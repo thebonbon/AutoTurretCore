@@ -1,7 +1,6 @@
 enum BON_TurretFireMode
 {
 	Direct,
-	Follow,
 	Intercept
 }
 
@@ -69,7 +68,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Muzzle")]
 	float m_fAttackInaccuracy;
 
-	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | \ Guided: Follow the target (missiles only!) | Intercept: Lead the target to intercept at predicted position", enumType: BON_TurretFireMode, category: "Muzzle")]
+	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | Intercept: Lead the target to intercept at predicted position", enumType: BON_TurretFireMode, category: "Muzzle")]
 	BON_TurretFireMode m_eFireMode;
 
 	//--- MISC ---
@@ -87,10 +86,11 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected Faction m_Faction;
 	protected ref BON_AutoTurretTarget m_Target;
 	protected int m_iShootCmd;
-	protected float m_fProjectileSpeed;
+	float m_fProjectileSpeed;
 	protected bool m_bIsProjectileReplicated;
 	protected float m_fAttackTimer;
 	protected int m_iCurrentMuzzle;
+	bool m_bIsMissile;
 
 	//GM Settings
 	float m_fRocketGuidanceStrength = 0;
@@ -154,23 +154,14 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	//! Follow or Intercept (Missile)
-	void LaunchGuided(IEntity projectile)
+	//! Intercept (Missile)
+	void LaunchGuided(BON_GuidedProjectile guidedProjectile)
 	{
-		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(projectile);
-		
-		if (!guidedProjectile)
-		{
-			Print("Follow/Guided fire mode set but projectile not of type BON_GuidedProjectile! Switching to direct mode..", LogLevel.WARNING);
-			LaunchDirect(projectile);
-			return;
-		}
-		
 		//Override guidance strength (set via GM)
 		if (m_fRocketGuidanceStrength != 0)
 				guidedProjectile.m_fGuidanceStrength = m_fRocketGuidanceStrength;
-		
-		guidedProjectile.SetTargetAndLaunch(m_Target.m_Ent, m_eFireMode);
+
+		guidedProjectile.SetTargetAndLaunch(m_Target.m_Ent, m_eFireMode, m_fProjectileSpeed);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -183,16 +174,19 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Bullet + Missiles
 	void LaunchProjectile(IEntity projectile)
 	{
 		if (!projectile)
 			return;
 
-		if (m_eFireMode == BON_TurretFireMode.Direct)
+		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(projectile);
+
+		if (!guidedProjectile || m_eFireMode == BON_TurretFireMode.Direct)
 			LaunchDirect(projectile);
 		else
-			LaunchGuided(projectile);
-		
+			LaunchGuided(guidedProjectile);
+
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -346,6 +340,10 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_bIsProjectileReplicated = (rplCompBase != null);
 		BaseContainer projectileMoveComp = SCR_BaseContainerTools.FindComponentSource(projectileResource, ProjectileMoveComponent);
 		projectileMoveComp.Get("InitSpeed", m_fProjectileSpeed);
+
+		BaseContainer missileMoveComp = SCR_BaseContainerTools.FindComponentSource(projectileResource, MissileMoveComponent);
+		if (missileMoveComp)
+			m_bIsMissile = true;
 
 		m_bActive = m_bActiveOnSpawn;
 		if (m_bActive)

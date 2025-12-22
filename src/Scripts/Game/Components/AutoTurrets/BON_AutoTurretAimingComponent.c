@@ -118,7 +118,17 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	//! Lead offset needed to hit target
+	//! Predicts the position with given speed to target pos
+	vector ComputeLeadSimple()
+	{
+		float targetDistance = vector.Distance(m_Target.m_Ent.GetOrigin(), GetOwner().GetOrigin());
+		float timeToTarget = targetDistance / m_TurretComp.m_fProjectileSpeed;
+
+		return m_Target.m_Ent.GetOrigin() + m_Target.m_Ent.GetPhysics().GetVelocity() * timeToTarget;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Lead offset (velocity, time) needed to hit target
 	vector ComputeLead()
 	{
 		vector predictedLeadingOffset;
@@ -135,7 +145,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource);
 
 		Physics targetRB = m_Target.m_Ent.GetPhysics();
-		
+
 		if (targetRB)
 		{
 			//Add Leading
@@ -146,7 +156,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		//Add Ballistics
 		predictedLeadingOffset[1] = predictedLeadingOffset[1] + heightOffset;
-				
+
 		return predictedLeadingOffset;
 	}
 
@@ -163,7 +173,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		vector current = SCR_Math3D.FixEulerVector180(m_vCurrentAngles);
 		vector target = SCR_Math3D.FixEulerVector180(m_vTargetAngles);
-		
+
 		return Math.AbsFloat(current[0] - target[0]) < ANGLE_TOLERANCE
 			&& Math.AbsFloat(current[1] - target[1]) < ANGLE_TOLERANCE;
 	}
@@ -191,11 +201,19 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 			GetOwner().GetTransform(barrelMat); //Override mat
 			barrelMat[3] = barrelOrigin; //Add origin back
-			
+
 			vector aimPoint = m_Target.GetAimPoint();
 			if (m_TurretComp.m_eFireMode == BON_TurretFireMode.Intercept)
-				aimPoint += ComputeLead();
-			
+			{
+				//Only apply ballistics if not a missile
+				if (m_TurretComp.m_bIsMissile)
+					aimPoint += ComputeLeadSimple();
+				else
+					aimPoint += ComputeLead();
+
+				Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, aimPoint, 10);
+			}
+
 			desiredAngles = SCR_Math3D.GetLocalAngles(barrelMat, aimPoint);
 		}
 		else
@@ -206,11 +224,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		RotateTo(desiredAngles, timeSlice);
 
-		//Rotated to Idle pos
+		//Done rotating to idle pos
 		if (!m_Target && IsOnTarget())
-		{
 			m_eAimState = BON_TurretAimState.IDLE;
-		}
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -258,7 +274,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		// Prevent firing on stale idle angles
 		if (target != m_Target)
 			m_vTargetAngles = Vector(-1, -1, -1);
-		
+
 		m_Target = target;
 
 		switch (m_eAimState)

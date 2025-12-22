@@ -5,10 +5,7 @@ class BON_GuidedProjectileClass : ProjectileClass
 
 class BON_GuidedProjectile : Projectile
 {
-	[Attribute(defvalue: "1", desc: "Move Speed", params: "0 inf 0.01")]
-	float m_fMoveSpeed;
-
-	[Attribute(defvalue: "0", desc: "Guidance Strength, how fast to turn towards target", params: "0 inf 0.01")]
+	[Attribute(defvalue: "10", desc: "Guidance Strength, how fast to turn towards target", params: "0 inf 0.01")]
 	float m_fGuidanceStrength;
 
 	[RplProp(onRplName: "OnTargetChanged")]
@@ -18,6 +15,8 @@ class BON_GuidedProjectile : Projectile
 	vector m_vAimOffset;
 	vector m_vLastDirToTarget;
 	BON_TurretFireMode m_eFireMode;
+	MissileMoveComponent m_MissileMove;
+	float m_fSpeed;
 
 	//------------------------------------------------------------------------------------------------
 	void OnTargetChanged()
@@ -36,6 +35,7 @@ class BON_GuidedProjectile : Projectile
 		vector targetVel = m_TrackedTarget.GetPhysics().GetVelocity();
 		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
 
+		//TODO: Check for trigger on target from turret?
 		if (targetDistance < 5)
 		{
 			BaseTriggerComponent triggerComp = BaseTriggerComponent.Cast(FindComponent(BaseTriggerComponent));
@@ -43,18 +43,15 @@ class BON_GuidedProjectile : Projectile
 			return;
 		}
 
-		float timeToTarget = targetDistance / m_fMoveSpeed;
-		vector newTargetPos;
+		//Add lead
 		if (m_eFireMode == BON_TurretFireMode.Intercept)
 		{
-			newTargetPos = targetPos + targetVel * timeToTarget;
+			float timeToTarget = targetDistance / m_fSpeed;
+			targetPos += targetVel * timeToTarget;
 		}
-		else
-			newTargetPos = targetPos;
 
-		//Shape.CreateSphere(COLOR_GREEN, ShapeFlags.ONCE | ShapeFlags.NOZWRITE, newTargetPos, 0.5);
-
-		vector dirToTarget = newTargetPos - GetOrigin();
+		Shape.CreateSphere(Color.YELLOW, ShapeFlags.ONCE, targetPos, 20);
+		vector dirToTarget = targetPos - GetOrigin();
 		dirToTarget.Normalize();
 
 		vector localFwd = GetTransformAxis(2).Normalized();
@@ -66,9 +63,8 @@ class BON_GuidedProjectile : Projectile
 
 		vector angularVel = axis * angleRad * m_fGuidanceStrength;
 
-		GetPhysics().SetVelocity(localFwd * m_fMoveSpeed);
-		GetPhysics().SetAngularVelocity(angularVel);
-
+		m_MissileMove.SetVelocity(localFwd * m_fSpeed);
+		m_MissileMove.SetAngularVelocity(angularVel);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -90,21 +86,22 @@ class BON_GuidedProjectile : Projectile
 
 		SetEventMask(EntityEvent.FRAME);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
-	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode)
-	{		
+	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode, float speed)
+	{
 		if (!target)
 			return;
-		
+
+		m_fSpeed = speed;
 		m_eFireMode = fireMode;
 
 		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
 		m_iTrackedTargetId = targetRplComp.Id();
 		Replication.BumpMe();
 
-		MissileMoveComponent missileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
-		missileMove.Launch(vector.Zero, vector.Zero, 0, this, null, null, null, null);
+		m_MissileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
+		m_MissileMove.Launch(GetTransformAxis(2), vector.Zero, 1, this, null, null, null, null);
 
 		Launch(target);
 	}
