@@ -191,9 +191,12 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 			GetOwner().GetTransform(barrelMat); //Override mat
 			barrelMat[3] = barrelOrigin; //Add origin back
-
-			vector leadPoint = m_Target.GetAimPoint() + ComputeLead();
-			desiredAngles = SCR_Math3D.GetLocalAngles(barrelMat, leadPoint);
+			
+			vector aimPoint = m_Target.GetAimPoint();
+			if (m_TurretComp.m_eFireMode == BON_TurretFireMode.Intercept)
+				aimPoint += ComputeLead();
+			
+			desiredAngles = SCR_Math3D.GetLocalAngles(barrelMat, aimPoint);
 		}
 		else
 		{
