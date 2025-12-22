@@ -7,7 +7,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    }
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_Projectile "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/TrackedRocket.et"
+   m_Projectile "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et"
    m_ProjectileSpawnPositions {
     PointInfo "{67248446C2004E3A}" {
      PivotID "w_barrel"

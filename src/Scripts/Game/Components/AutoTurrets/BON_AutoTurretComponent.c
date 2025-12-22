@@ -69,7 +69,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Muzzle")]
 	float m_fAttackInaccuracy;
 
-	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | \ Guided: Follow the target (missiles only!) | Intercept: Lead the target to intercept at predicted position", enums: ParamEnumArray.FromEnum(BON_TurretFireMode), category: "Muzzle")]
+	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | \ Guided: Follow the target (missiles only!) | Intercept: Lead the target to intercept at predicted position", enumType: BON_TurretFireMode, category: "Muzzle")]
 	BON_TurretFireMode m_eFireMode;
 
 	//--- MISC ---
@@ -155,8 +155,17 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	//------------------------------------------------------------------------------------------------
 	//! Follow or Intercept (Missile)
-	void LaunchGuided(BON_GuidedProjectile guidedProjectile)
+	void LaunchGuided(IEntity projectile)
 	{
+		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(projectile);
+		
+		if (!guidedProjectile)
+		{
+			Print("Follow/Guided fire mode set but projectile not of type BON_GuidedProjectile! Switching to direct mode..", LogLevel.WARNING);
+			LaunchDirect(projectile);
+			return;
+		}
+		
 		//Override guidance strength (set via GM)
 		if (m_fRocketGuidanceStrength != 0)
 				guidedProjectile.m_fGuidanceStrength = m_fRocketGuidanceStrength;
@@ -168,12 +177,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Direct (Missile / Bullet)
 	void LaunchDirect(IEntity projectile)
 	{
-		if (m_eFireMode != BON_TurretFireMode.Direct)
-			Print("[ATC] Guided/Intercept fire mode requires projectiles of type BON_GuidedProjectile! Switching to direct mode..", LogLevel.WARNING);
-
 		ProjectileMoveComponent moveComp = ProjectileMoveComponent.Cast(projectile.FindComponent(ProjectileMoveComponent));
 		if (moveComp)
-			moveComp.Launch(projectile.GetTransformAxis(2).Normalized(), vector.Zero, 1, projectile, GetOwner(), null, null, null);
+			moveComp.Launch(projectile.GetTransformAxis(2), vector.Zero, 1, projectile, GetOwner(), null, null, null);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -182,12 +188,11 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!projectile)
 			return;
 
-		BON_GuidedProjectile guidedProjectile = BON_GuidedProjectile.Cast(projectile);
-
-		if (guidedProjectile)
-			LaunchGuided(guidedProjectile);
-		else
+		if (m_eFireMode == BON_TurretFireMode.Direct)
 			LaunchDirect(projectile);
+		else
+			LaunchGuided(projectile);
+		
 	}
 
 	//------------------------------------------------------------------------------------------------

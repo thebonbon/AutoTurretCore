@@ -24,17 +24,12 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
   }
   MissileMoveComponent "{0EF36690881261EF}" {
    Enabled 1
-   InitSpeed 0.1
-   InitSpeedVariation 0
    TimeToLive 22
    ProjectileEffects {
     ProjectileDamage "{56829D01651CE9A7}" {
      DamageValue 750
     }
    }
-   MaxControlRange 0
-   Maneuvrability 0
-   TrackLead 0
   }
   RigidBody "{529E88841E9EDFB4}" {
    Gravity 1

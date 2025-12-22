@@ -36,6 +36,7 @@ GenericEntity {
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
   }
   MeshObject "{62ACAE2F976BB2AB}" {
+   ClutterOccluder 1
   }
   RigidBody "{62ACF1D3ED0F7C62}" {
    ModelGeometry 1
