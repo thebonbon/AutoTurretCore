@@ -13,7 +13,7 @@ class BON_AutoTurretTargetComponentClass : ScriptComponentClass
 
 class BON_AutoTurretTargetComponent : ScriptComponent
 {
-	[Attribute("0", UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Setup")]
+	[Attribute("0", UIWidgets.Flags, enumType: BON_TurretTargetFilterFlags, category: "Setup")]
 	BON_TurretTargetFilterFlags m_TargetFlags;
 	
 	//Used for e.g missile IFF (Instigator faction)
