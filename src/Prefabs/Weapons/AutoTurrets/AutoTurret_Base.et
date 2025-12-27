@@ -8,6 +8,8 @@ GenericEntity {
     }
    }
   }
+  Persistence "{673690647044FAE4}" {
+  }
   SignalsManagerComponent "{62ACAE2F976BB347}" {
   }
   SoundComponent "{62ACAE2F976BB3F9}" {
