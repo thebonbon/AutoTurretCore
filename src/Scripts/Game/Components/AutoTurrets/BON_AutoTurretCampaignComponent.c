@@ -13,18 +13,23 @@ class BON_AutoTurretCampaignComponent : SCR_MilitaryBaseLogicComponent
 	{
 		super.OnCapturingFactionChanged();
 		
+		Print("[ATC] OnCapturingFactionChanged -> Changing turret faction to " + faction);
 		m_FactionComp.SetAffiliatedFactionByKey(faction);		
 	}
 	
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
+		super.EOnInit(owner);
+		
 		m_FactionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 	}
 	
 	//------------------------------------------------------------------------------------------------
 	override void OnPostInit(IEntity owner)
 	{
+		super.OnPostInit(owner);
+		
 		owner.SetEventMask(EntityEvent.INIT);
 	}
 
