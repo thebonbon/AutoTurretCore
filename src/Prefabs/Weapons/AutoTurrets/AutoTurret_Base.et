@@ -24,6 +24,8 @@ GenericEntity {
    components {
     BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
     }
+    BON_AutoTurretCampaignComponent "{673690607E8C0E7C}" {
+    }
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
     }
    }

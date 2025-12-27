@@ -83,7 +83,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	BON_AutoTurretAimingComponent m_AimingComp;
 	BON_AutoTurretTargetingComponent m_TargetingComp;
 
-	protected Faction m_Faction;
+	protected FactionAffiliationComponent m_FactionComp;
 	protected ref BON_AutoTurretTarget m_Target;
 	protected int m_iShootCmd;
 	float m_fProjectileSpeed;
@@ -262,7 +262,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			//Update projectile faction of IFF
 			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(lastSpawnedProjectile.FindComponent(BON_AutoTurretTargetComponent));
 			if (targetComp)
-				targetComp.m_Faction = m_Faction;
+				targetComp.m_Faction = m_FactionComp.GetAffiliatedFaction();
 		}
 
 		return lastSpawnedProjectile;
@@ -322,8 +322,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!GetGame().InPlayMode())
 			return;
 
-		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
-		m_Faction = factionComp.GetAffiliatedFaction();
+		m_FactionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 
 		m_SoundComponent = SoundComponent.Cast(GetOwner().FindComponent(SoundComponent));
 		m_AimingComp = BON_AutoTurretAimingComponent.Cast(owner.FindComponent(BON_AutoTurretAimingComponent));

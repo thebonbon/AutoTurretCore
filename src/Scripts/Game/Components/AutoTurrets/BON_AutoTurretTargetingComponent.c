@@ -5,7 +5,7 @@ class BON_AutoTurretTargetingComponentClass : ScriptComponentClass
 
 class BON_AutoTurretTargetingComponent : ScriptComponent
 {
-	[Attribute(uiwidget: UIWidgets.Flags, enums: ParamEnumArray.FromEnum(BON_TurretTargetFilterFlags), category: "Targeting")]
+	[Attribute(uiwidget: UIWidgets.Flags, enumType: BON_TurretTargetFilterFlags, category: "Targeting")]
 	BON_TurretTargetFilterFlags m_eTargetFlags;
 
 	[Attribute("500", UIWidgets.Auto, "Radius to scan / attack targets (m)", category: "Targeting")]
@@ -17,18 +17,20 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 
 	protected float m_fSearchTimer = 0;
 	protected BON_AutoTurretAimingComponent m_AimingComp;
-	protected Faction m_Faction;
-
+	protected FactionAffiliationComponent m_FactionComp
 	protected ref BON_AutoTurretTarget m_CurrentTarget;
 	protected BON_AutoTurretComponent m_MainTurretComp;
 
 	//------------------------------------------------------------------------------------------------
 	bool IsEnemy(BON_AutoTurretTarget target)
 	{
+		if (target.m_Ent.GetName() == "BOB")
+			return true;
+		
 		if (!target.m_Faction)
 			return false;
 		
-		return target.m_Faction.IsFactionEnemy(m_Faction);
+		return target.m_Faction.IsFactionEnemy(m_FactionComp.GetAffiliatedFaction());
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -122,8 +124,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	{
 		m_MainTurretComp = BON_AutoTurretComponent.Cast(owner.FindComponent(BON_AutoTurretComponent));
 		m_AimingComp = BON_AutoTurretAimingComponent.Cast(owner.FindComponent(BON_AutoTurretAimingComponent));
-		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
-		m_Faction = factionComp.GetAffiliatedFaction();
+		FactionAffiliationComponent m_FactionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 	}
 
 	//------------------------------------------------------------------------------------------------
