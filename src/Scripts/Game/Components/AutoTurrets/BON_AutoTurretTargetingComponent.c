@@ -124,7 +124,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	{
 		m_MainTurretComp = BON_AutoTurretComponent.Cast(owner.FindComponent(BON_AutoTurretComponent));
 		m_AimingComp = BON_AutoTurretAimingComponent.Cast(owner.FindComponent(BON_AutoTurretAimingComponent));
-		FactionAffiliationComponent m_FactionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
+		m_FactionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 	}
 
 	//------------------------------------------------------------------------------------------------
