@@ -302,7 +302,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		m_iSignalBody = m_SignalsManager.AddOrFindSignal("BodyRotation", 0);
 		m_iSignalBarrel = m_SignalsManager.AddOrFindSignal("BarrelRotation", 0);
 
-		m_iBarrelBoneIndex = GetOwner().GetAnimation().GetBoneIndex(m_sBarrelBone);
+		Animation anim = GetOwner().GetAnimation();
+		if (anim)
+			m_iBarrelBoneIndex = anim.GetBoneIndex(m_sBarrelBone);
 	}
 
 	//------------------------------------------------------------------------------------------------
