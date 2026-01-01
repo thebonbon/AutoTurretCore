@@ -65,12 +65,12 @@ class BON_AutoTurretGridMap : PointGridMap
 
 			float distance = vector.DistanceSq(origin, candidate.GetOrigin());
 			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(candidate.FindComponent(BON_AutoTurretTargetComponent));
-				
+
 			BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(candidate, distance, targetComp.m_Faction);
 			if (newTarget.IsValid())
 				sortedTargets.Insert(newTarget);
-		}		
-				
+		}
+
 		sortedTargets.Sort(); //Sorted by m_fDistance, smallest first
 
 		return sortedTargets.Count();

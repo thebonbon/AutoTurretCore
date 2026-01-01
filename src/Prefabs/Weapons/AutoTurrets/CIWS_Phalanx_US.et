@@ -10,6 +10,15 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    }
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   components {
+    BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
+     m_fRotationSpeed 3
+    }
+    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
+     m_eTargetFlags 24
+     m_iSearchRadius 1000
+    }
+   }
    m_Projectile "{B235232B080D2F83}Prefabs/Weapons/Ammo/Ammo_127x99_AP_Tracer_M2.et"
    m_ProjectileSpawnPositions {
     PointInfo "{67248446B9826769}" {
@@ -24,8 +33,12 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
      Offset 0 0.0615 2.4334
     }
    }
-   m_fAttackInaccuracy 0.17
+   m_fTimeBetweenShots 0.08
+   m_fAttackInaccuracy 1
    m_eFireMode Intercept
+  }
+  BON_AutoTurretTargetComponent "{62C91C0D0A7CBA50}" {
+   m_TargetFlags 7
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
    "faction affiliation" "US"

@@ -141,7 +141,7 @@ class BON_AutoTurretAttackSpeedEditorAttribute : SCR_BaseValueListEditorAttribut
 		if (!autoTurretComponent)
 			return null;
 
-		return SCR_BaseEditorAttributeVar.CreateFloat(autoTurretComponent.m_fAttackDelay);
+		return SCR_BaseEditorAttributeVar.CreateFloat(autoTurretComponent.m_fTimeBetweenShots);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ class BON_AutoTurretAttackSpeedEditorAttribute : SCR_BaseValueListEditorAttribut
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
-			autoTurretComponent.m_fAttackDelay = var.GetFloat();
+			autoTurretComponent.m_fTimeBetweenShots = var.GetFloat();
 	}
 }
 

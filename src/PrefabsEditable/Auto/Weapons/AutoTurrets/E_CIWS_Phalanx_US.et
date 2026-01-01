@@ -2,21 +2,23 @@ GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.e
  ID "62ACAE2FAC6D2BB1"
  components {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_ProjectileMuzzle PointInfo "{62ACAE2F976BB3CC}" {
-    Offset 0 0 2.4223
+   components {
+    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
+     m_eTargetFlags 30
+    }
    }
   }
   SCR_EditableEntityComponent "{62B08A24E90BD1E1}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
-   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
+   m_UIInfo SCR_EditableVehicleUIInfo "{5298E609432D192D}" {
     Name "CIWS Phalanx US"
     Icon "{4802E7182AFEA3A9}UI/Textures/EditableEntities/AutoTurrets/EditableEntity_AutoTurret_CIWS_Phalanx.edds"
     m_Image "{2393FE90AE2AC8AC}UI/Textures/EditableEntities/AutoTurrets/AutoTurret_Phalanx_BCR.edds"
     m_sFaction "US"
     m_aAuthoredLabels {
-     1001
+     CONTENT_MODDED ENTITYTYPE_OBJECT
     }
     m_aAutoLabels {
-     11 1 122
+     FACTION_US ENTITYTYPE_OBJECT SIZE_M
     }
    }
    m_sIconBoneName "w_barrel"
@@ -28,7 +30,6 @@ GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.e
     SCR_BasePreviewEntry "{62B08A24E935B53A}" {
      m_iParentID -1
      m_Mesh "{22231BFF749287E1}Assets/Weapons/AutoTurrets/CIWS/CIWS.xob"
-     m_Flags EDITABLE
      m_Shape MESH
      m_iPivotID ""
      m_vScale 1 1 1

@@ -63,7 +63,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 	//--- SHOOTING ---
 	[Attribute("1", UIWidgets.Auto, "Time / Cooldown between attacks (s). Lower = faster", "0 inf 0.1", category: "Muzzle")]
-	float m_fAttackDelay;
+	float m_fTimeBetweenShots;
 
 	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Muzzle")]
 	float m_fAttackInaccuracy;
@@ -196,6 +196,19 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_SoundComponent.SoundEvent(m_sShootSound);
 	}
 
+#ifdef WCS_ARMAMENTS
+	//------------------------------------------------------------------------------------------------
+	//! WCS missile detection sound compatibility
+	void PlayThreatDetectionSound()
+	{
+		SoundComponent soundComp = SoundComponent.Cast(m_Target.m_Ent.FindComponent(SoundComponent));
+		if (!soundComp)
+			return;
+
+		soundComp.SoundEvent("MWS_INCOMING_MISSILE");
+	}
+#endif
+
 	//------------------------------------------------------------------------------------------------
 	void SpawnMuzzleParticle(vector muzzleMat[4])
 	{
@@ -226,6 +239,10 @@ class BON_AutoTurretComponent : ScriptComponent
 		LaunchProjectile(projectile);
 		SpawnMuzzleParticle(effectMat);
 		PlayShootSound();
+		
+#ifdef WCS_ARMAMENTS
+		PlayThreatDetectionSound();
+#endif
 
 		if (m_AnimationController)
 			m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
@@ -281,7 +298,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (m_fAttackTimer <= 0 && m_AimingComp.CanFire())
 		{
 			Fire();
-			m_fAttackTimer = m_fAttackDelay;
+			m_fAttackTimer = m_fTimeBetweenShots;
 		}
 	}
 

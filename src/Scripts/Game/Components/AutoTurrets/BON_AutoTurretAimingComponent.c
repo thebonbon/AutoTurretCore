@@ -197,7 +197,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		{
 			vector barrelMat[4];
 			GetOwner().GetAnimation().GetBoneMatrix(m_iBarrelBoneIndex, barrelMat); //Local mat
-			vector barrelOrigin = GetOwner().CoordToParent(barrelMat[3]); //World mat
+			vector barrelOrigin = GetOwner().CoordToParent(barrelMat[3]); //World pos
 
 			GetOwner().GetTransform(barrelMat); //Override mat
 			barrelMat[3] = barrelOrigin; //Add origin back
@@ -210,8 +210,6 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 					aimPoint += ComputeLeadSimple();
 				else
 					aimPoint += ComputeLead();
-
-				Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, aimPoint, 10);
 			}
 
 			desiredAngles = SCR_Math3D.GetLocalAngles(barrelMat, aimPoint);
@@ -243,6 +241,32 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);
 	}
 
+	//------------------------------------------------------------------------------------------------
+	void GetBodyTransform(out vector mat[4])
+	{
+		Animation ownerAnim = GetOwner().GetAnimation();
+		vector localBoneMat[4];
+		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBodyBone), localBoneMat); //Local mat
+		
+		//Transform relative to turret
+		vector ownerMat[4];
+		GetOwner().GetWorldTransform(ownerMat);
+		Math3D.MatrixMultiply4(ownerMat, localBoneMat, mat);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void GetBarrelTransform(out vector mat[4])
+	{
+		Animation ownerAnim = GetOwner().GetAnimation();
+		vector localBoneMat[4];
+		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBarrelBone), localBoneMat); //Local mat
+		
+		//Transform relative to turret
+		vector ownerMat[4];
+		GetOwner().GetWorldTransform(ownerMat);
+		Math3D.MatrixMultiply4(ownerMat, localBoneMat, mat);
+	}	
+	
 	#ifdef WORKBENCH
 	//------------------------------------------------------------------------------------------------
 	void ShowDebug()
@@ -250,6 +274,17 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		DebugTextWorldSpace.Create(GetOwner().GetWorld(), typename.EnumToString(BON_TurretAimState, m_eAimState),
 			DebugTextFlags.ONCE | DebugTextFlags.CENTER | DebugTextFlags.FACE_CAMERA,
 			GetOwner().GetOrigin()[0], GetOwner().GetOrigin()[1] + 5, GetOwner().GetOrigin()[2]
+		);
+		
+		FactionAffiliationComponent fac = FactionAffiliationComponent.Cast(GetOwner().FindComponent(FactionAffiliationComponent));
+		
+		DebugTextWorldSpace.Create(
+			GetOwner().GetWorld(),
+			fac.GetAffiliatedFaction().GetFactionKey(),
+			DebugTextFlags.ONCE | DebugTextFlags.CENTER | DebugTextFlags.FACE_CAMERA,
+			GetOwner().GetOrigin()[0], GetOwner().GetOrigin()[1] + 5.5, GetOwner().GetOrigin()[2],
+			20,
+			fac.GetAffiliatedFaction().GetFactionColor().PackToInt()
 		);
 
 		vector dir = m_vTargetAngles.AnglesToVector().Normalized();
@@ -311,20 +346,6 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	override void OnPostInit(IEntity owner)
 	{
 		SetEventMask(owner, EntityEvent.INIT);
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void GetBodyTransform(out vector mat[4])
-	{
-		Animation ownerAnim = GetOwner().GetAnimation();
-		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBodyBone), mat);
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void GetBarrelTransform(out vector mat[4])
-	{
-		Animation ownerAnim = GetOwner().GetAnimation();
-		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBarrelBone), mat);
 	}
 
 	//------------------------------------------------------------------------------------------------
