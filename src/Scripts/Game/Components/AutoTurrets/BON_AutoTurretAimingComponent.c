@@ -131,6 +131,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//! Lead offset (velocity, time) needed to hit target
 	vector ComputeLead()
 	{
+		if (!m_Target.m_Ent)
+			return vector.Zero;
+		
 		vector predictedLeadingOffset;
 
 		vector barrelMat[4];

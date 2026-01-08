@@ -1,0 +1,9 @@
+GenericEntity : "{EDBFF908FC24B222}Prefabs/Props/Core/Debris_Base.et" {
+ ID "5AD69538DE9D4DDD"
+ components {
+  MeshObject "{5AD69538DE9D4DC5}" {
+   Object "{593BBF5D3D81747C}Assets/Weapons/AutoTurrets/RIM-116/dst/Rim-116_Root_Dst.xob"
+  }
+ }
+ coords 130.769 1 72.486
+}

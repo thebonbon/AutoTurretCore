@@ -292,6 +292,9 @@ class BON_AutoTurretComponent : ScriptComponent
 			return;
 
 		m_Target = m_TargetingComp.GetTarget();
+		if (!m_Target.m_Ent)
+			return;
+		
 		m_AimingComp.OnUpdate(m_Target, timeSlice);
 
 		m_fAttackTimer -= timeSlice;

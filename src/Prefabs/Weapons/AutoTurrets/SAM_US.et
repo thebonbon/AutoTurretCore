@@ -23,7 +23,6 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
     }
    }
    m_bActiveOnSpawn 0
-   m_fAttackDelay 5
    m_eFireMode Intercept
    m_bDebug 1
   }
@@ -37,6 +36,19 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    "Additional hit zones" {
     SCR_HitZone default {
      HZDefault 1
+    }
+   }
+   m_DestroySpawnObjects {
+    SCR_ParticleSpawnable "{62CA80161915D831}" {
+     m_vOffsetPosition 0 0.605 0
+     m_Particle "{D38B85669DBFEB05}Particles/Logistics/Explosion/Fuel/Explosion_Fuel_small.ptc"
+    }
+    SCR_DebrisSpawnable "{685100A86E1A72E2}" {
+     m_ModelPrefabs {
+      "{53C101BF23EFB77E}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Root_Dst.et" "{C4979EF9F3CAD2F2}Assets/Weapons/AutoTurrets/RIM-116/dst/Rim-116_Body_Dst.xob" "{23D40E185FE32A0E}Assets/Weapons/AutoTurrets/RIM-116/dst/Rim-116_Barrel_Dst.xob"
+     }
+     m_bUseMaterialsFromParent 1
+     m_eMaterialSoundType METAL_HEAVY
     }
    }
   }

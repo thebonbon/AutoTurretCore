@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{4FE1C54CB7A3DA68}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Body_Dst.et"
+ Configurations {
+  EntityTemplateResourceClass PC {
+  }
+  EntityTemplateResourceClass XBOX_ONE : PC {
+  }
+  EntityTemplateResourceClass XBOX_SERIES : PC {
+  }
+  EntityTemplateResourceClass PS4 : PC {
+  }
+  EntityTemplateResourceClass PS5 : PC {
+  }
+  EntityTemplateResourceClass HEADLESS : PC {
+  }
+ }
+}

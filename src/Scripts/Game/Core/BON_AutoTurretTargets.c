@@ -21,6 +21,9 @@ class BON_AutoTurretTarget
 	//------------------------------------------------------------------------------------------------
 	vector GetAimPoint()
 	{
+		if (!m_Ent)
+			return vector.Zero;
+		
 		vector aimPoint = m_Ent.GetOrigin();
 		if (m_PerceivableComp)
 		{
