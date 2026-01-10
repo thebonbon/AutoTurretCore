@@ -31,10 +31,74 @@ MetaFileClass {
     }
    }
    GeometryParams {
-    GeometryParam UTM_FG_CIWS {
-     LayerPreset "FireGeo"
+    GeometryParam UBX_Root {
+     LayerPreset "PropFireView"
      SurfaceProperties {
-      "{CE9253778DD8FBDE}Common/Materials/Game/metal.gamemat"
+      "{469B8DA92D8109EC}Common/Materials/Game/Metal/metal_10mm_min.gamemat"
+     }
+     Mass 0
+     Margin 0
+    }
+    GeometryParam UBX_Root2 {
+     LayerPreset "PropFireView"
+     SurfaceProperties {
+      "{469B8DA92D8109EC}Common/Materials/Game/Metal/metal_10mm_min.gamemat"
+     }
+     Mass 0
+     Margin 0
+    }
+    GeometryParam UCX_Barrel2 {
+     LayerPreset "PropFireView"
+     SurfaceProperties {
+      "{469B8DA92D8109EC}Common/Materials/Game/Metal/metal_10mm_min.gamemat"
+     }
+     Mass 0
+     Margin 0
+    }
+    GeometryParam UCX_Barrel3 {
+     LayerPreset "PropFireView"
+     SurfaceProperties {
+      "{469B8DA92D8109EC}Common/Materials/Game/Metal/metal_10mm_min.gamemat"
+     }
+     Mass 0
+     Margin 0
+    }
+    GeometryParam UCX_Barrel4 {
+     LayerPreset "PropFireView"
+     SurfaceProperties {
+      "{469B8DA92D8109EC}Common/Materials/Game/Metal/metal_10mm_min.gamemat"
+     }
+     Mass 0
+     Margin 0
+    }
+    GeometryParam UCX_Body_Left {
+     LayerPreset "PropFireView"
+     SurfaceProperties {
+      "{469B8DA92D8109EC}Common/Materials/Game/Metal/metal_10mm_min.gamemat"
+     }
+     Mass 0
+     Margin 0
+    }
+    GeometryParam UCX_Body_Right {
+     LayerPreset "PropFireView"
+     SurfaceProperties {
+      "{469B8DA92D8109EC}Common/Materials/Game/Metal/metal_10mm_min.gamemat"
+     }
+     Mass 0
+     Margin 0
+    }
+    GeometryParam UCL_Barrel {
+     LayerPreset "PropFireView"
+     SurfaceProperties {
+      "{469B8DA92D8109EC}Common/Materials/Game/Metal/metal_10mm_min.gamemat"
+     }
+     Mass 0
+     Margin 0
+    }
+    GeometryParam UCL_Body1 {
+     LayerPreset "PropFireView"
+     SurfaceProperties {
+      "{469B8DA92D8109EC}Common/Materials/Game/Metal/metal_10mm_min.gamemat"
      }
      Mass 0
      Margin 0
@@ -56,7 +120,7 @@ MetaFileClass {
    }
   }
   FBXResourceClass PS5 : PC {
-   Common TXOCommonClass "{62ACF1D3B09284DD}" : "{F62AA8E7B8EA9D26}configs/ResourceTypes/PS5/MeshObjectCommon.conf" {
+   Common TXOCommonClass "{62ACF1D3B09284DD}" : "{F62AA8E7B8EA9D26}Configs/System/ResourceTypes/PS5/MeshObjectCommon.conf" {
    }
   }
   FBXResourceClass HEADLESS : PC {

@@ -1,0 +1,9 @@
+GenericEntity : "{EDBFF908FC24B222}Prefabs/Props/Core/Debris_Base.et" {
+ ID "5AD69538DE9D4DDD"
+ components {
+  MeshObject "{5AD69538DE9D4DC5}" {
+   Object "{3C68D14767976ACC}Assets/Weapons/AutoTurrets/CIWS/Dst/CIWS_Root_Dst.xob"
+  }
+ }
+ coords 130.769 1 72.486
+}

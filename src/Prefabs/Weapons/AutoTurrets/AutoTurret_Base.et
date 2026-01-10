@@ -55,10 +55,10 @@ GenericEntity {
    m_fBaseHealth 5000
    m_DestroySpawnObjects {
     SCR_ParticleSpawnable "{62CA80161915D831}" {
-     m_Particle "{33736FDD82DD3405}Particles/Logistics/Explosion/Ammo_Rack/Explosion_Ammo_Rack_Small.ptc"
+     m_Particle "{D38B85669DBFEB05}Particles/Logistics/Explosion/Fuel/Explosion_Fuel_small.ptc"
     }
    }
-   m_eMaterialSoundType BREAK_METAL
+   m_eMaterialSoundType BREAK_METAL_GENERATOR
   }
   PerceivableComponent "{62C90A57DDAC34D4}" {
    "Additional aim points" {

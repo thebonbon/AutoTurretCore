@@ -53,22 +53,20 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
   SCR_DestructionMultiPhaseComponent "{62ACF1D12DE6C3BD}" {
    "Additional hit zones" {
     SCR_HitZone default {
-     HZDefault 1
-     MaxHealth 5000
-     DamageReduction 40
-     DamageThreshold 8
-     "Melee multiplier" 0.01
-     "Kinetic multiplier" 0.1
-     "Explosive multiplier" 0.7
-     "DamageState threshold" {
-      0.7 0.4 0.2
-     }
     }
    }
-   CollisionVelocityThreshold 100000
-   "Heavy damage threshold" 200000
    m_fBaseHealth 8000
-   m_eMaterialSoundType BREAK_METAL
+   m_DestroySpawnObjects {
+    SCR_DebrisSpawnable "{6854ACB1F7F83B41}" {
+     m_ModelPrefabs {
+      "{357684CC335E515B}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Dst.et" "{2F708543B751BF0E}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Sensor_Dst.et" "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst.et"
+     }
+     m_bUseMaterialsFromParent 1
+     m_fRandomVelocityLinear 5
+     m_fRandomVelocityAngular 5
+     m_eMaterialSoundType METAL_HEAVY
+    }
+   }
   }
   PerceivableComponent "{62C90A57DDAC34D4}" {
    "Additional aim points" {

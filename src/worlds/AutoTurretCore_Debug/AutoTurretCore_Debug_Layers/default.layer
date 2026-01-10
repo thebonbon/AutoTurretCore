@@ -1,34 +1,262 @@
 SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
-Vehicle BOB : "{039615384D5685B3}Prefabs/MP/CombatOps/Vehicles/Cinematic_Flying_Mi8.et" {
- components {
-  SCR_HelicopterCinematicFlyComponent "{665C8BD859E6EDAD}" {
-   m_fInitialForceMultiplier 50
-  }
- }
- coords -1112.472 713.946 794.996
- angles 0 93.776 0
- EOnInit ""\
- "		/* code here */"\
- "	"
+GenericEntity : "{0838D33167666DDA}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_USSR.et" {
+ coords 156.629 1 72.021
+}
+GenericEntity : "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst.et" {
+ coords 130.049 1 77.776
+}
+GenericEntity : "{1688847C72A5E4C0}Prefabs/Weapons/AutoTurrets/dst/CIWS_Root_Dst.et" {
+ coords 128.432 1 76.748
 }
 GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
  components {
+  SoundComponent "{62ACAE2F976BB3F9}" {
+   Filenames +{
+   }
+  }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   components {
-    BON_AutoTurretAimingComponent "{670CB067D2C43437}" {
-     m_fRotationSpeed 2
-     m_bDebug 1
+   m_Projectile "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et"
+   m_ProjectileSpawnPositions {
+    PointInfo "{67248446C2004E3A}" {
+     PivotID "w_barrel"
+     Offset 0 0.16 1.5
     }
-    BON_AutoTurretTargetingComponent "{670CB067D05746A0}" {
-     m_eTargetFlags CHARACTERS
-     m_fMaxSearchTime 3
+   }
+   m_MuzzleParticle "{9BAE936C6A1D8A0D}Particles/Muzzle_RIM_116_Back.ptc"
+   m_EffectPositions {
+    PointInfo "{6724844462A1D7F0}" {
+     PivotID "w_barrel"
+     Offset 0 0.16 -1.5269
+     Angles 180 0 0
+    }
+   }
+   m_bActiveOnSpawn 0
+   m_eFireMode Intercept
+   m_bDebug 1
+  }
+  FactionAffiliationComponent "{62ACAE2F976BB213}" {
+   "faction affiliation" "USSR"
+  }
+  SCR_DestructionMultiPhaseComponent "{62ACF1D12DE6C3BD}" {
+   "Additional hit zones" {
+    SCR_HitZone default {
+     HZDefault 1
+    }
+   }
+   m_DestroySpawnObjects {
+    SCR_DebrisSpawnable "{685100A86E1A72E2}" {
     }
    }
   }
  }
- coords 151.661 1 71.621
+ coords 164.17 1 71.269
+}
+GenericEntity : "{2F708543B751BF0E}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Sensor_Dst.et" {
+ coords 131.399 1 78.648
+}
+GenericEntity : "{357684CC335E515B}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Dst.et" {
+ coords 133.202 1 76.71
+}
+Vehicle BOB : "{41609B3289F9ECC4}Prefabs/MP/CombatOps/Vehicles/Cinematic_Flying_UH1.et" {
+ coords -366.423 554.82 616.892
+ angles -17.26 130.267 0
+}
+GenericEntity : "{4FE1C54CB7A3DA68}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Body_Dst.et" {
+ coords 128.882 1 72.312
+}
+GenericEntity : "{53C101BF23EFB77E}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Root_Dst.et" {
+ coords 127.036 1 71.695
+}
+GenericEntity : "{6D7296248186E975}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_US.et" {
+ components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   components {
+    BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
+     m_fRotationSpeed 5
+    }
+   }
+   m_fTimeBetweenShots 0.04
+  }
+ }
+ coords 169.663 1 71.769
+}
+$grp SCR_DestructibleBuildingEntity : "{6E10F2B9F8C8BB2C}Prefabs/Structures/Cultural/Castles/Castle_01_OuterWall_01_Round.et" {
+ {
+  coords 8.457 0 221.835
+ }
+ {
+  coords 31.624 0 225.31
+ }
+ {
+  coords 26.808 0 221.923
+ }
+ {
+  coords 55.033 0 222.903
+ }
+ {
+  coords 50.821 0 223.556
+ }
+ {
+  coords 33.424 0 218.568
+ }
+ {
+  coords 22.386 0 217.392
+ }
+ {
+  coords 57.748 0.439 222.918
+ }
+ {
+  coords 78.451 0 224.532
+ }
+ {
+  coords 96.47 0 223.263
+ }
+ {
+  coords 107.7 0 221.932
+ }
+ {
+  coords 103.517 0 220.257
+ }
+ {
+  coords 76.204 0 222.172
+ }
+ {
+  coords 62.133 0.288 223.1
+ }
+ {
+  coords 35.235 1.285 218.586
+ }
+ {
+  coords 8.898 0 219.088
+ }
+ {
+  coords -2.936 0 220.584
+ }
+ {
+  coords 22.082 7.513 224.178
+ }
+ {
+  coords 26.254 7.36 222.988
+ }
+ {
+  coords 39.992 8.221 224.101
+ }
+ {
+  coords 52.001 8.278 225.799
+ }
+ {
+  coords 64.083 8.602 225.863
+ }
+ {
+  coords 78.557 7.644 226.573
+ }
+ {
+  coords 92.826 7.554 226.202
+ }
+ {
+  coords 109.029 6.679 225.225
+ }
+ {
+  coords 24.839 14.902 224.383
+ }
+ {
+  coords 37.361 15.967 226.289
+ }
+ {
+  coords 47.198 16.134 227.381
+ }
+ {
+  coords 60.651 16.624 226.703
+ }
+ {
+  coords 74.498 15.626 227.173
+ }
+ {
+  coords 90.044 14.635 228.172
+ }
+ {
+  coords 106.626 14.109 228.616
+ }
+ {
+  coords 113.731 18.82 229.216
+ }
+ {
+  coords 105.377 19.82 231.167
+ }
+ {
+  coords 84.503 22.033 228.366
+ }
+ {
+  coords 70.582 22.682 227.873
+ }
+ {
+  coords 54.992 21.998 228.114
+ }
+ {
+  coords 41.718 22.393 226.499
+ }
+ {
+  coords 28.633 22.186 224.528
+ }
+ {
+  coords -10.021 0 269.455
+ }
+ {
+  coords 30.709 26.29 224.548
+ }
+ {
+  coords 45.764 26.883 226.662
+ }
+ {
+  coords 65.752 27.088 229.501
+ }
+ {
+  coords 84.492 28.619 229.002
+ }
+ {
+  coords 98.762 28.187 230.95
+ }
+ {
+  coords 117.913 25.01 233.109
+ }
+ {
+  coords 13.283 7.17 223.036
+ }
+ {
+  coords 13.282 10.201 225.365
+ }
+ {
+  coords 14.821 14.053 223.982
+ }
+ {
+  coords 16.016 19.07 226.806
+ }
+ {
+  coords 16.017 23.126 227.043
+ }
+ {
+  coords -2.301 6.905 220.867
+ }
+ {
+  coords -1.496 14.789 221.791
+ }
+ {
+  coords -1.496 19.714 222.646
+ }
+ {
+  coords -0.282 25.944 223.581
+ }
+}
+Vehicle UH1H1 : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
+ coords 134.531 1 46.347
+}
+GenericEntity : "{74913F7E554D1AC7}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Barrel_Dst.et" {
+ coords 131.036 1 71.023
+}
+SCR_DestructibleEntity : "{9A25B3AF92191E1F}Prefabs/Structures/Walls/Concrete/ConcreteWall_USSR_01/ConcreteWall_USSR_01_single.et" {
+ coords 133.494 -0.988 95.062
 }
 GenericEntity : "{D584F2FFFDC7DE49}Prefabs/Weapons/Warheads/Warhead_Shell_HE.et" {
  coords 149.318 1 79.049
