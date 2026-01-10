@@ -106,7 +106,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void EOnFrame(IEntity owner, float timeSlice)
 	{
-		if (m_CurrentTarget)
+		if (m_CurrentTarget && m_CurrentTarget.m_Ent)
 			Shape.CreateArrow(owner.GetOrigin(), m_CurrentTarget.m_Ent.GetOrigin(), 0.1, COLOR_GREEN, ShapeFlags.ONCE);
 
 		m_fSearchTimer -= timeSlice;
