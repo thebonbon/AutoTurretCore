@@ -10,49 +10,6 @@ GenericEntity : "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst
 GenericEntity : "{1688847C72A5E4C0}Prefabs/Weapons/AutoTurrets/dst/CIWS_Root_Dst.et" {
  coords 128.432 1 76.748
 }
-GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
- components {
-  SoundComponent "{62ACAE2F976BB3F9}" {
-   Filenames +{
-   }
-  }
-  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_Projectile "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et"
-   m_ProjectileSpawnPositions {
-    PointInfo "{67248446C2004E3A}" {
-     PivotID "w_barrel"
-     Offset 0 0.16 1.5
-    }
-   }
-   m_MuzzleParticle "{9BAE936C6A1D8A0D}Particles/Muzzle_RIM_116_Back.ptc"
-   m_EffectPositions {
-    PointInfo "{6724844462A1D7F0}" {
-     PivotID "w_barrel"
-     Offset 0 0.16 -1.5269
-     Angles 180 0 0
-    }
-   }
-   m_bActiveOnSpawn 0
-   m_eFireMode Intercept
-   m_bDebug 1
-  }
-  FactionAffiliationComponent "{62ACAE2F976BB213}" {
-   "faction affiliation" "USSR"
-  }
-  SCR_DestructionMultiPhaseComponent "{62ACF1D12DE6C3BD}" {
-   "Additional hit zones" {
-    SCR_HitZone default {
-     HZDefault 1
-    }
-   }
-   m_DestroySpawnObjects {
-    SCR_DebrisSpawnable "{685100A86E1A72E2}" {
-    }
-   }
-  }
- }
- coords 164.17 1 71.269
-}
 GenericEntity : "{2F708543B751BF0E}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Sensor_Dst.et" {
  coords 131.399 1 78.648
 }
@@ -68,19 +25,6 @@ GenericEntity : "{4FE1C54CB7A3DA68}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Body_
 }
 GenericEntity : "{53C101BF23EFB77E}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Root_Dst.et" {
  coords 127.036 1 71.695
-}
-GenericEntity : "{6D7296248186E975}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_US.et" {
- components {
-  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   components {
-    BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
-     m_fRotationSpeed 5
-    }
-   }
-   m_fTimeBetweenShots 0.04
-  }
- }
- coords 169.663 1 71.769
 }
 $grp SCR_DestructibleBuildingEntity : "{6E10F2B9F8C8BB2C}Prefabs/Structures/Cultural/Castles/Castle_01_OuterWall_01_Round.et" {
  {

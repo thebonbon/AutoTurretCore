@@ -10,13 +10,13 @@ class BON_GuidedProjectile : Projectile
 
 	[Attribute("1", UIWidgets.Auto, "Max turn rate limit (rad/s)")]
 	protected float m_fMaxTurnRate;
-	
-	
+
+
 	[RplProp(onRplName: "OnTargetChanged")]
 	RplId m_iTrackedTargetId;
 
 	const int SELF_DESTRUCT_TIME = 1;
-	
+
 	int m_iSelfDestructTime;
 	IEntity m_TrackedTarget;
 	vector m_vAimOffset;
@@ -24,7 +24,7 @@ class BON_GuidedProjectile : Projectile
 	BON_TurretFireMode m_eFireMode;
 	MissileMoveComponent m_MissileMove;
 	float m_fSpeed;
-	
+
 
 	//------------------------------------------------------------------------------------------------
 	void OnTargetChanged()
@@ -39,11 +39,11 @@ class BON_GuidedProjectile : Projectile
 	//------------------------------------------------------------------------------------------------
 	//No need to get trigger comp on init, called once
 	void Trigger()
-	{	
+	{
 		BaseTriggerComponent triggerComp = BaseTriggerComponent.Cast(FindComponent(BaseTriggerComponent));
-		triggerComp.OnUserTrigger(this);		
+		triggerComp.OnUserTrigger(this);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void SteerToTarget(float timeSlice)
 	{
@@ -51,14 +51,14 @@ class BON_GuidedProjectile : Projectile
 		{
 			Trigger();
 		}
-		
+
 		vector targetPos = m_TrackedTarget.GetOrigin();
 		vector targetVel = m_TrackedTarget.GetPhysics().GetVelocity();
 		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
-		
+
 		if (targetDistance <= 1)
 			Trigger();
-		
+
 		//Add lead
 		if (m_eFireMode == BON_TurretFireMode.Intercept)
 		{
@@ -70,7 +70,7 @@ class BON_GuidedProjectile : Projectile
 		dirToTarget.Normalize();
 		vector localFwd = GetTransformAxis(2).Normalized();
 		vector axis = SCR_Math3D.Cross(localFwd, dirToTarget);
-		
+
 		float dot = vector.Dot(localFwd, dirToTarget);
 		dot = Math.Clamp(dot, -1.0, 1.0);
 		float angleRad = Math.Acos(dot);
@@ -88,16 +88,16 @@ class BON_GuidedProjectile : Projectile
 		if (m_TrackedTarget)
 			SteerToTarget(timeSlice);
 	}
-		
+
 	//------------------------------------------------------------------------------------------------
 	void Launch(IEntity target)
 	{
 		m_TrackedTarget = target;
-		
-		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());		
+
+		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
 		float timeToTarget = targetDistance / m_fSpeed;
 		m_iSelfDestructTime = System.GetUnixTime() + (int)timeToTarget + SELF_DESTRUCT_TIME;
-		
+
 		GetPhysics().SetActive(ActiveState.ACTIVE);
 
 		m_vLastDirToTarget = target.GetOrigin() - GetOrigin();

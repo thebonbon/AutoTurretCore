@@ -26,7 +26,6 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("w_barrel", UIWidgets.Auto, "", category: "Setup")]
 	protected string m_sBarrelBone;
 
-
 	[Attribute("false", UIWidgets.CheckBox, "Show Aiming debug?", category: "Debug")]
 	protected bool m_bDebug;
 

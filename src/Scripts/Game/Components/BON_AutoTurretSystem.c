@@ -4,11 +4,11 @@ class BON_AutoTurretSystem : GameSystem
 
 	//------------------------------------------------------------------------------------------------
 	//! Pause if game is paused
-	override bool ShouldBePaused() 
+	override bool ShouldBePaused()
 	{
 		return true;
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	protected override void OnUpdate(ESystemPoint point)
 	{
@@ -23,8 +23,9 @@ class BON_AutoTurretSystem : GameSystem
 			if (component)
 				component.OnUpdate(timeSlice);
 		}
-		
+
 		//Also update the global target gridmap
+		//TODO: OnFixedFrame
 		GetGame().GetAutoTurretGrid().Update();
 	}
 
@@ -51,13 +52,13 @@ class BON_AutoTurretSystem : GameSystem
 	{
 		if (component.GetOwner().IsDeleted() || (component.GetOwner().GetFlags() & EntityFlags.USER5))
 			return;
-		
+
 		if (!m_aTurretManagers.Contains(component))
 		{
 			m_aTurretManagers.Insert(component);
 			Print("[ATC] System registered: " + component.GetOwner());
 		}
-		
+
 	}
 
 	//------------------------------------------------------------------------------------------------

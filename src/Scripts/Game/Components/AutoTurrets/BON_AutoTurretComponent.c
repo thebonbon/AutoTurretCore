@@ -239,7 +239,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		LaunchProjectile(projectile);
 		SpawnMuzzleParticle(effectMat);
 		PlayShootSound();
-		
+
 #ifdef WCS_ARMAMENTS
 		PlayThreatDetectionSound();
 #endif
@@ -294,7 +294,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		m_Target = m_TargetingComp.GetTarget();
 		if (!m_Target.m_Ent)
 			return;
-		
+
 		m_AimingComp.OnUpdate(m_Target, timeSlice);
 
 		m_fAttackTimer -= timeSlice;

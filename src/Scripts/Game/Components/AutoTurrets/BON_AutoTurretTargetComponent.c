@@ -8,24 +8,24 @@ enum BON_TurretTargetFilterFlags
 
 [ComponentEditorProps(category: "GameScripted/Misc", description: "")]
 class BON_AutoTurretTargetComponentClass : ScriptComponentClass
-{	
+{
 }
 
 class BON_AutoTurretTargetComponent : ScriptComponent
 {
 	[Attribute("0", UIWidgets.Flags, enumType: BON_TurretTargetFilterFlags, category: "Setup")]
 	BON_TurretTargetFilterFlags m_TargetFlags;
-	
+
 	//Used for e.g missile IFF (Instigator faction)
 	Faction m_Faction;
-	
+
 	//------------------------------------------------------------------------------------------------
 	override void EOnPhysicsActive(IEntity owner, bool activeState)
 	{
 		if (m_TargetFlags == BON_TurretTargetFilterFlags.PROJECTILES)
 			GetGame().GetAutoTurretGrid().Insert(owner, true, m_TargetFlags);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
@@ -33,7 +33,7 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 		if (factionComp)
 			m_Faction = factionComp.GetAffiliatedFaction();
-		
+
 		GetGame().GetAutoTurretGrid().Insert(owner, true, m_TargetFlags);
 	}
 
@@ -42,7 +42,7 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 	{
 		SetEventMask(owner, EntityEvent.INIT);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	//! On Death remove self as target
 	override void EOnDeactivate(IEntity owner)
@@ -53,14 +53,14 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 
 modded class ArmaReforgerScripted
 {
-	protected ref BON_AutoTurretGridMap m_AutoTurretGridMap;	
-	
+	protected ref BON_AutoTurretGridMap m_AutoTurretGridMap;
+
 	//------------------------------------------------------------------------------------------------
 	BON_AutoTurretGridMap GetAutoTurretGrid()
 	{
 		if (!m_AutoTurretGridMap)
 			m_AutoTurretGridMap = new BON_AutoTurretGridMap();
-		
+
 		return m_AutoTurretGridMap;
 	}
 }

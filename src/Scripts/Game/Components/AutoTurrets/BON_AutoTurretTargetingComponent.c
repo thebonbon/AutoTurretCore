@@ -26,10 +26,10 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	{
 		if (target.m_Ent.GetName() == "BOB")
 			return true;
-		
+
 		if (!target.m_Faction)
 			return false;
-		
+
 		return target.m_Faction.IsFactionEnemy(m_FactionComp.GetAffiliatedFaction());
 	}
 

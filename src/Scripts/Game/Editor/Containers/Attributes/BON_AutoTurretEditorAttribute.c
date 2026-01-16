@@ -250,7 +250,7 @@ class BON_AutoTurretFireModeEditorAttribute : SCR_BaseFloatValueHolderEditorAttr
 		m_aValues.Clear();
 		array<string> fireModes = {};
 		SCR_Enum.GetEnumNames(BON_TurretFireMode, fireModes);
-		
+
 		SCR_EditorAttributeFloatStringValueHolder value;
 		foreach (int i, string fireMode : fireModes)
 		{
@@ -262,7 +262,7 @@ class BON_AutoTurretFireModeEditorAttribute : SCR_BaseFloatValueHolderEditorAttr
 		outEntries.Insert(new SCR_BaseEditorAttributeFloatStringValues(m_aValues));
 		return outEntries.Count();
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{

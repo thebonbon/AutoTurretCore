@@ -1,0 +1,25 @@
+GenericEntity : "{6D7296248186E975}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_US.et" {
+ components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   components {
+    BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
+     m_bDebug 1
+    }
+    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
+     m_eTargetFlags 30
+    }
+   }
+   m_bDebug 1
+  }
+  SCR_EditableEntityComponent "{62B08A24E90BD1E1}" {
+   m_UIInfo SCR_EditableVehicleUIInfo "{5298E609432D192D}" {
+    m_aAuthoredLabels {
+     CONTENT_MODDED
+     TRAIT_ARMED
+    }
+   }
+  }
+ }
+ coords 6263.017 36.684 8044.222
+ angles 0 -126.859 0
+}
