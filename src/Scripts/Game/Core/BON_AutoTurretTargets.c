@@ -9,15 +9,37 @@ class BON_AutoTurretTarget
 	int m_iFactionID = -1;
 
 	//------------------------------------------------------------------------------------------------
-	void BON_AutoTurretTarget(IEntity ent, float distance, int factionID)
+	static BON_AutoTurretTarget Create(IEntity ent, float distance)
+	{
+		BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget();
+		newTarget.m_fDistance = distance;
+		
+		newTarget.CreateFromEnt(ent);
+		
+		return newTarget;
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void CreateFromEnt(IEntity ent)
 	{
 		m_Ent = ent;
-		m_fDistance = distance;
-		m_iFactionID = factionID;
-
+		
+		BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(ent.FindComponent(BON_AutoTurretTargetComponent));		
+		m_iFactionID = targetComp.m_iFactionID;
+		
 		m_PerceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
+		
+		RplComponent rplComp = RplComponent.Cast(ent.FindComponent(RplComponent));
+		m_iRplId = rplComp.Id()
 	}
-
+	
+	//------------------------------------------------------------------------------------------------
+	void CreateFromRplId(RplId id)
+	{
+		RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(id));
+		CreateFromEnt(rplComponent.GetEntity());		
+	}
+	
 	//------------------------------------------------------------------------------------------------
 	vector GetAimPoint()
 	{
@@ -64,6 +86,9 @@ class BON_AutoTurretTarget
 	{
 		snapshot.SerializeInt(instance.m_iRplId);
 		snapshot.SerializeInt(instance.m_iFactionID);
+		
+		instance.CreateFromRplId(instance.m_iRplId);
+		
 		return true;
 	}
 
@@ -85,7 +110,7 @@ class BON_AutoTurretTarget
 	//------------------------------------------------------------------------------------------------
 	static bool SnapCompare(SSnapSerializerBase lhs, SSnapSerializerBase rhs, ScriptCtx ctx)
 	{
-		return lhs.CompareSnapshots(rhs, 8); //2x 4bit ints
+		return lhs.CompareSnapshots(rhs, 8); //4 rplid + 4 factionId
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -95,8 +120,6 @@ class BON_AutoTurretTarget
 			&& snapshot.CompareInt(instance.m_iFactionID);
 	}
 }
-
-
 
 
 class BON_AutoTurretGridMap : PointGridMap
@@ -115,9 +138,8 @@ class BON_AutoTurretGridMap : PointGridMap
 				continue;
 
 			float distance = vector.DistanceSq(origin, candidate.GetOrigin());
-			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(candidate.FindComponent(BON_AutoTurretTargetComponent));
 			
-			BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(candidate, distance, targetComp.m_iFactionID);
+			BON_AutoTurretTarget newTarget = BON_AutoTurretTarget.Create(candidate, distance);
 			if (newTarget.IsValid())
 				sortedTargets.Insert(newTarget);
 		}

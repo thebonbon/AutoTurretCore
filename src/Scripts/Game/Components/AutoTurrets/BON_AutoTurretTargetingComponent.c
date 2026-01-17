@@ -14,7 +14,8 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	[Attribute("2", UIWidgets.Auto, "Time to scan for new targets (s)", category: "Targeting")]
 	protected float m_fMaxSearchTime;
 
-	protected ref BON_AutoTurretTarget m_CurrentTarget;
+	[RplProp()]
+	ref BON_AutoTurretTarget m_CurrentTarget;
 	
 	protected float m_fSearchTimer = 0;
 	protected BON_AutoTurretAimingComponent m_AimingComp;
@@ -88,6 +89,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	bool CleanupTarget()
 	{
 		m_CurrentTarget = null;
+		Replication.BumpMe();
 		return false;
 	}
 
@@ -119,7 +121,10 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		m_fSearchTimer = m_fMaxSearchTime;
 
 		if (!CheckTarget())
+		{
 			m_CurrentTarget = FindTarget();
+			Replication.BumpMe();
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------
