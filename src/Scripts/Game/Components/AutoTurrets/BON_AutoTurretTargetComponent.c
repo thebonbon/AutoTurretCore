@@ -17,7 +17,7 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 	BON_TurretTargetFilterFlags m_TargetFlags;
 
 	//Used for e.g missile IFF (Instigator faction)
-	Faction m_Faction;
+	int m_iFactionID;
 
 	//------------------------------------------------------------------------------------------------
 	override void EOnPhysicsActive(IEntity owner, bool activeState)
@@ -32,7 +32,10 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 		//Set Faction for entities with FactionAffiliationComponent
 		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(owner.FindComponent(FactionAffiliationComponent));
 		if (factionComp)
-			m_Faction = factionComp.GetAffiliatedFaction();
+		{
+			FactionManager factionManager = GetGame().GetFactionManager();
+			m_iFactionID = factionManager.GetFactionIndex(factionComp.GetAffiliatedFaction());
+		}
 
 		GetGame().GetAutoTurretGrid().Insert(owner, true, m_TargetFlags);
 	}

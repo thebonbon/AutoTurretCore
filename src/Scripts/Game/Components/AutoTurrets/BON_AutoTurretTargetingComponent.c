@@ -14,11 +14,11 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	[Attribute("2", UIWidgets.Auto, "Time to scan for new targets (s)", category: "Targeting")]
 	protected float m_fMaxSearchTime;
 
-
+	protected ref BON_AutoTurretTarget m_CurrentTarget;
+	
 	protected float m_fSearchTimer = 0;
 	protected BON_AutoTurretAimingComponent m_AimingComp;
-	protected FactionAffiliationComponent m_FactionComp
-	protected ref BON_AutoTurretTarget m_CurrentTarget;
+	protected FactionAffiliationComponent m_FactionComp	
 	protected BON_AutoTurretComponent m_MainTurretComp;
 
 	//------------------------------------------------------------------------------------------------
@@ -27,10 +27,13 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		if (target.m_Ent.GetName() == "BOB")
 			return true;
 
-		if (!target.m_Faction)
+		if (target.m_iFactionID == -1)
 			return false;
 
-		return target.m_Faction.IsFactionEnemy(m_FactionComp.GetAffiliatedFaction());
+		FactionManager factionManager = GetGame().GetFactionManager();
+		Faction targetFaction = factionManager.GetFactionByIndex(target.m_iFactionID);
+		
+		return targetFaction.IsFactionEnemy(m_FactionComp.GetAffiliatedFaction());
 	}
 
 	//------------------------------------------------------------------------------------------------

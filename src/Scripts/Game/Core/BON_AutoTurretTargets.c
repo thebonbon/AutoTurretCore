@@ -1,19 +1,19 @@
 class BON_AutoTurretTarget
 {
 	[SortAttribute()]
-	float m_fDistance;
+	float m_fDistance; //Only used for target sorting
 
 	IEntity m_Ent;
 	RplId m_iRplId;
 	PerceivableComponent m_PerceivableComp;
-	Faction m_Faction;
+	int m_iFactionID = -1;
 
 	//------------------------------------------------------------------------------------------------
-	void BON_AutoTurretTarget(IEntity ent, float distance, Faction faction)
+	void BON_AutoTurretTarget(IEntity ent, float distance, int factionID)
 	{
 		m_Ent = ent;
 		m_fDistance = distance;
-		m_Faction = faction;
+		m_iFactionID = factionID;
 
 		m_PerceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
 	}
@@ -25,11 +25,12 @@ class BON_AutoTurretTarget
 			return vector.Zero;
 
 		vector aimPoint = m_Ent.GetOrigin();
+		
 		if (m_PerceivableComp)
 		{
 			array<vector> aimPoints();
-			m_PerceivableComp.GetAimpoints(aimPoints); //World pos
-			if (!aimPoints.IsEmpty())
+			int points = m_PerceivableComp.GetAimpoints(aimPoints); //World pos
+			if (points > 0)
 				aimPoint = aimPoints[0];
 		}
 
@@ -49,7 +50,54 @@ class BON_AutoTurretTarget
 
 		return true;
 	}
+	
+	//------------------------------------------------------------------------------------------------
+	static bool Extract(BON_AutoTurretTarget instance, ScriptCtx ctx, SSnapSerializerBase snapshot)
+	{
+		snapshot.SerializeInt(instance.m_iRplId);
+		snapshot.SerializeInt(instance.m_iFactionID);		
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	static bool Inject(SSnapSerializerBase snapshot, ScriptCtx ctx, BON_AutoTurretTarget instance)
+	{
+		snapshot.SerializeInt(instance.m_iRplId);
+		snapshot.SerializeInt(instance.m_iFactionID);
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	static void Encode(SSnapSerializerBase snapshot, ScriptCtx ctx, ScriptBitSerializer packet)
+	{
+		snapshot.EncodeInt(packet);		// m_iRplId
+		snapshot.EncodeInt(packet);		// m_iFactionID
+	}
+
+	//------------------------------------------------------------------------------------------------
+	static bool Decode(ScriptBitSerializer packet, ScriptCtx ctx, SSnapSerializerBase snapshot)
+	{
+		snapshot.DecodeInt(packet);		// m_iRplId
+		snapshot.DecodeInt(packet);		// m_iFactionID
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	static bool SnapCompare(SSnapSerializerBase lhs, SSnapSerializerBase rhs, ScriptCtx ctx)
+	{
+		return lhs.CompareSnapshots(rhs, 8); //2x 4bit ints
+	}
+
+	//------------------------------------------------------------------------------------------------
+	static bool PropCompare(BON_AutoTurretTarget instance, SSnapSerializerBase snapshot, ScriptCtx ctx)
+	{
+		return snapshot.CompareInt(instance.m_iRplId)
+			&& snapshot.CompareInt(instance.m_iFactionID);
+	}
 }
+
+
+
 
 class BON_AutoTurretGridMap : PointGridMap
 {
@@ -68,8 +116,8 @@ class BON_AutoTurretGridMap : PointGridMap
 
 			float distance = vector.DistanceSq(origin, candidate.GetOrigin());
 			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(candidate.FindComponent(BON_AutoTurretTargetComponent));
-
-			BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(candidate, distance, targetComp.m_Faction);
+			
+			BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(candidate, distance, targetComp.m_iFactionID);
 			if (newTarget.IsValid())
 				sortedTargets.Insert(newTarget);
 		}

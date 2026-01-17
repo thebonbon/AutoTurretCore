@@ -279,7 +279,10 @@ class BON_AutoTurretComponent : ScriptComponent
 			//Update projectile faction of IFF
 			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(lastSpawnedProjectile.FindComponent(BON_AutoTurretTargetComponent));
 			if (targetComp)
-				targetComp.m_Faction = m_FactionComp.GetAffiliatedFaction();
+			{
+				FactionManager factionManager = GetGame().GetFactionManager();
+				targetComp.m_iFactionID  = factionManager.GetFactionIndex(m_FactionComp.GetAffiliatedFaction());
+			}
 		}
 
 		return lastSpawnedProjectile;
