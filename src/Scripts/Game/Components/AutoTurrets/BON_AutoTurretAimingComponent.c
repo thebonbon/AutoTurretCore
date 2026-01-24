@@ -29,6 +29,8 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("false", UIWidgets.CheckBox, "Show Aiming debug?", category: "Debug")]
 	protected bool m_bDebug;
 
+	protected const float ANGLE_TOLERANCE = 0.75; // degrees
+
 	SignalsManagerComponent m_SignalsManager;
 	int m_iSignalBody;
 	int m_iSignalBarrel;
@@ -39,60 +41,6 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	BON_TurretAimState m_eAimState = BON_TurretAimState.IDLE;
 	vector m_vCurrentAngles;
 	vector m_vTargetAngles;
-
-	//TODO
-	/*
-	//------------------------------------------------------------------------------------------------
-	void SetNewTarget(IEntity target)
-	{
-		m_Target = target;
-		if (target)
-		{
-			RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
-			m_iNearestTargetId = targetRplComp.Id();
-			m_TargetPerceivableComp = PerceivableComponent.Cast(target.FindComponent(PerceivableComponent));
-		}
-		else
-		{
-			m_iNearestTargetId = -1;
-			m_TargetPerceivableComp = null;
-		}
-
-		Replication.BumpMe(); //Triggers OnTargetChanged()
-
-		//Apply current rotation
-		m_fCurrentBodyYaw = m_fNewBodyYaw;
-		m_fCurrentBarrelPitch = m_fNewBarrelPitch;
-		m_fLerp = 0;
-
-	}
-
-
-	//------------------------------------------------------------------------------------------------
-	void OnTargetChanged()
-	{
-		if (m_iNearestTargetId == -1)
-		{
-			m_Target = null;
-			m_TargetPerceivableComp = null;
-		}
-		else
-		{
-			RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(m_iNearestTargetId));
-			if (rplComponent)
-			{
-				m_Target = rplComponent.GetEntity();
-				m_TargetPerceivableComp = PerceivableComponent.Cast(rplComponent.GetEntity().FindComponent(PerceivableComponent));
-			}
-			else
-			{
-
-				Print("[AutoTurretCore] Failed to get rplComponent for ID: " + m_iNearestTargetId, LogLevel.WARNING);
-				m_Target = null;
-			}
-	}
-	*/
-
 
 	//------------------------------------------------------------------------------------------------
 	bool IsWithinLimitsAngle(vector angles)
@@ -120,10 +68,11 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//! Predicts the position with given speed to target pos
 	vector ComputeLeadSimple()
 	{
+		vector targetVelocity = m_Target.m_Ent.GetPhysics().GetVelocity();
 		float targetDistance = vector.Distance(m_Target.m_Ent.GetOrigin(), GetOwner().GetOrigin());
 		float timeToTarget = targetDistance / m_TurretComp.m_fProjectileSpeed;
 
-		return m_Target.m_Ent.GetOrigin() + m_Target.m_Ent.GetPhysics().GetVelocity() * timeToTarget;
+		return targetVelocity * timeToTarget;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -132,7 +81,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	{
 		if (!m_Target.m_Ent)
 			return vector.Zero;
-		
+
 		vector predictedLeadingOffset;
 
 		vector barrelMat[4];
@@ -171,8 +120,6 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool IsOnTarget()
 	{
-		const float ANGLE_TOLERANCE = 0.75; // degrees
-
 		vector current = SCR_Math3D.FixEulerVector180(m_vCurrentAngles);
 		vector target = SCR_Math3D.FixEulerVector180(m_vTargetAngles);
 
@@ -186,8 +133,6 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	{
 		if (m_Target)
 			m_eAimState = BON_TurretAimState.ROTATING_TO_TARGET;
-
-		//Maybe idle rotate here..
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -205,6 +150,12 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			barrelMat[3] = barrelOrigin; //Add origin back
 
 			vector aimPoint = m_Target.GetAimPoint();
+
+			#ifdef WORKBENCH
+			if (m_bDebug)
+				Shape.CreateSphere(Color.YELLOW, ShapeFlags.ONCE, aimPoint, 0.3);
+			#endif
+
 			if (m_TurretComp.m_eFireMode == BON_TurretFireMode.Intercept)
 			{
 				//Only apply ballistics if not a missile
@@ -213,6 +164,11 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 				else
 					aimPoint += ComputeLead();
 			}
+
+			#ifdef WORKBENCH
+			if (m_bDebug)
+				Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, aimPoint, 0.3);
+			#endif
 
 			desiredAngles = SCR_Math3D.GetLocalAngles(barrelMat, aimPoint);
 		}
@@ -249,7 +205,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		Animation ownerAnim = GetOwner().GetAnimation();
 		vector localBoneMat[4];
 		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBodyBone), localBoneMat); //Local mat
-		
+
 		//Transform relative to turret
 		vector ownerMat[4];
 		GetOwner().GetWorldTransform(ownerMat);
@@ -262,13 +218,13 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		Animation ownerAnim = GetOwner().GetAnimation();
 		vector localBoneMat[4];
 		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBarrelBone), localBoneMat); //Local mat
-		
+
 		//Transform relative to turret
 		vector ownerMat[4];
 		GetOwner().GetWorldTransform(ownerMat);
 		Math3D.MatrixMultiply4(ownerMat, localBoneMat, mat);
-	}	
-	
+	}
+
 	#ifdef WORKBENCH
 	//------------------------------------------------------------------------------------------------
 	void ShowDebug()
@@ -277,9 +233,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			DebugTextFlags.ONCE | DebugTextFlags.CENTER | DebugTextFlags.FACE_CAMERA,
 			GetOwner().GetOrigin()[0], GetOwner().GetOrigin()[1] + 5, GetOwner().GetOrigin()[2]
 		);
-		
+
 		FactionAffiliationComponent fac = FactionAffiliationComponent.Cast(GetOwner().FindComponent(FactionAffiliationComponent));
-		
+
 		DebugTextWorldSpace.Create(
 			GetOwner().GetWorld(),
 			fac.GetAffiliatedFaction().GetFactionKey(),
@@ -313,7 +269,6 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			m_vTargetAngles = Vector(-1, -1, -1);
 
 		m_Target = target;
-
 		switch (m_eAimState)
 		{
 			case BON_TurretAimState.IDLE:

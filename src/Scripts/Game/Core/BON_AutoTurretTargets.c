@@ -4,42 +4,41 @@ class BON_AutoTurretTarget
 	float m_fDistance; //Only used for target sorting
 
 	IEntity m_Ent;
-	RplId m_iRplId;
+	RplId m_iRplId = -1;
 	PerceivableComponent m_PerceivableComp;
 	int m_iFactionID = -1;
 
 	//------------------------------------------------------------------------------------------------
-	static BON_AutoTurretTarget Create(IEntity ent, float distance)
+	static BON_AutoTurretTarget Create(IEntity ent, float distance = 0, int factionId = -1)
 	{
 		BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget();
 		newTarget.m_fDistance = distance;
+		newTarget.m_iFactionID = factionId;
 		
 		newTarget.CreateFromEnt(ent);
-		
+
 		return newTarget;
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void CreateFromEnt(IEntity ent)
 	{
 		m_Ent = ent;
-		
-		BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(ent.FindComponent(BON_AutoTurretTargetComponent));		
+
+		if (!ent)
+			return;
+
+		m_Ent = ent;
+
+		BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(ent.FindComponent(BON_AutoTurretTargetComponent));
 		m_iFactionID = targetComp.m_iFactionID;
-		
+
 		m_PerceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
-		
+
 		RplComponent rplComp = RplComponent.Cast(ent.FindComponent(RplComponent));
 		m_iRplId = rplComp.Id()
 	}
-	
-	//------------------------------------------------------------------------------------------------
-	void CreateFromRplId(RplId id)
-	{
-		RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(id));
-		CreateFromEnt(rplComponent.GetEntity());		
-	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	vector GetAimPoint()
 	{
@@ -47,7 +46,7 @@ class BON_AutoTurretTarget
 			return vector.Zero;
 
 		vector aimPoint = m_Ent.GetOrigin();
-		
+
 		if (m_PerceivableComp)
 		{
 			array<vector> aimPoints();
@@ -72,53 +71,6 @@ class BON_AutoTurretTarget
 
 		return true;
 	}
-	
-	//------------------------------------------------------------------------------------------------
-	static bool Extract(BON_AutoTurretTarget instance, ScriptCtx ctx, SSnapSerializerBase snapshot)
-	{
-		snapshot.SerializeInt(instance.m_iRplId);
-		snapshot.SerializeInt(instance.m_iFactionID);		
-		return true;
-	}
-
-	//------------------------------------------------------------------------------------------------
-	static bool Inject(SSnapSerializerBase snapshot, ScriptCtx ctx, BON_AutoTurretTarget instance)
-	{
-		snapshot.SerializeInt(instance.m_iRplId);
-		snapshot.SerializeInt(instance.m_iFactionID);
-		
-		instance.CreateFromRplId(instance.m_iRplId);
-		
-		return true;
-	}
-
-	//------------------------------------------------------------------------------------------------
-	static void Encode(SSnapSerializerBase snapshot, ScriptCtx ctx, ScriptBitSerializer packet)
-	{
-		snapshot.EncodeInt(packet);		// m_iRplId
-		snapshot.EncodeInt(packet);		// m_iFactionID
-	}
-
-	//------------------------------------------------------------------------------------------------
-	static bool Decode(ScriptBitSerializer packet, ScriptCtx ctx, SSnapSerializerBase snapshot)
-	{
-		snapshot.DecodeInt(packet);		// m_iRplId
-		snapshot.DecodeInt(packet);		// m_iFactionID
-		return true;
-	}
-
-	//------------------------------------------------------------------------------------------------
-	static bool SnapCompare(SSnapSerializerBase lhs, SSnapSerializerBase rhs, ScriptCtx ctx)
-	{
-		return lhs.CompareSnapshots(rhs, 8); //4 rplid + 4 factionId
-	}
-
-	//------------------------------------------------------------------------------------------------
-	static bool PropCompare(BON_AutoTurretTarget instance, SSnapSerializerBase snapshot, ScriptCtx ctx)
-	{
-		return snapshot.CompareInt(instance.m_iRplId)
-			&& snapshot.CompareInt(instance.m_iFactionID);
-	}
 }
 
 
@@ -138,7 +90,7 @@ class BON_AutoTurretGridMap : PointGridMap
 				continue;
 
 			float distance = vector.DistanceSq(origin, candidate.GetOrigin());
-			
+
 			BON_AutoTurretTarget newTarget = BON_AutoTurretTarget.Create(candidate, distance);
 			if (newTarget.IsValid())
 				sortedTargets.Insert(newTarget);

@@ -14,26 +14,22 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	[Attribute("2", UIWidgets.Auto, "Time to scan for new targets (s)", category: "Targeting")]
 	protected float m_fMaxSearchTime;
 
-	[RplProp()]
 	ref BON_AutoTurretTarget m_CurrentTarget;
-	
+
 	protected float m_fSearchTimer = 0;
 	protected BON_AutoTurretAimingComponent m_AimingComp;
-	protected FactionAffiliationComponent m_FactionComp	
+	protected FactionAffiliationComponent m_FactionComp
 	protected BON_AutoTurretComponent m_MainTurretComp;
 
 	//------------------------------------------------------------------------------------------------
 	bool IsEnemy(BON_AutoTurretTarget target)
 	{
-		if (target.m_Ent.GetName() == "BOB")
-			return true;
-
 		if (target.m_iFactionID == -1)
 			return false;
 
 		FactionManager factionManager = GetGame().GetFactionManager();
 		Faction targetFaction = factionManager.GetFactionByIndex(target.m_iFactionID);
-		
+
 		return targetFaction.IsFactionEnemy(m_FactionComp.GetAffiliatedFaction());
 	}
 
@@ -89,14 +85,35 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	bool CleanupTarget()
 	{
 		m_CurrentTarget = null;
-		Replication.BumpMe();
+		Rpc(RpcDo_SetNewTarget, -1, -1);
 		return false;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	[RplRpc(RplChannel.Reliable, RplRcver.Broadcast)]
+	void RpcDo_SetNewTarget(RplId id, int factionId)
+	{
+		RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(id));
+		if (!rplComponent)
+		{
+			m_CurrentTarget = null;
+			return;
+		}
+
+		IEntity targetEnt = rplComponent.GetEntity();
+		if (!targetEnt)
+		{
+			m_CurrentTarget = null;
+			return;
+		}
+
+		m_CurrentTarget = BON_AutoTurretTarget.Create(targetEnt, 0, factionId);
 	}
 
 	//------------------------------------------------------------------------------------------------
 	bool CheckTarget()
 	{
-		if (!m_CurrentTarget || !m_CurrentTarget.IsValid())
+		if (!m_CurrentTarget.IsValid())
 			return CleanupTarget();
 
 		if (!m_AimingComp.IsWithinLimitsPos(m_CurrentTarget))
@@ -120,10 +137,14 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 
 		m_fSearchTimer = m_fMaxSearchTime;
 
-		if (!CheckTarget())
+		if (!m_CurrentTarget || !CheckTarget())
 		{
 			m_CurrentTarget = FindTarget();
-			Replication.BumpMe();
+			if (!m_CurrentTarget)
+				return;
+
+			RplComponent rplComp = RplComponent.Cast(m_CurrentTarget.m_Ent.FindComponent(RplComponent));
+			Rpc(RpcDo_SetNewTarget, rplComp.Id(), m_CurrentTarget.m_iFactionID);
 		}
 	}
 
@@ -138,6 +159,9 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void OnPostInit(IEntity owner)
 	{
+		if (!Replication.IsServer())
+			return;
+
 		SetEventMask(owner, EntityEvent.INIT | EntityEvent.FRAME);
 	}
 }

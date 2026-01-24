@@ -8,10 +8,10 @@ GenericEntity : "{05E6942F6E616690}Prefabs/Weapons/AutoTurrets/SAM_USSR.et" {
     m_Image ""
     m_sFaction "USSR"
     m_aAuthoredLabels {
-     1001
+     CONTENT_MODDED
     }
     m_aAutoLabels {
-     10 1 122
+     FACTION_USSR ENTITYTYPE_OBJECT SIZE_M
     }
    }
    m_sIconBoneName "w_body"

@@ -14,7 +14,7 @@ GenericEntity {
   }
   SoundComponent "{62ACAE2F976BB3F9}" {
    Filenames {
-    "{2C3081D1EE023D68}Sounds/Weapons/Rifles/AK-74/Weapons_Rifles_AK-74_Shot.acp"
+    "{2C3081D1EE023D68}Sounds/Weapons/Rifles/AK-74/Weapons_Rifles_AK-74_Shot.acp" "{838DFCDE83FC1B35}Sounds/AutoTurret/AutoTurret_Rotation.acp"
    }
    SoundPoints {
     SoundPointInfo Muzzle {
@@ -25,6 +25,7 @@ GenericEntity {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    components {
     BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
+     m_bDebug 1
     }
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
     }
@@ -33,6 +34,7 @@ GenericEntity {
    }
    m_sShootSound "SOUND_SHOT"
    m_fAttackInaccuracy 1
+   m_bDebug 1
   }
   BON_AutoTurretTargetComponent "{62C91C0D0A7CBA50}" {
    m_TargetFlags 5

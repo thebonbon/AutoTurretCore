@@ -281,7 +281,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			if (targetComp)
 			{
 				FactionManager factionManager = GetGame().GetFactionManager();
-				targetComp.m_iFactionID  = factionManager.GetFactionIndex(m_FactionComp.GetAffiliatedFaction());
+				targetComp.m_iFactionID = factionManager.GetFactionIndex(m_FactionComp.GetAffiliatedFaction());
 			}
 		}
 
@@ -295,8 +295,6 @@ class BON_AutoTurretComponent : ScriptComponent
 			return;
 
 		m_Target = m_TargetingComp.GetTarget();
-		if (!m_Target.m_Ent)
-			return;
 
 		m_AimingComp.OnUpdate(m_Target, timeSlice);
 

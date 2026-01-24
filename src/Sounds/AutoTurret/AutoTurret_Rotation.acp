@@ -1,0 +1,168 @@
+AudioClass {
+ sounds {
+  SoundClass "5129" {
+   id 5129
+   name "SOUND_AUTOTURRET_ROTATE"
+   version 5
+   tl 96 -16
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "6162:65" {
+       id 6162
+       port 65
+      }
+     }
+    }
+   }
+   outState 7179
+   outStatePort 79879
+  }
+ }
+ mixers {
+  MixerClass "7179" {
+   id 7179
+   name "OutputState 7"
+   version 4
+   tl 304 -16
+   res "{B764D803219C775E}Sounds/FinalMix.afm"
+   ins {
+    ConnectionsClass "con:79879" {
+     id 79879
+     links {
+      ConnectionClass "5129:65" {
+       id 5129
+       port 65
+      }
+     }
+    }
+   }
+   pi {
+    8192 0
+   }
+   path "{B764D803219C775E}Sounds/FinalMix.afm"
+   inputs {
+    "WPN_Handling" "WPN_Shots" "WPN_Explosions" "WNP_BulletHits" "CHAR" "ENV_AMB_2D" "VEH_Animations" "Impacts" "Dialog" "ENV_Doors" "VEH_Engine" "VEH_Tires" "VON" "SFX" "SFX_Reverb_OBSOLETE" "VON_Reverb_Small" "Dialog_Reverb" "Impacts_EXT" "ENV_AMB_3D" "WPN_SonicCracks" "CHAR_Gear" "PA" "SFX_Reverb_Exterior" "ENV_AMB_3D_Reverb_Exterior" "SFX_Direct" "SFX_Reverb_Small" "SFX_Reverb_Medium" "SFX_Reverb_Large" "WPN_Shots_Player" "Dialog_Reverb_Small" "Dialog_Reverb_Medium" "Dialog_Reverb_Large" "WPN_TravelingProjectile" "Dialog_Delay_Exterior" "SFX_Reverb_InCabin" "VON_Reverb_Medium" "VON_Reverb_Large"
+   }
+   visiblePorts {
+    79879
+   }
+  }
+ }
+ shaders {
+  ShaderClass "6162" {
+   id 6162
+   name "Shader 6"
+   version 5
+   tl -128 -16
+   ins {
+    ConnectionsClass "con:0" {
+     id 0
+     links {
+      ConnectionClass "4124:65" {
+       id 4124
+       port 65
+      }
+     }
+    }
+    ConnectionsClass "con:1" {
+     id 1
+     links {
+      ConnectionClass "3091:65" {
+       id 3091
+       port 65
+      }
+     }
+    }
+    ConnectionsClass "con:2" {
+     id 2
+     links {
+      ConnectionClass "2069:65" {
+       id 2069
+       port 65
+      }
+     }
+    }
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "1028:65" {
+       id 1028
+       port 65
+      }
+      ConnectionClass "8196:65" {
+       id 8196
+       port 65
+      }
+     }
+    }
+   }
+   pi {
+    7 0
+   }
+  }
+ }
+ amplitudes {
+  AmplitudeClass "3091" {
+   id 3091
+   name "Amplitude 3"
+   version 5
+   tl -144 -224
+   curve "1/r"
+  }
+ }
+ frequency {
+  FrequencyClass "2069" {
+   id 2069
+   name "Frequency 2"
+   version 5
+   tl -144 -144
+   enableDistanceAtt 1
+  }
+ }
+ banks_local {
+  BankLocalClass "1028" {
+   id 1028
+   name "Bank 1"
+   version 7
+   tl -336 -16
+   Pitch 3
+   "Pitch variance" 1
+   Samples {
+    AudioBankSampleClass "turret_rotation.wav" {
+     Filename "{EA110D15C44B34AE}Sounds/AutoTurret/turret_rotation.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+  BankLocalClass "8196" {
+   id 8196
+   name "Bank 8"
+   version 7
+   tl -336 80
+   Pitch -2
+   "Pitch variance" 1
+   Samples {
+    AudioBankSampleClass "BarGate_Metal_Open_Finish_2.wav" {
+     Filename "{D34E65E699EFEB2E}Sounds/Structures/_ShaderData/Doors/Samples/Metalic/BarGate/BarGate_Metal_Open_Finish_2.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+ }
+ spatialities {
+  SpatialityClass "4124" {
+   id 4124
+   name "Spatiality 4"
+   version 5
+   tl -144 -304
+   spatialFactor 1
+  }
+ }
+ version 1
+}

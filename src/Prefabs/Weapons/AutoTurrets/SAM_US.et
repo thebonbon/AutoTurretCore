@@ -7,6 +7,11 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    }
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   components {
+    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
+     m_eTargetFlags AIRCRAFTS
+    }
+   }
    m_Projectile "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et"
    m_ProjectileSpawnPositions {
     PointInfo "{67248446C2004E3A}" {
@@ -22,7 +27,6 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
      Angles 180 0 0
     }
    }
-   m_bActiveOnSpawn 0
    m_eFireMode Intercept
    m_bDebug 1
   }

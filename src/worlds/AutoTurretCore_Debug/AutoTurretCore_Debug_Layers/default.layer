@@ -1,30 +1,26 @@
 SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
-GenericEntity : "{0838D33167666DDA}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_USSR.et" {
- coords 156.629 1 72.021
+GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SAM_USSR.et" {
+ coords 130.784 1 107.402
 }
 GenericEntity : "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst.et" {
- coords 130.049 1 77.776
+ coords 128.529 2.115 76.489
 }
 GenericEntity : "{1688847C72A5E4C0}Prefabs/Weapons/AutoTurrets/dst/CIWS_Root_Dst.et" {
  coords 128.432 1 76.748
 }
 GenericEntity : "{2F708543B751BF0E}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Sensor_Dst.et" {
- coords 131.399 1 78.648
+ coords 128.039 3.629 76.851
 }
 GenericEntity : "{357684CC335E515B}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Dst.et" {
- coords 133.202 1 76.71
-}
-Vehicle BOB : "{41609B3289F9ECC4}Prefabs/MP/CombatOps/Vehicles/Cinematic_Flying_UH1.et" {
- coords -366.423 554.82 616.892
- angles -17.26 130.267 0
+ coords 128.636 3.911 75.963
 }
 GenericEntity : "{4FE1C54CB7A3DA68}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Body_Dst.et" {
- coords 128.882 1 72.312
+ coords 124.599 1.936 75.999
 }
 GenericEntity : "{53C101BF23EFB77E}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Root_Dst.et" {
- coords 127.036 1 71.695
+ coords 124.606 1 76.04
 }
 $grp SCR_DestructibleBuildingEntity : "{6E10F2B9F8C8BB2C}Prefabs/Structures/Cultural/Castles/Castle_01_OuterWall_01_Round.et" {
  {
@@ -197,10 +193,7 @@ Vehicle UH1H1 : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
  coords 134.531 1 46.347
 }
 GenericEntity : "{74913F7E554D1AC7}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Barrel_Dst.et" {
- coords 131.036 1 71.023
-}
-SCR_DestructibleEntity : "{9A25B3AF92191E1F}Prefabs/Structures/Walls/Concrete/ConcreteWall_USSR_01/ConcreteWall_USSR_01_single.et" {
- coords 133.494 -0.988 95.062
+ coords 124.638 3.987 75.638
 }
 GenericEntity : "{D584F2FFFDC7DE49}Prefabs/Weapons/Warheads/Warhead_Shell_HE.et" {
  coords 149.318 1 79.049

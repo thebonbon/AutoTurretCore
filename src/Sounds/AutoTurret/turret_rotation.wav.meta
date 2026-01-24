@@ -1,5 +1,5 @@
 MetaFileClass {
- Name "{5061D2CC8C976B80}Sounds/AutoTurret/LASRGun_Ballista Fire Long_05.wav"
+ Name "{EA110D15C44B34AE}Sounds/AutoTurret/turret_rotation.wav"
  Configurations {
   WAVResourceClass PC : "{F72B05D02F3F135E}Configs/System/ResourceTypes/PC/Sound.conf" {
   }
@@ -9,7 +9,7 @@ MetaFileClass {
   }
   WAVResourceClass PS4 : "{89EB939911B4C093}Configs/System/ResourceTypes/PS4/Sound.conf" {
   }
-  WAVResourceClass PS5 : "{A584A3B556D4A981}configs/ResourceTypes/PS5/Sound.conf" {
+  WAVResourceClass PS5 : "{A584A3B556D4A981}Configs/System/ResourceTypes/PS5/Sound.conf" {
   }
   WAVResourceClass HEADLESS : "{D63592CA950AF3A8}Configs/System/ResourceTypes/HEADLESS/Sound.conf" {
   }
