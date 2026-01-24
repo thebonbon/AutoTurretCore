@@ -196,19 +196,6 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_SoundComponent.SoundEvent(m_sShootSound);
 	}
 
-#ifdef WCS_ARMAMENTS
-	//------------------------------------------------------------------------------------------------
-	//! WCS missile detection sound compatibility
-	void PlayThreatDetectionSound()
-	{
-		SoundComponent soundComp = SoundComponent.Cast(m_Target.m_Ent.FindComponent(SoundComponent));
-		if (!soundComp)
-			return;
-
-		soundComp.SoundEvent("MWS_INCOMING_MISSILE");
-	}
-#endif
-
 	//------------------------------------------------------------------------------------------------
 	void SpawnMuzzleParticle(vector muzzleMat[4])
 	{
@@ -239,10 +226,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		LaunchProjectile(projectile);
 		SpawnMuzzleParticle(effectMat);
 		PlayShootSound();
-
-#ifdef WCS_ARMAMENTS
-		PlayThreatDetectionSound();
-#endif
 
 		if (m_AnimationController)
 			m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
