@@ -4,39 +4,32 @@ class BON_AutoTurretTarget
 	float m_fDistance; //Only used for target sorting
 
 	IEntity m_Ent;
-	RplId m_iRplId = -1;
 	PerceivableComponent m_PerceivableComp;
 	int m_iFactionID = -1;
 
 	//------------------------------------------------------------------------------------------------
-	static BON_AutoTurretTarget Create(IEntity ent, float distance = 0, int factionId = -1)
+	void BON_AutoTurretTarget(IEntity ent, float distance = 0)
 	{
-		BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget();
-		newTarget.m_fDistance = distance;
-		newTarget.m_iFactionID = factionId;
+		m_Ent = ent;
+		m_fDistance = distance;
 		
-		newTarget.CreateFromEnt(ent);
-
-		return newTarget;
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void CreateFromEnt(IEntity ent)
-	{
-		m_Ent = ent;
-
-		if (!ent)
-			return;
-
-		m_Ent = ent;
-
-		BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(ent.FindComponent(BON_AutoTurretTargetComponent));
-		m_iFactionID = targetComp.m_iFactionID;
-
 		m_PerceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
 
-		RplComponent rplComp = RplComponent.Cast(ent.FindComponent(RplComponent));
-		m_iRplId = rplComp.Id()
+		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(ent.FindComponent(FactionAffiliationComponent));
+		if (factionComp)
+		{
+			FactionManager factionManager = GetGame().GetFactionManager();
+			m_iFactionID = factionManager.GetFactionIndex(factionComp.GetAffiliatedFaction());
+		}
+		else //e.g missiles dont have faction comp -> try target data
+		{
+			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(ent.FindComponent(BON_AutoTurretTargetComponent));			
+			if (targetComp)
+				m_iFactionID = targetComp.m_iFactionID;
+		}
+		
+		if (m_iFactionID == -1)
+			Print("Didnt find any faction for " + ent, LogLevel.WARNING);		
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -91,7 +84,7 @@ class BON_AutoTurretGridMap : PointGridMap
 
 			float distance = vector.DistanceSq(origin, candidate.GetOrigin());
 
-			BON_AutoTurretTarget newTarget = BON_AutoTurretTarget.Create(candidate, distance);
+			BON_AutoTurretTarget newTarget = new BON_AutoTurretTarget(candidate, distance);
 			if (newTarget.IsValid())
 				sortedTargets.Insert(newTarget);
 		}

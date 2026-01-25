@@ -25,6 +25,7 @@ GenericEntity {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    components {
     BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
+     m_fRotationSpeed 2
      m_bDebug 1
     }
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {

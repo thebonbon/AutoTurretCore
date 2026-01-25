@@ -11,10 +11,6 @@ class BON_GuidedProjectile : Projectile
 	[Attribute("1", UIWidgets.Auto, "Max turn rate limit (rad/s)")]
 	protected float m_fMaxTurnRate;
 
-
-	[RplProp(onRplName: "OnTargetChanged")]
-	RplId m_iTrackedTargetId;
-
 	const int SELF_DESTRUCT_TIME = 1;
 
 	int m_iSelfDestructTime;
@@ -24,17 +20,6 @@ class BON_GuidedProjectile : Projectile
 	BON_TurretFireMode m_eFireMode;
 	MissileMoveComponent m_MissileMove;
 	float m_fSpeed;
-
-
-	//------------------------------------------------------------------------------------------------
-	void OnTargetChanged()
-	{
-		RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(m_iTrackedTargetId));
-		if (rplComponent)
-		{
-			Launch(rplComponent.GetEntity());
-		}
-	}
 
 	//------------------------------------------------------------------------------------------------
 	//No need to get trigger comp on init, called once
@@ -92,8 +77,14 @@ class BON_GuidedProjectile : Projectile
 	//------------------------------------------------------------------------------------------------
 	void Launch(IEntity target)
 	{
-		m_TrackedTarget = target;
+		if (!target)
+			return;
 
+		m_MissileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
+		m_MissileMove.Launch(GetTransformAxis(2), vector.Zero, 1, this, null, null, null, null);
+		
+		m_TrackedTarget = target;
+		
 		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
 		float timeToTarget = targetDistance / m_fSpeed;
 		m_iSelfDestructTime = System.GetUnixTime() + (int)timeToTarget + SELF_DESTRUCT_TIME;
@@ -107,21 +98,41 @@ class BON_GuidedProjectile : Projectile
 	}
 
 	//------------------------------------------------------------------------------------------------
+	[RplRpc(RplChannel.Reliable, RplRcver.Broadcast)]
+	void RpcDo_Launch(RplId targetID, BON_TurretFireMode fireMode, float speed)
+	{
+		m_fSpeed = speed;
+		m_eFireMode = fireMode;
+
+		RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(targetID));
+		IEntity target = rplComponent.GetEntity();
+		Print("RpcDo_Launch: " + speed + " | " + m_eFireMode + " | " +  target);
+		Launch(target);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void DelayLaunch(IEntity target, BON_TurretFireMode fireMode, float speed)
+	{
+		
+		
+		//Broadcast all data for clients to also steer to target (steering is not replicated)
+		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
+		Rpc(RpcDo_Launch, targetRplComp.Id(), fireMode, speed);
+		
+		Launch(target);
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	//! Called from Server
 	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode, float speed)
 	{
-		if (!target)
+		if (!Replication.IsServer() || !target)
 			return;
 
 		m_fSpeed = speed;
 		m_eFireMode = fireMode;
 
-		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
-		m_iTrackedTargetId = targetRplComp.Id();
-		Replication.BumpMe();
-
-		m_MissileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
-		m_MissileMove.Launch(GetTransformAxis(2), vector.Zero, 1, this, null, null, null, null);
-
-		Launch(target);
+		GetGame().GetCallqueue().CallLater(DelayLaunch, 1, false, target, fireMode, speed);
+		
 	}
 }

@@ -220,23 +220,33 @@ class BON_AutoTurretComponent : ScriptComponent
 		vector muzzleMat[4];
 		vector effectMat[4];
 		GetMuzzleTransform(muzzleMat, effectMat);
-		SCR_Math3D.AddRandomVectorToMat(muzzleMat, -m_fAttackInaccuracy, m_fAttackInaccuracy);
 
-		IEntity projectile = SpawnProjectile(muzzleMat, m_Target);
-		LaunchProjectile(projectile);
-		SpawnMuzzleParticle(effectMat);
-		PlayShootSound();
+		//Only spawn and launch if projectile is not replicated. But always do on server
+		if (Replication.IsServer() || !m_bIsProjectileReplicated)
+		{
+			SCR_Math3D.AddRandomVectorToMat(muzzleMat, -m_fAttackInaccuracy, m_fAttackInaccuracy);
+			IEntity projectile = SpawnProjectile(muzzleMat, m_Target);
+			LaunchProjectile(projectile);
+			
+			if (m_bTriggerOnTarget)
+				SetTriggerOnTarget(projectile);
+		}
 
-		if (m_AnimationController)
-			m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
+		//Dedicated Server doesnt need SFX or VFX
+		if (RplSession.Mode() != RplMode.Dedicated)
+		{
+			SpawnMuzzleParticle(effectMat);
+			PlayShootSound();
 
-		if (m_bTriggerOnTarget)
-			SetTriggerOnTarget(projectile);
+			if (m_AnimationController)
+				m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
+		}
 
 		//TOOD: Maybe first few bullets never hit? To prevent first one to hit. Or increase chance every bullet up to max
 		bool triggerTargetProjectile = s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance;
 		if (triggerTargetProjectile && m_Target.m_Ent.FindComponent(BaseTriggerComponent))
 			TriggerProjectile(m_Target.m_Ent);
+
 
 		//Increase muzzle index
 		m_iCurrentMuzzle++;
@@ -253,20 +263,17 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		IEntity lastSpawnedProjectile;
 
-		if (!m_bIsProjectileReplicated || Replication.IsServer())
-		{
-			lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
-			if (!lastSpawnedProjectile)
-				return null;
+		lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
+		if (!lastSpawnedProjectile)
+			return null;
 
-			//Update projectile faction of IFF
-			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(lastSpawnedProjectile.FindComponent(BON_AutoTurretTargetComponent));
-			if (targetComp)
-			{
-				FactionManager factionManager = GetGame().GetFactionManager();
-				targetComp.m_iFactionID = factionManager.GetFactionIndex(m_FactionComp.GetAffiliatedFaction());
-			}
-		}
+		//Update projectile faction of IFF
+		BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(lastSpawnedProjectile.FindComponent(BON_AutoTurretTargetComponent));
+		if (targetComp)
+		{
+			FactionManager factionManager = GetGame().GetFactionManager();
+			targetComp.m_iFactionID = factionManager.GetFactionIndex(m_FactionComp.GetAffiliatedFaction());
+		}		
 
 		return lastSpawnedProjectile;
 	}

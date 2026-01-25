@@ -51,7 +51,9 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		float traceDistance = GetOwner().GetWorld().TraceMove(param, null);
 
 		//Max distance or hit entity directly
-		if (traceDistance == 1 || param.TraceEnt == target.m_Ent)
+		
+		IEntity mainParent = SCR_EntityHelper.GetMainParent(param.TraceEnt, true);
+		if (traceDistance == 1 || param.TraceEnt == target.m_Ent || mainParent == target.m_Ent)
 			return true;
 
 		//Hit entity but its an equipment of the target (e.g vest, helmet etc..)
@@ -91,7 +93,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 
 	//------------------------------------------------------------------------------------------------
 	[RplRpc(RplChannel.Reliable, RplRcver.Broadcast)]
-	void RpcDo_SetNewTarget(RplId id, int factionId)
+	void RpcDo_SetNewTarget(RplId id)
 	{
 		RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(id));
 		if (!rplComponent)
@@ -107,7 +109,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 			return;
 		}
 
-		m_CurrentTarget = BON_AutoTurretTarget.Create(targetEnt, 0, factionId);
+		m_CurrentTarget = new BON_AutoTurretTarget(targetEnt, 0);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -144,7 +146,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 				return;
 
 			RplComponent rplComp = RplComponent.Cast(m_CurrentTarget.m_Ent.FindComponent(RplComponent));
-			Rpc(RpcDo_SetNewTarget, rplComp.Id(), m_CurrentTarget.m_iFactionID);
+			Rpc(RpcDo_SetNewTarget, rplComp.Id());
 		}
 	}
 

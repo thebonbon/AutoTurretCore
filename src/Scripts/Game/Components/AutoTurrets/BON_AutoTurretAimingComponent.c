@@ -29,7 +29,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("false", UIWidgets.CheckBox, "Show Aiming debug?", category: "Debug")]
 	protected bool m_bDebug;
 
-	protected const float ANGLE_TOLERANCE = 0.75; // degrees
+	protected const float ANGLE_TOLERANCE = 1; // degrees
 
 	SignalsManagerComponent m_SignalsManager;
 	int m_iSignalBody;

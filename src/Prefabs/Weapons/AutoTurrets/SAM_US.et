@@ -10,6 +10,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
    components {
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
      m_eTargetFlags AIRCRAFTS
+     m_iSearchRadius 1000
     }
    }
    m_Projectile "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et"

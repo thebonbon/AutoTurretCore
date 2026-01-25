@@ -2,7 +2,16 @@ SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
 GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SAM_USSR.et" {
- coords 130.784 1 107.402
+ components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   components {
+    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
+     m_iSearchRadius 5000
+    }
+   }
+  }
+ }
+ coords 170.337 1 80.117
 }
 GenericEntity : "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst.et" {
  coords 128.529 2.115 76.489
@@ -190,7 +199,8 @@ $grp SCR_DestructibleBuildingEntity : "{6E10F2B9F8C8BB2C}Prefabs/Structures/Cult
  }
 }
 Vehicle UH1H1 : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
- coords 134.531 1 46.347
+ coords 60.208 1 250.62
+ angles 0 90 0
 }
 GenericEntity : "{74913F7E554D1AC7}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Barrel_Dst.et" {
  coords 124.638 3.987 75.638
