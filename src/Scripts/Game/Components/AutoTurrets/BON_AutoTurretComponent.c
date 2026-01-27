@@ -228,6 +228,8 @@ class BON_AutoTurretComponent : ScriptComponent
 			IEntity projectile = SpawnProjectile(muzzleMat, m_Target);
 			LaunchProjectile(projectile);
 			
+			m_Target.SetAlarm(6);
+			
 			if (m_bTriggerOnTarget)
 				SetTriggerOnTarget(projectile);
 		}

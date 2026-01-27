@@ -2,3 +2,7 @@ Based on the Arma Public License (https://www.bohemia.net/community/licenses/arm
 
 No Reupload: You may not solely reupload all or any portion of this material.
 Moddable: You are permitted to remix, transform, or build upon the material, using this mod as a dependency.
+
+---
+Permission from Cyborgmatt to add WCS_Armaments compatibility
+WCS_Armaments License: https://reforger.armaplatform.com/workshop/629B2BA37EFFD577

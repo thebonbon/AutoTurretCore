@@ -139,12 +139,16 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 
 		m_fSearchTimer = m_fMaxSearchTime;
 
+		//Find new target
 		if (!m_CurrentTarget || !CheckTarget())
 		{
 			m_CurrentTarget = FindTarget();
 			if (!m_CurrentTarget)
 				return;
-
+	
+			//New target found
+			m_CurrentTarget.SetAlarm(-6);
+		
 			RplComponent rplComp = RplComponent.Cast(m_CurrentTarget.m_Ent.FindComponent(RplComponent));
 			Rpc(RpcDo_SetNewTarget, rplComp.Id());
 		}

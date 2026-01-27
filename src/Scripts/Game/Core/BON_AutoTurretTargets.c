@@ -6,7 +6,9 @@ class BON_AutoTurretTarget
 	IEntity m_Ent;
 	PerceivableComponent m_PerceivableComp;
 	int m_iFactionID = -1;
-
+	SoundComponent m_SoundComp;
+	protected AudioHandle m_AlarmAudioHandle = AudioHandle.Invalid;
+	
 	//------------------------------------------------------------------------------------------------
 	void BON_AutoTurretTarget(IEntity ent, float distance = 0)
 	{
@@ -14,7 +16,8 @@ class BON_AutoTurretTarget
 		m_fDistance = distance;
 		
 		m_PerceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
-
+		m_SoundComp = SoundComponent.Cast(ent.FindComponent(SoundComponent));
+		
 		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(ent.FindComponent(FactionAffiliationComponent));
 		if (factionComp)
 		{
@@ -63,6 +66,29 @@ class BON_AutoTurretTarget
 			return false;
 
 		return true;
+	}
+		
+	//------------------------------------------------------------------------------------------------
+	//! -6 for rotation to target, +6 for shooting at target
+	void SetAlarm(float pitch)
+	{
+		if (!m_SoundComp)
+			return;
+		
+		m_SoundComp.SetSignalValueStr("AutoTurretAlarmPitch", pitch);
+		
+		if (m_AlarmAudioHandle == AudioHandle.Invalid)
+			m_AlarmAudioHandle = m_SoundComp.SoundEvent("SOUND_ATC_WARN");		
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	//! Target instance no longer used by any turret -> stop sound
+	void ~BON_AutoTurretTarget()
+	{
+		if (!m_SoundComp)
+			return;
+		
+		m_SoundComp.Terminate(m_AlarmAudioHandle);
 	}
 }
 

@@ -1,108 +1,42 @@
 AudioClass {
  signals {
-  SignalClass {
-   id 13325
-   name "Signal Occlusion"
-   tl -277.35 -379.789
-   res "{FC5C9C507476D6B9}Sounds/_SharedData/Signals/Vehicles/Vehicles_Occlusion_InsideVehicleSource.sig"
-   conns {
-    IOPConnectionClass iopConnection {
-     port 15
-     conn {
-      ConnectionsClass connections {
-       id 8
-       links {
-        ConnectionClass connection {
-         id 14348
-         port 1
-        }
-       }
-      }
-     }
-    }
-   }
-   inputsport {
-    3 15 37 38 66 75 81
-   }
-   outputsport {
-    47
-   }
-   inputvalues {
-    1 0.4 0 0 400 1000 0
-   }
-   inputvaluesmin {
-    0 0 0 0 0 0 0
-   }
-   inputvaluesmax {
-    1 1 1 1 10000 10000 1
-   }
-   path "{FC5C9C507476D6B9}Sounds/_SharedData/Signals/Vehicles/Vehicles_Occlusion_InsideVehicleSource.sig"
-  }
-  SignalClass {
-   id 18445
-   name "Signal Reverb"
-   tl 152.485 -407.212
-   res "{76CBB40EF7F227B6}Sounds/_SharedData/Signals/Reverb/Reverb_Base.sig"
-   inputsport {
-    1 35 40 112 139
-   }
-   outputsport {
-    34 39 105 107 106 110
-   }
-   inputvalues {
-    40 0 0 16000 16000
-   }
-   inputvaluesmin {
-    0 0 0 0 0
-   }
-   inputvaluesmax {
-    100 1 1 16000 16000
-   }
-   path "{76CBB40EF7F227B6}Sounds/_SharedData/Signals/Reverb/Reverb_Base.sig"
-  }
-  SignalClass {
-   id 19469
-   name "Signal 19"
-   tl 202.364 -87.182
+  SignalClass "17421" {
+   id 17421
+   name "Signal 17"
+   tl -448 32
    res "{592EEE79B13E44F7}Sounds/AutoTurret/Helicopter_Alarm_Signal.sig"
    inputsport {
-    4 5 6
+    4
    }
    outputsport {
     8
    }
    inputvalues {
-    1 0.1 1
+    6
    }
    inputvaluesmin {
-    0 0 0
+    -6
    }
    inputvaluesmax {
-    1 1 1
+    6
    }
    path "{592EEE79B13E44F7}Sounds/AutoTurret/Helicopter_Alarm_Signal.sig"
   }
  }
  sounds {
-  SoundClass {
+  SoundClass "2057" {
    id 2057
-   name "SOUND_TARGET_BEEP"
+   name "SOUND_ATC_WARN"
    version 5
-   tl 202.455 37
+   tl 144 32
    ins {
-    ConnectionsClass connections {
+    ConnectionsClass "con:0" {
      id 0
-     links {
-      ConnectionClass connection {
-       id 19469
-       port 8
-      }
-     }
     }
-    ConnectionsClass connections {
+    ConnectionsClass "con:64" {
      id 64
      links {
-      ConnectionClass connection {
+      ConnectionClass "3090:65" {
        id 3090
        port 65
       }
@@ -113,110 +47,80 @@ AudioClass {
     1 0
    }
    outState 15371
-   outStatePort 17415
+   outStatePort 79879
    transformation Offset
    offsetName "Warning_Speaker"
-   type Timer
    time 250
   }
  }
  mixers {
-  MixerClass {
+  MixerClass "15371" {
    id 15371
    name "OutputState"
    version 4
-   tl 691.259 51.902
+   tl 352 32
    res "{B764D803219C775E}Sounds/FinalMix.afm"
    ins {
-    ConnectionsClass connections {
-     id 17415
+    ConnectionsClass "con:79879" {
+     id 79879
      links {
-      ConnectionClass connection {
+      ConnectionClass "2057:65" {
        id 2057
-       port 65
-      }
-     }
-    }
-    ConnectionsClass connections {
-     id 152583
-     links {
-      ConnectionClass connection {
-       id 16413
-       port 65
-      }
-     }
-    }
-    ConnectionsClass connections {
-     id 197639
-     links {
-      ConnectionClass connection {
-       id 17437
        port 65
       }
      }
     }
    }
    pi {
-    8421440 0
+    8192 0
    }
    path "{B764D803219C775E}Sounds/FinalMix.afm"
    inputs {
-    "WPN_Handling" "WPN_Shots" "WPN_Explosions" "WNP_BulletHits" "CHAR" "ENV_AMB_2D" "VEH_Animations" "Impacts" "Dialog" "Music" "ENV_Doors" "VEH_Engine" "VEH_Tires" "VON" "SFX" "SFX_Reverb" "VON_Reverb" "Dialog_Reverb" "Impacts_EXT" "ENV_AMB_3D" "WPN_SonicCracks" "CHAR_Gear" "PA" "SFX_Reverb_Exterior" "UI" "ENV_AMB_3D_Reverb_Exterior" "SFX_Direct" "SFX_Reverb_Small" "SFX_Reverb_Medium" "SFX_Reverb_Large" "WPN_Shots_Player" "Dialog_Reverb_Small" "Dialog_Reverb_Medium" "Dialog_Reverb_Large" "WPN_TravelingProjectile" "Dialog_Delay_Exterior" "SFX_Reverb_InCabin"
+    "WPN_Handling" "WPN_Shots" "WPN_Explosions" "WNP_BulletHits" "CHAR" "ENV_AMB_2D" "VEH_Animations" "Impacts" "Dialog" "ENV_Doors" "VEH_Engine" "VEH_Tires" "VON" "SFX" "SFX_Reverb_OBSOLETE" "VON_Reverb_Small" "Dialog_Reverb" "Impacts_EXT" "ENV_AMB_3D" "WPN_SonicCracks" "CHAR_Gear" "PA" "SFX_Reverb_Exterior" "ENV_AMB_3D_Reverb_Exterior" "SFX_Direct" "SFX_Reverb_Small" "SFX_Reverb_Medium" "SFX_Reverb_Large" "WPN_Shots_Player" "Dialog_Reverb_Small" "Dialog_Reverb_Medium" "Dialog_Reverb_Large" "WPN_TravelingProjectile" "Dialog_Delay_Exterior" "SFX_Reverb_InCabin" "VON_Reverb_Medium" "VON_Reverb_Large"
    }
-  }
- }
- constants {
-  ConstantClass {
-   id 14348
-   name "Constant"
-   version 5
-   tl -472.105 -308.211
-   "Constant values" {
-    IOPConstantsValueClass VehicleCoverage {
-     Key "VehicleCoverage"
-     Port 1
-    }
+   visiblePorts {
+    79879
    }
   }
  }
  shaders {
-  ShaderClass {
+  ShaderClass "3090" {
    id 3090
-   name "SOUND_TARGET_BEEP"
+   name "SHADER_ATC_WARN"
    version 5
-   tl -45 37
+   tl -48 32
    ins {
-    ConnectionsClass connections {
+    ConnectionsClass "con:0" {
      id 0
      links {
-      ConnectionClass connection {
+      ConnectionClass "10268:65" {
        id 10268
        port 65
       }
      }
     }
-    ConnectionsClass connections {
+    ConnectionsClass "con:1" {
      id 1
      links {
-      ConnectionClass connection {
+      ConnectionClass "11283:65" {
        id 11283
        port 65
       }
      }
     }
-    ConnectionsClass connections {
+    ConnectionsClass "con:2" {
      id 2
      links {
-      ConnectionClass connection {
+      ConnectionClass "12309:65" {
        id 12309
        port 65
       }
      }
     }
-    ConnectionsClass connections {
+    ConnectionsClass "con:64" {
      id 64
      links {
-      ConnectionClass connection {
+      ConnectionClass "9220:65" {
        id 9220
        port 65
       }
@@ -229,7 +133,7 @@ AudioClass {
   }
  }
  amplitudes {
-  AmplitudeClass : "{B8DF212957DF97E8}Sounds/_SharedData/Configs/Amplitude/_SharedData/Amplitude_-50LUFS_to_-45LUFS.conf" {
+  AmplitudeClass "11283" : "{B8DF212957DF97E8}Sounds/_SharedData/Configs/Amplitude/_SharedData/Amplitude_-50LUFS_to_-45LUFS.conf" {
    id 11283
    version 5
    tl -45.455 -100.818
@@ -237,130 +141,57 @@ AudioClass {
   }
  }
  frequency {
-  FrequencyClass : "{CA912C59A9267045}Sounds/_SharedData/Configs/Frequency/_SharedData/Frequency_Base.conf" {
+  FrequencyClass "12309" : "{CA912C59A9267045}Sounds/_SharedData/Configs/Frequency/_SharedData/Frequency_Base.conf" {
    id 12309
    version 5
    tl -43.364 -30.818
    parent "{CA912C59A9267045}Sounds/_SharedData/Configs/Frequency/_SharedData/Frequency_Base.conf"
+   dynamicUpdate 1
+  }
+ }
+ banks_local {
+  BankLocalClass "9220" {
+   id 9220
+   name "Bank"
+   version 7
+   tl -272 32
    ins {
-    ConnectionsClass connections {
-     id 4
+    ConnectionsClass "con:1" {
+     id 1
      links {
-      ConnectionClass connection {
-       id 13325
-       port 47
+      ConnectionClass "17421:8" {
+       id 17421
+       port 8
       }
      }
     }
    }
    pi {
-    16 0
+    2 0
    }
    pu {
-    16 0
+    2 0
    }
-   dynamicUpdate 1
-  }
- }
- banks_local {
-  BankLocalClass {
-   id 9220
-   name "Gearbox Warning"
-   version 7
-   tl -283 40
-   Pitch 7
+   "Loop count" 255
    "Loop length" 8000
+   "Infinite loop" 1
    Samples {
-    AudioBankSampleClass Sample {
+    AudioBankSampleClass "Vehicles_UH1H_Warning_GearBox.wav" {
      Filename "{4227476DDA23F424}Sounds/Vehicles/Helicopters/UH1H/Samples/Warnings/Vehicles_UH1H_Warning_GearBox.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
     }
    }
   }
  }
  spatialities {
-  SpatialityClass {
+  SpatialityClass "10268" {
    id 10268
    name "Spatiality"
    version 5
    tl -44.636 -170.364
    spatialFactor 1
-  }
- }
- auxOuts {
-  AuxOutClass {
-   id 16413
-   name "AuxOut Reverb INT"
-   version 5
-   tl 400.178 -415.556
-   ins {
-    ConnectionsClass connections {
-     id 0
-     links {
-      ConnectionClass connection {
-       id 2057
-       port 5
-      }
-     }
-    }
-    ConnectionsClass connections {
-     id 1
-     links {
-      ConnectionClass connection {
-       id 18445
-       port 34
-      }
-     }
-    }
-    ConnectionsClass connections {
-     id 2
-     links {
-      ConnectionClass connection {
-       id 18445
-       port 39
-      }
-     }
-    }
-   }
-   pi {
-    7 0
-   }
-   pu {
-    6 0
-   }
-   OSPort 152583
-  }
-  AuxOutClass {
-   id 17437
-   name "AuxOut Reverb EXT"
-   version 5
-   tl 399.155 -272.504
-   ins {
-    ConnectionsClass connections {
-     id 0
-     links {
-      ConnectionClass connection {
-       id 2057
-       port 5
-      }
-     }
-    }
-    ConnectionsClass connections {
-     id 1
-     links {
-      ConnectionClass connection {
-       id 18445
-       port 105
-      }
-     }
-    }
-   }
-   pi {
-    3 0
-   }
-   pu {
-    2 0
-   }
-   OSPort 197639
   }
  }
  version 1

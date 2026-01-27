@@ -11,8 +11,15 @@ class BON_GuidedProjectile : Projectile
 	[Attribute("1", UIWidgets.Auto, "Max turn rate limit (rad/s)")]
 	protected float m_fMaxTurnRate;
 
+	[Attribute("50", UIWidgets.Slider, "What % chance does a single countermeasure fire have? (def: 50)", "0 100 1")]
+	protected int m_iCountermeasureSuccessChance;
+
+	[Attribute("1", UIWidgets.Auto, "Max turn rate limit (rad/s)")]
+	protected int m_iMaxTurnRate;
+
 	const int SELF_DESTRUCT_TIME = 1;
 
+	protected EventHandlerManagerComponent m_EventHandlerManager;
 	int m_iSelfDestructTime;
 	IEntity m_TrackedTarget;
 	vector m_vAimOffset;
@@ -25,6 +32,11 @@ class BON_GuidedProjectile : Projectile
 	//No need to get trigger comp on init, called once
 	void Trigger()
 	{
+#ifdef WCS_DEFINES_ARMAMENTS
+		m_EventHandlerManager.RemoveScriptHandler(WCS_Armament_ChaffDispenserComponent.CHAFF_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
+		m_EventHandlerManager.RemoveScriptHandler(WCS_Armament_FlareDispenserComponent.FLARE_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
+#endif
+
 		BaseTriggerComponent triggerComp = BaseTriggerComponent.Cast(FindComponent(BaseTriggerComponent));
 		triggerComp.OnUserTrigger(this);
 	}
@@ -72,7 +84,46 @@ class BON_GuidedProjectile : Projectile
 	{
 		if (m_TrackedTarget)
 			SteerToTarget(timeSlice);
+
 	}
+	
+	//Official WCS compatibility. Thanks to Cyborgmatt :)
+	#ifdef WCS_DEFINES_ARMAMENTS
+	//------------------------------------------------------------------------------------------------
+	//! % chance to succeed
+	void OnCounterMeasuresFired()
+	{
+		if (Math.RandomInt(0, 100) <= m_iCountermeasureSuccessChance)
+			GetGame().GetCallqueue().CallLater(SearchCounterMeasures, 100);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void SearchCounterMeasures()
+	{
+		GetGame().GetWorld().QueryEntitiesBySphere(m_TrackedTarget.GetOrigin(), 10, QueryEntities, FilterEntity);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected bool FilterEntity(IEntity ent)
+	{
+		return Projectile.Cast(ent) != null;
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	bool QueryEntities(IEntity ent)
+	{
+		WCS_Armament_ChaffComponent chaff = WCS_Armament_ChaffComponent.Cast(ent.FindComponent(WCS_Armament_ChaffComponent));
+		WCS_Armament_FlareComponent flare = WCS_Armament_FlareComponent.Cast(ent.FindComponent(WCS_Armament_FlareComponent));
+
+		if (chaff || flare)
+		{
+			m_TrackedTarget = ent;
+			return false; //Stop search
+		}
+
+		return true; //Continue search
+	}
+	#endif
 
 	//------------------------------------------------------------------------------------------------
 	void Launch(IEntity target)
@@ -80,11 +131,12 @@ class BON_GuidedProjectile : Projectile
 		if (!target)
 			return;
 
+		
 		m_MissileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
 		m_MissileMove.Launch(GetTransformAxis(2), vector.Zero, 1, this, null, null, null, null);
-		
+
 		m_TrackedTarget = target;
-		
+
 		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
 		float timeToTarget = targetDistance / m_fSpeed;
 		m_iSelfDestructTime = System.GetUnixTime() + (int)timeToTarget + SELF_DESTRUCT_TIME;
@@ -95,6 +147,13 @@ class BON_GuidedProjectile : Projectile
 		m_vLastDirToTarget.Normalize();
 
 		SetEventMask(EntityEvent.FRAME);
+
+		//Official WCS compatibility. Thanks to Cyborgmatt :)
+		#ifdef WCS_DEFINES_ARMAMENTS		
+		m_EventHandlerManager = EventHandlerManagerComponent.Cast(target.FindComponent(EventHandlerManagerComponent));
+		m_EventHandlerManager.RegisterScriptHandler(WCS_Armament_ChaffDispenserComponent.CHAFF_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
+		m_EventHandlerManager.RegisterScriptHandler(WCS_Armament_FlareDispenserComponent.FLARE_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);		
+		#endif		
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -106,22 +165,21 @@ class BON_GuidedProjectile : Projectile
 
 		RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(targetID));
 		IEntity target = rplComponent.GetEntity();
-		Print("RpcDo_Launch: " + speed + " | " + m_eFireMode + " | " +  target);
+		Print("RpcDo_Launch: " + speed + " | " + m_eFireMode + " | " + target);
+
 		Launch(target);
 	}
 
 	//------------------------------------------------------------------------------------------------
 	void DelayLaunch(IEntity target, BON_TurretFireMode fireMode, float speed)
 	{
-		
-		
 		//Broadcast all data for clients to also steer to target (steering is not replicated)
 		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
 		Rpc(RpcDo_Launch, targetRplComp.Id(), fireMode, speed);
-		
+
 		Launch(target);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	//! Called from Server
 	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode, float speed)
@@ -133,6 +191,16 @@ class BON_GuidedProjectile : Projectile
 		m_eFireMode = fireMode;
 
 		GetGame().GetCallqueue().CallLater(DelayLaunch, 1, false, target, fireMode, speed);
-		
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void ~BON_GuidedProjectile()
+	{
+		#ifdef WCS_DEFINES_ARMAMENTS
+		if (!m_EventHandlerManager)
+			return;
+		m_EventHandlerManager.RemoveScriptHandler(WCS_Armament_ChaffDispenserComponent.CHAFF_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
+		m_EventHandlerManager.RemoveScriptHandler(WCS_Armament_FlareDispenserComponent.FLARE_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
+		#endif
 	}
 }
