@@ -30,9 +30,6 @@ class BON_AutoTurretTarget
 			if (targetComp)
 				m_iFactionID = targetComp.m_iFactionID;
 		}
-		
-		if (m_iFactionID == -1)
-			Print("Didnt find any faction for " + ent, LogLevel.WARNING);		
 	}
 
 	//------------------------------------------------------------------------------------------------
