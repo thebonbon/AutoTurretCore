@@ -5,18 +5,17 @@ class BON_AutoTurretTarget
 
 	IEntity m_Ent;
 	PerceivableComponent m_PerceivableComp;
+	BON_AutoTurretTargetComponent m_TargetComp;
 	int m_iFactionID = -1;
-	SoundComponent m_SoundComp;
-	protected AudioHandle m_AlarmAudioHandle = AudioHandle.Invalid;
-	
+
 	//------------------------------------------------------------------------------------------------
 	void BON_AutoTurretTarget(IEntity ent, float distance = 0)
 	{
 		m_Ent = ent;
 		m_fDistance = distance;
-		
+
 		m_PerceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
-		m_SoundComp = SoundComponent.Cast(ent.FindComponent(SoundComponent));
+		m_TargetComp = BON_AutoTurretTargetComponent.Cast(ent.FindComponent(BON_AutoTurretTargetComponent));
 		
 		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(ent.FindComponent(FactionAffiliationComponent));
 		if (factionComp)
@@ -26,9 +25,8 @@ class BON_AutoTurretTarget
 		}
 		else //e.g missiles dont have faction comp -> try target data
 		{
-			BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(ent.FindComponent(BON_AutoTurretTargetComponent));			
-			if (targetComp)
-				m_iFactionID = targetComp.m_iFactionID;
+			if (m_TargetComp)
+				m_iFactionID = m_TargetComp.m_iFactionID;
 		}
 	}
 
@@ -64,28 +62,18 @@ class BON_AutoTurretTarget
 
 		return true;
 	}
-		
+
 	//------------------------------------------------------------------------------------------------
-	//! -6 for rotation to target, +6 for shooting at target
-	void SetAlarm(float pitch)
+	void SetAlarm(int pitch)
 	{
-		if (!m_SoundComp)
-			return;
-		
-		m_SoundComp.SetSignalValueStr("AutoTurretAlarmPitch", pitch);
-		
-		if (m_AlarmAudioHandle == AudioHandle.Invalid)
-			m_AlarmAudioHandle = m_SoundComp.SoundEvent("SOUND_ATC_WARN");		
+		m_TargetComp.SetAlarm(pitch);
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	//! Target instance no longer used by any turret -> stop sound
 	void ~BON_AutoTurretTarget()
 	{
-		if (!m_SoundComp)
-			return;
-		
-		m_SoundComp.Terminate(m_AlarmAudioHandle);
+		m_TargetComp.StopAlarm();
 	}
 }
 

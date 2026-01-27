@@ -18,6 +18,47 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 
 	//Used for e.g missile IFF (Instigator faction)
 	int m_iFactionID = -1;
+	protected SoundComponent m_SoundComp;
+	protected AudioHandle m_AlarmAudioHandle = AudioHandle.Invalid;
+	protected int m_iActiveInstances;
+
+	static const int PITCH_TARGET_SPOTTED = -6;
+	static const int PITCH_SHOOTING = 6;
+
+	//------------------------------------------------------------------------------------------------
+	void StopAlarm()
+	{
+		if (!m_SoundComp)
+			return;
+
+		m_iActiveInstances--;
+
+		if (m_iActiveInstances <= 0)
+		{
+			m_SoundComp.Terminate(m_AlarmAudioHandle);
+			m_AlarmAudioHandle = AudioHandle.Invalid;
+			m_iActiveInstances = 0;
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Surley there is a better way to do this but oh well ¯\_(ツ)_/¯
+	//! Counts active instances to not stop if multiple turrets target this ent but only one looses contact
+	void SetAlarm(int pitch)
+	{
+		if (!m_SoundComp)
+			return;
+
+		//New target created
+		if (pitch == BON_AutoTurretTargetComponent.PITCH_TARGET_SPOTTED)
+			m_iActiveInstances++;
+
+		m_SoundComp.SetSignalValueStr("AutoTurretAlarmPitch", pitch);
+		
+		//First time this ent is a target
+		if (m_AlarmAudioHandle == AudioHandle.Invalid)
+			m_AlarmAudioHandle = m_SoundComp.SoundEvent("SOUND_ATC_WARN");
+	}
 
 	//------------------------------------------------------------------------------------------------
 	override void EOnPhysicsActive(IEntity owner, bool activeState)
@@ -29,6 +70,7 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
+		m_SoundComp = SoundComponent.Cast(owner.FindComponent(SoundComponent));
 		GetGame().GetAutoTurretGrid().Insert(owner, true, m_TargetFlags);
 	}
 

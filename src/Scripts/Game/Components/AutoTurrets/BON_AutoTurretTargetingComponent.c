@@ -147,7 +147,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 				return;
 	
 			//New target found
-			m_CurrentTarget.SetAlarm(-6);
+			m_CurrentTarget.SetAlarm(BON_AutoTurretTargetComponent.PITCH_TARGET_SPOTTED);
 		
 			RplComponent rplComp = RplComponent.Cast(m_CurrentTarget.m_Ent.FindComponent(RplComponent));
 			Rpc(RpcDo_SetNewTarget, rplComp.Id());
