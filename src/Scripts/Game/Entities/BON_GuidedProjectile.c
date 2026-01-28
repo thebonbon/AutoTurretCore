@@ -32,10 +32,10 @@ class BON_GuidedProjectile : Projectile
 	//No need to get trigger comp on init, called once
 	void Trigger()
 	{
-#ifdef WCS_DEFINES_ARMAMENTS
+		#ifdef WCS_DEFINES_ARMAMENTS
 		m_EventHandlerManager.RemoveScriptHandler(WCS_Armament_ChaffDispenserComponent.CHAFF_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
 		m_EventHandlerManager.RemoveScriptHandler(WCS_Armament_FlareDispenserComponent.FLARE_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
-#endif
+		#endif
 
 		BaseTriggerComponent triggerComp = BaseTriggerComponent.Cast(FindComponent(BaseTriggerComponent));
 		triggerComp.OnUserTrigger(this);
@@ -87,8 +87,8 @@ class BON_GuidedProjectile : Projectile
 
 	}
 	
-	//Official WCS compatibility. Thanks to Cyborgmatt :)
 	#ifdef WCS_DEFINES_ARMAMENTS
+	//Official WCS compatibility. Thanks to Cyborgmatt :)
 	//------------------------------------------------------------------------------------------------
 	//! % chance to succeed
 	void OnCounterMeasuresFired()
@@ -165,7 +165,6 @@ class BON_GuidedProjectile : Projectile
 
 		RplComponent rplComponent = RplComponent.Cast(Replication.FindItem(targetID));
 		IEntity target = rplComponent.GetEntity();
-		Print("RpcDo_Launch: " + speed + " | " + m_eFireMode + " | " + target);
 
 		Launch(target);
 	}
