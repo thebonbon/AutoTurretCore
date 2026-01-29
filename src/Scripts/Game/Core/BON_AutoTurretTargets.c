@@ -66,14 +66,16 @@ class BON_AutoTurretTarget
 	//------------------------------------------------------------------------------------------------
 	void SetAlarm(int pitch)
 	{
-		m_TargetComp.SetAlarm(pitch);
+		if (m_TargetComp)
+			m_TargetComp.SetAlarm(pitch);
 	}
 
 	//------------------------------------------------------------------------------------------------
 	//! Target instance no longer used by any turret -> stop sound
 	void ~BON_AutoTurretTarget()
 	{
-		m_TargetComp.StopAlarm();
+		if (m_TargetComp)
+			m_TargetComp.StopAlarm();
 	}
 }
 

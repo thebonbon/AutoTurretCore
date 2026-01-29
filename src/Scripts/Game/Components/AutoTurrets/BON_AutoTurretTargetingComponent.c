@@ -12,7 +12,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	int m_iSearchRadius;
 
 	[Attribute("2", UIWidgets.Auto, "Time to scan for new targets (s)", category: "Targeting")]
-	protected float m_fMaxSearchTime;
+	float m_fMaxSearchTime;
 
 	ref BON_AutoTurretTarget m_CurrentTarget;
 

@@ -17,7 +17,7 @@ class BON_GuidedProjectile : Projectile
 	[Attribute("1", UIWidgets.Auto, "Max turn rate limit (rad/s)")]
 	protected int m_iMaxTurnRate;
 
-	const int SELF_DESTRUCT_TIME = 1;
+	int m_fSelfDestructTime = 1;
 
 	protected EventHandlerManagerComponent m_EventHandlerManager;
 	int m_iSelfDestructTime;
@@ -131,7 +131,6 @@ class BON_GuidedProjectile : Projectile
 		if (!target)
 			return;
 
-		
 		m_MissileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
 		m_MissileMove.Launch(GetTransformAxis(2), vector.Zero, 1, this, null, null, null, null);
 
@@ -139,7 +138,7 @@ class BON_GuidedProjectile : Projectile
 
 		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
 		float timeToTarget = targetDistance / m_fSpeed;
-		m_iSelfDestructTime = System.GetUnixTime() + (int)timeToTarget + SELF_DESTRUCT_TIME;
+		m_iSelfDestructTime = System.GetUnixTime() + (int)timeToTarget + m_fSelfDestructTime;
 
 		GetPhysics().SetActive(ActiveState.ACTIVE);
 

@@ -29,18 +29,18 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("false", UIWidgets.CheckBox, "Show Aiming debug?", category: "Debug")]
 	protected bool m_bDebug;
 
-	protected const float ANGLE_TOLERANCE = 1; // degrees
+	float m_fAngleTolerance = 1; // degrees
 
-	SignalsManagerComponent m_SignalsManager;
-	int m_iSignalBody;
-	int m_iSignalBarrel;
+	protected SignalsManagerComponent m_SignalsManager;
+	protected int m_iSignalBody;
+	protected int m_iSignalBarrel;
 
 	protected TNodeId m_iBarrelBoneIndex;
-	BON_AutoTurretComponent m_TurretComp
-	ref BON_AutoTurretTarget m_Target;
-	BON_TurretAimState m_eAimState = BON_TurretAimState.IDLE;
-	vector m_vCurrentAngles;
-	vector m_vTargetAngles;
+	protected BON_AutoTurretComponent m_TurretComp
+	protected ref BON_AutoTurretTarget m_Target;
+	protected BON_TurretAimState m_eAimState = BON_TurretAimState.IDLE;
+	protected vector m_vCurrentAngles;
+	protected vector m_vTargetAngles;
 
 	//------------------------------------------------------------------------------------------------
 	bool IsWithinLimitsAngle(vector angles)
@@ -123,8 +123,8 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		vector current = SCR_Math3D.FixEulerVector180(m_vCurrentAngles);
 		vector target = SCR_Math3D.FixEulerVector180(m_vTargetAngles);
 
-		return Math.AbsFloat(current[0] - target[0]) < ANGLE_TOLERANCE
-			&& Math.AbsFloat(current[1] - target[1]) < ANGLE_TOLERANCE;
+		return Math.AbsFloat(current[0] - target[0]) < m_fAngleTolerance
+			&& Math.AbsFloat(current[1] - target[1]) < m_fAngleTolerance;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -251,7 +251,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		Shape.CreateArrow(barrelMat[3], barrelMat[3] + dir * 5, 0.25, Color.BLUE, ShapeFlags.ONCE);
 
-		if (m_Target)
+		if (m_Target && m_Target.m_Ent)
 		{
 			Shape.CreateSphere(Color.GREEN, ShapeFlags.ONCE, m_Target.m_Ent.GetOrigin(), 0.1);
 			Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, m_Target.GetAimPoint(), 0.11);

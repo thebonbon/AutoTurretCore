@@ -274,3 +274,80 @@ class BON_AutoTurretFireModeEditorAttribute : SCR_BaseFloatValueHolderEditorAttr
 			autoTurretComponent.m_eFireMode = var.GetInt();
 	}
 }
+
+[BaseContainerProps(), SCR_BaseEditorAttributeCustomTitle()]
+class BON_AutoTurretAngleToleranceEditorAttribute : SCR_BaseValueListEditorAttribute
+{
+	//------------------------------------------------------------------------------------------------
+	override SCR_BaseEditorAttributeVar ReadVariable(Managed item, SCR_AttributesManagerEditorComponent manager)
+	{
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (!autoTurretComponent)
+			return null;
+
+		return SCR_BaseEditorAttributeVar.CreateFloat(autoTurretComponent.m_AimingComp.m_fAngleTolerance);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
+	{
+		if (!var)
+			return;
+
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (autoTurretComponent)
+			autoTurretComponent.m_AimingComp.m_fAngleTolerance = var.GetFloat();
+	}
+}
+
+[BaseContainerProps(), SCR_BaseEditorAttributeCustomTitle()]
+class BON_AutoTurretSearchTimeEditorAttribute : SCR_BaseValueListEditorAttribute
+{
+	//------------------------------------------------------------------------------------------------
+	override SCR_BaseEditorAttributeVar ReadVariable(Managed item, SCR_AttributesManagerEditorComponent manager)
+	{
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (!autoTurretComponent)
+			return null;
+
+		return SCR_BaseEditorAttributeVar.CreateFloat(autoTurretComponent.m_TargetingComp.m_fMaxSearchTime);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
+	{
+		if (!var)
+			return;
+
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (autoTurretComponent)
+			autoTurretComponent.m_TargetingComp.m_fMaxSearchTime = var.GetFloat();
+	}
+}
+
+[BaseContainerProps(), SCR_BaseEditorAttributeCustomTitle()]
+class BON_AutoTurretTriggerOnTargetEditorAttribute : SCR_BaseValueListEditorAttribute
+{
+	//------------------------------------------------------------------------------------------------
+	override SCR_BaseEditorAttributeVar ReadVariable(Managed item, SCR_AttributesManagerEditorComponent manager)
+	{
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (!autoTurretComponent || !autoTurretComponent.m_bIsMissile)
+			return null;
+
+		return SCR_BaseEditorAttributeVar.CreateBool(autoTurretComponent.m_bTriggerOnTarget);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
+	{
+		if (!var)
+			return;
+
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (autoTurretComponent && autoTurretComponent.m_bIsMissile)
+			autoTurretComponent.m_bTriggerOnTarget = var.GetBool();
+	}
+}
+
+
