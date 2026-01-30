@@ -75,9 +75,6 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("0", UIWidgets.CheckBox, "Enable debug?", category: "Debug")]
 	bool m_bDebug;
 
-	//[RplProp(onRplName: "OnTargetChanged")]
-	RplId m_iNearestTargetId;
-
 	protected AnimationControllerComponent m_AnimationController;
 	protected SoundComponent m_SoundComponent;
 	BON_AutoTurretAimingComponent m_AimingComp;
@@ -86,22 +83,52 @@ class BON_AutoTurretComponent : ScriptComponent
 	protected FactionAffiliationComponent m_FactionComp;
 	protected ref BON_AutoTurretTarget m_Target;
 	protected int m_iShootCmd;
-	float m_fProjectileSpeed;
 	protected bool m_bIsProjectileReplicated;
 	protected float m_fAttackTimer;
 	protected int m_iCurrentMuzzle;
 	bool m_bIsMissile;
 
 	//GM Settings
-	float m_fRocketGuidanceStrength = 0;
+	[RplProp()]
+	float m_fProjectileSpeed;
+	[RplProp()]
+	float m_fRocketTurnRate = 0;
+	[RplProp(onRplName: "UpdateSystemState")]
 	bool m_bActive = false;
 
 
 	//------------------------------------------------------------------------------------------------
-	void ToggleActive()
+	void SetProjectileSpeed(int chance)
 	{
-		m_bActive = !m_bActive;
+		m_fProjectileTriggerChance = chance;
+		Replication.BumpMe();
+	}
 
+	//------------------------------------------------------------------------------------------------
+	void SetProjectileSpeed(float speed)
+	{
+		m_fProjectileSpeed = speed;
+		Replication.BumpMe();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void SetRocketTurnRate(float rate)
+	{
+		m_fRocketTurnRate = rate;
+		Replication.BumpMe();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void SetActive(bool active)
+	{
+		m_bActive = active;
+		Replication.BumpMe();
+		UpdateSystemState()
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void UpdateSystemState()
+	{
 		if (m_bActive)
 			ConnectToAutoTurretSystem();
 		else
@@ -157,11 +184,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Intercept (Missile)
 	void LaunchGuided(BON_GuidedProjectile guidedProjectile)
 	{
-		//Override guidance strength (set via GM)
-		if (m_fRocketGuidanceStrength != 0)
-				guidedProjectile.m_fGuidanceStrength = m_fRocketGuidanceStrength;
-
-		guidedProjectile.SetTargetAndLaunch(m_Target.m_Ent, m_eFireMode, m_fProjectileSpeed);
+		guidedProjectile.SetTargetAndLaunch(m_Target.m_Ent, m_eFireMode, m_fProjectileSpeed, m_fRocketTurnRate);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -227,9 +250,9 @@ class BON_AutoTurretComponent : ScriptComponent
 			SCR_Math3D.AddRandomVectorToMat(muzzleMat, -m_fAttackInaccuracy, m_fAttackInaccuracy);
 			IEntity projectile = SpawnProjectile(muzzleMat, m_Target);
 			LaunchProjectile(projectile);
-			
+
 			m_Target.SetAlarm(BON_AutoTurretTargetComponent.PITCH_SHOOTING);
-			
+
 			if (m_bTriggerOnTarget)
 				SetTriggerOnTarget(projectile);
 		}
@@ -275,7 +298,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			FactionManager factionManager = GetGame().GetFactionManager();
 			targetComp.m_iFactionID = factionManager.GetFactionIndex(m_FactionComp.GetAffiliatedFaction());
-		}		
+		}
 
 		return lastSpawnedProjectile;
 	}
@@ -284,7 +307,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	void OnUpdate(float timeSlice)
 	{
 		if (!m_bActive)
+		{
+			DisconnectFromAutoTurretSystem();
 			return;
+		}
 
 		m_Target = m_TargetingComp.GetTarget();
 
@@ -347,6 +373,9 @@ class BON_AutoTurretComponent : ScriptComponent
 		Resource projectileResource = Resource.Load(m_Projectile);
 		if (!projectileResource)
 			return;
+
+		IEntitySource entitySource = SCR_BaseContainerTools.FindEntitySource(projectileResource);
+		entitySource.Get("m_fMaxTurnRate", m_fRocketTurnRate);
 
 		BaseContainer rplCompBase = SCR_BaseContainerTools.FindComponentSource(projectileResource, RplComponent);
 		m_bIsProjectileReplicated = (rplCompBase != null);

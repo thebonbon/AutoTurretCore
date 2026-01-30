@@ -5,38 +5,27 @@ class BON_GuidedProjectileClass : ProjectileClass
 
 class BON_GuidedProjectile : Projectile
 {
-	[Attribute(defvalue: "10", desc: "Guidance Strength, how fast to turn towards target", params: "0 inf 0.01")]
-	float m_fGuidanceStrength;
-
-	[Attribute("1", UIWidgets.Auto, "Max turn rate limit (rad/s)")]
-	protected float m_fMaxTurnRate;
+	[Attribute("0.1", UIWidgets.Auto, "Max turn rate limit (rad/s). 0 = no turn, >1 = fast turn")]
+	float m_fMaxTurnRate;
 
 	[Attribute("50", UIWidgets.Slider, "What % chance does a single countermeasure fire have? (def: 50)", "0 100 1")]
-	protected int m_iCountermeasureSuccessChance;
+	int m_iCountermeasureSuccessChance;
 
-	[Attribute("1", UIWidgets.Auto, "Max turn rate limit (rad/s)")]
-	protected int m_iMaxTurnRate;
-
-	int m_fSelfDestructTime = 1;
+	//Can be set via GM
+	//m_fMaxTurnRate (Attribute)
+	//m_iCountermeasureSuccessChance (Attribute)
+	int m_iSelfDestructTime = 1;
+	BON_TurretFireMode m_eFireMode;
+	float m_fSpeed;
 
 	protected EventHandlerManagerComponent m_EventHandlerManager;
-	int m_iSelfDestructTime;
-	IEntity m_TrackedTarget;
-	vector m_vAimOffset;
-	vector m_vLastDirToTarget;
-	BON_TurretFireMode m_eFireMode;
-	MissileMoveComponent m_MissileMove;
-	float m_fSpeed;
+	protected MissileMoveComponent m_MissileMove;
+	protected IEntity m_TrackedTarget;
 
 	//------------------------------------------------------------------------------------------------
 	//No need to get trigger comp on init, called once
 	void Trigger()
 	{
-		#ifdef WCS_DEFINES_ARMAMENTS
-		m_EventHandlerManager.RemoveScriptHandler(WCS_Armament_ChaffDispenserComponent.CHAFF_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
-		m_EventHandlerManager.RemoveScriptHandler(WCS_Armament_FlareDispenserComponent.FLARE_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
-		#endif
-
 		BaseTriggerComponent triggerComp = BaseTriggerComponent.Cast(FindComponent(BaseTriggerComponent));
 		triggerComp.OnUserTrigger(this);
 	}
@@ -45,9 +34,7 @@ class BON_GuidedProjectile : Projectile
 	void SteerToTarget(float timeSlice)
 	{
 		if (System.GetUnixTime() > m_iSelfDestructTime)
-		{
 			Trigger();
-		}
 
 		vector targetPos = m_TrackedTarget.GetOrigin();
 		vector targetVel = m_TrackedTarget.GetPhysics().GetVelocity();
@@ -86,9 +73,9 @@ class BON_GuidedProjectile : Projectile
 			SteerToTarget(timeSlice);
 
 	}
-	
+
 	#ifdef WCS_DEFINES_ARMAMENTS
-	//Official WCS compatibility. Thanks to Cyborgmatt :)
+	//WCS compatibility. Thanks to Cyborgmatt :)
 	//------------------------------------------------------------------------------------------------
 	//! % chance to succeed
 	void OnCounterMeasuresFired()
@@ -108,7 +95,7 @@ class BON_GuidedProjectile : Projectile
 	{
 		return Projectile.Cast(ent) != null;
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	bool QueryEntities(IEntity ent)
 	{
@@ -126,6 +113,7 @@ class BON_GuidedProjectile : Projectile
 	#endif
 
 	//------------------------------------------------------------------------------------------------
+	//! Called from Client + Server
 	void Launch(IEntity target)
 	{
 		if (!target)
@@ -138,21 +126,17 @@ class BON_GuidedProjectile : Projectile
 
 		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
 		float timeToTarget = targetDistance / m_fSpeed;
-		m_iSelfDestructTime = System.GetUnixTime() + (int)timeToTarget + m_fSelfDestructTime;
+		m_iSelfDestructTime += System.GetUnixTime() + timeToTarget;
 
 		GetPhysics().SetActive(ActiveState.ACTIVE);
-
-		m_vLastDirToTarget = target.GetOrigin() - GetOrigin();
-		m_vLastDirToTarget.Normalize();
-
 		SetEventMask(EntityEvent.FRAME);
 
-		//Official WCS compatibility. Thanks to Cyborgmatt :)
-		#ifdef WCS_DEFINES_ARMAMENTS		
+		//WCS compatibility. Thanks to Cyborgmatt :)
+		#ifdef WCS_DEFINES_ARMAMENTS
 		m_EventHandlerManager = EventHandlerManagerComponent.Cast(target.FindComponent(EventHandlerManagerComponent));
 		m_EventHandlerManager.RegisterScriptHandler(WCS_Armament_ChaffDispenserComponent.CHAFF_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
-		m_EventHandlerManager.RegisterScriptHandler(WCS_Armament_FlareDispenserComponent.FLARE_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);		
-		#endif		
+		m_EventHandlerManager.RegisterScriptHandler(WCS_Armament_FlareDispenserComponent.FLARE_COUNT_CHANGED_EVENT, this, OnCounterMeasuresFired);
+		#endif
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -169,6 +153,7 @@ class BON_GuidedProjectile : Projectile
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Called from Server
 	void DelayLaunch(IEntity target, BON_TurretFireMode fireMode, float speed)
 	{
 		//Broadcast all data for clients to also steer to target (steering is not replicated)
@@ -180,11 +165,12 @@ class BON_GuidedProjectile : Projectile
 
 	//------------------------------------------------------------------------------------------------
 	//! Called from Server
-	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode, float speed)
+	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode, float speed, float turnRate = 0)
 	{
 		if (!Replication.IsServer() || !target)
 			return;
 
+		m_fMaxTurnRate = turnRate;
 		m_fSpeed = speed;
 		m_eFireMode = fireMode;
 

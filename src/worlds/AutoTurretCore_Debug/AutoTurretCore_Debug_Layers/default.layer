@@ -6,7 +6,7 @@ GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SA
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    components {
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
-     m_iSearchRadius 5000
+     m_iSearchRadius 5
     }
    }
   }
@@ -25,8 +25,13 @@ GenericEntity : "{2F708543B751BF0E}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_S
 GenericEntity : "{357684CC335E515B}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Dst.et" {
  coords 128.636 3.911 75.963
 }
-BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et" {
- coords 177.717 1 78.827
+$grp BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et" {
+ {
+  coords 177.717 1 78.827
+ }
+ {
+  coords 106.516 1 80.076
+ }
 }
 GenericEntity : "{4FE1C54CB7A3DA68}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Body_Dst.et" {
  coords 124.599 1.936 75.999

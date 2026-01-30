@@ -1,6 +1,13 @@
 GenericEntity : "{05E6942F6E616690}Prefabs/Weapons/AutoTurrets/SAM_USSR.et" {
  ID "62ACAE2FAC6D2BB1"
  components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   components {
+    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
+     m_iSearchRadius 5
+    }
+   }
+  }
   SCR_EditableEntityComponent "{62C6A65B96BEAD8A}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
     Name "SAM Turret USSR"

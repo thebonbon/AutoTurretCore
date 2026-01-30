@@ -45,6 +45,4 @@ BON_GuidedProjectile : "{79FA751EEBE25DDE}Prefabs/Weapons/Ammo/Ammo_Rocket_M72A3
  }
  coords 194.965 2.163 161.241
  ProjectileModel "{7144B0ACBE74109B}Assets/Weapons/Ammo/Rockets/Hydra/Hydra70_M229.xob"
- m_fGuidanceStrength 0.1
- m_fMaxTurnRate 1
 }

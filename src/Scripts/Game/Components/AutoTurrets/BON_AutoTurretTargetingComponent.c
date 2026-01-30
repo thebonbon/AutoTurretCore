@@ -51,7 +51,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		float traceDistance = GetOwner().GetWorld().TraceMove(param, null);
 
 		//Max distance or hit entity directly
-		
+
 		IEntity mainParent = SCR_EntityHelper.GetMainParent(param.TraceEnt, true);
 		if (traceDistance == 1 || param.TraceEnt == target.m_Ent || mainParent == target.m_Ent)
 			return true;
@@ -128,6 +128,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Server only
 	override void EOnFrame(IEntity owner, float timeSlice)
 	{
 		if (m_CurrentTarget && m_CurrentTarget.m_Ent)
@@ -145,10 +146,10 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 			m_CurrentTarget = FindTarget();
 			if (!m_CurrentTarget)
 				return;
-	
+
 			//New target found
 			m_CurrentTarget.SetAlarm(BON_AutoTurretTargetComponent.PITCH_TARGET_SPOTTED);
-		
+
 			RplComponent rplComp = RplComponent.Cast(m_CurrentTarget.m_Ent.FindComponent(RplComponent));
 			Rpc(RpcDo_SetNewTarget, rplComp.Id());
 		}
