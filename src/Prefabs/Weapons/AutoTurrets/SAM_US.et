@@ -32,6 +32,7 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
      Angles 180 0 0
     }
    }
+   m_fTimeBetweenShots 5
    m_fAttackInaccuracy 0
    m_eFireMode Intercept
   }

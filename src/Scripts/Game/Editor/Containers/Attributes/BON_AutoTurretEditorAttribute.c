@@ -386,5 +386,3 @@ class BON_AutoTurretProjectileSpeedEditorAttribute : SCR_BaseValueListEditorAttr
 			autoTurretComponent.SetProjectileSpeed(var.GetFloat());
 	}
 }
-
-

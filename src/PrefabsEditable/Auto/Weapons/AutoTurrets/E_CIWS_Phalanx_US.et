@@ -9,7 +9,7 @@ GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.e
    }
   }
   SCR_EditableEntityComponent "{62B08A24E90BD1E1}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
-   m_UIInfo SCR_EditableVehicleUIInfo "{5298E609432D192D}" {
+   m_UIInfo BON_EditableEntityUIInfoFaction "{5298E609432D192D}" {
     Name "CIWS Phalanx US"
     Icon "{4802E7182AFEA3A9}UI/Textures/EditableEntities/AutoTurrets/EditableEntity_AutoTurret_CIWS_Phalanx.edds"
     m_Image "{2393FE90AE2AC8AC}UI/Textures/EditableEntities/AutoTurrets/AutoTurret_Phalanx_BCR.edds"
