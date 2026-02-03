@@ -7,7 +7,7 @@ class BON_AutoTurretSystem : GameSystem
 			.SetAbstract(false)
 			.AddPoint(ESystemPoint.Frame);
 	}
-	
+
 	protected ref array<BON_AutoTurretComponent> m_aTurretManagers = {};
 
 	//------------------------------------------------------------------------------------------------

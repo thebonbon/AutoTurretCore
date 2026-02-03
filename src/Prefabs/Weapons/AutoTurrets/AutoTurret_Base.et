@@ -52,10 +52,21 @@ GenericEntity {
    "Additional hit zones" {
     SCR_HitZone default {
      HZDefault 1
-     MaxHealth 5000
     }
    }
-   m_fBaseHealth 5000
+   m_RepairConfig SCR_RepairConfig "{6886A10E6301A4D6}" {
+    m_aSmokeRemovalHealthPercentage {
+     SCR_HealthAndBurn "{6886A10E63C14C16}" {
+      m_fSmokeThreshold 0.9
+      m_eTargetBurnState NONE
+     }
+     SCR_HealthAndBurn "{6886A10E775EF5C8}" {
+      m_fSmokeThreshold 0.75
+      m_eTargetBurnState SMOKING_LIGHT
+     }
+    }
+   }
+   m_fBaseHealth 2000
    m_DestroySpawnObjects {
     SCR_ParticleSpawnable "{62CA80161915D831}" {
      m_Particle "{D38B85669DBFEB05}Particles/Logistics/Explosion/Fuel/Explosion_Fuel_small.ptc"

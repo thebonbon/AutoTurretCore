@@ -55,7 +55,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		m_fRotationSpeed = speed;
 		Replication.BumpMe();
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	bool IsWithinLimitsAngle(vector angles)
 	{

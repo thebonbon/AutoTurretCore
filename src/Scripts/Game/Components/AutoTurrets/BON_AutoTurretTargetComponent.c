@@ -54,7 +54,7 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 			m_iActiveInstances++;
 
 		m_SoundComp.SetSignalValueStr("AutoTurretAlarmPitch", pitch);
-		
+
 		//First time this ent is a target
 		if (m_AlarmAudioHandle == AudioHandle.Invalid)
 			m_AlarmAudioHandle = m_SoundComp.SoundEvent("SOUND_ATC_WARN");

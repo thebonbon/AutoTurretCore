@@ -92,42 +92,42 @@ class BON_AutoTurretComponent : ScriptComponent
 	//GM Settings
 	[RplProp()]
 	float m_fProjectileSpeed;
-	
+
 	[RplProp()]
 	float m_fRocketTurnRate;
-	
+
 	[RplProp(onRplName: "UpdateSystemState")]
 	bool m_bActive = false;
 
-		
+
 	//------------------------------------------------------------------------------------------------
 	void SetTriggerOnTarget(bool trigger)
 	{
 		m_bTriggerOnTarget = trigger;
 		Replication.BumpMe();
-	}	
-	
+	}
+
 	//------------------------------------------------------------------------------------------------
 	void SetFireMode(BON_TurretFireMode mode)
 	{
 		m_eFireMode = mode;
 		Replication.BumpMe();
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void SetTimeBetweenShots(float time)
 	{
 		m_fTimeBetweenShots = time;
 		Replication.BumpMe();
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void SetAttackInaccuracy(float inaccuracy)
 	{
 		m_fAttackInaccuracy = inaccuracy;
 		Replication.BumpMe();
 	}
-	
+
 	//------------------------------------------------------------------------------------------------
 	void SetProjectileTriggerChance(int chance)
 	{

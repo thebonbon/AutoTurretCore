@@ -2,11 +2,7 @@ SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
 GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SAM_USSR.et" {
- components {
-  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-  }
- }
- coords 102.205 1 79.024
+ coords 100.271 1 79.571
 }
 GenericEntity : "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst.et" {
  coords 128.529 2.115 76.489
@@ -14,19 +10,17 @@ GenericEntity : "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst
 GenericEntity : "{1688847C72A5E4C0}Prefabs/Weapons/AutoTurrets/dst/CIWS_Root_Dst.et" {
  coords 128.432 1 76.748
 }
+GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
+ coords 79.72 1 79.981
+}
 GenericEntity : "{2F708543B751BF0E}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Sensor_Dst.et" {
  coords 128.039 3.629 76.851
 }
 GenericEntity : "{357684CC335E515B}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Dst.et" {
  coords 128.636 3.911 75.963
 }
-$grp BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et" {
- {
-  coords 177.717 1 78.827
- }
- {
-  coords 106.516 1 80.076
- }
+BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et" {
+ coords 177.717 1 78.827
 }
 GenericEntity : "{4FE1C54CB7A3DA68}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Body_Dst.et" {
  coords 124.599 1.936 75.999
