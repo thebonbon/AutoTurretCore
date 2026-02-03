@@ -5,13 +5,13 @@ GenericEntity : "{184DDF3B380D5219}Prefabs/Weapons/AutoTurrets/SAM_US.et" {
    m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
     Name "SAM Turret US"
     Icon "{CA395A8742244AF2}UI/Textures/EditableEntities/AutoTurrets/EditableEntity_AutoTurret_SAM.edds"
-    m_Image ""
+    m_Image "{CE2FB6E00D2650AB}UI/Textures/EditableEntities/AutoTurrets/AutoTurret_SAM_BCR.edds"
     m_sFaction "US"
     m_aAuthoredLabels {
-     1001
+     CONTENT_MODDED
     }
     m_aAutoLabels {
-     11 1 122
+     FACTION_US ENTITYTYPE_OBJECT SIZE_M
     }
    }
    m_sIconBoneName "w_body"

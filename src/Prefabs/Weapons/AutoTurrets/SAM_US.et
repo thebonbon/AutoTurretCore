@@ -8,9 +8,13 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    components {
+    BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
+     m_bDebug 0
+    }
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
      m_eTargetFlags AIRCRAFTS
      m_iSearchRadius 1000
+     m_fMaxSearchTime 5
     }
    }
    m_Projectile "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et"
@@ -28,8 +32,8 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
      Angles 180 0 0
     }
    }
+   m_fAttackInaccuracy 0
    m_eFireMode Intercept
-   m_bDebug 1
   }
   FactionAffiliationComponent "{62ACAE2F976BB213}" {
    "faction affiliation" "US"

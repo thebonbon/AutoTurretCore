@@ -26,7 +26,6 @@ GenericEntity {
    components {
     BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
      m_fRotationSpeed 2
-     m_bDebug 1
     }
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
     }
@@ -35,7 +34,6 @@ GenericEntity {
    }
    m_sShootSound "SOUND_SHOT"
    m_fAttackInaccuracy 1
-   m_bDebug 1
   }
   BON_AutoTurretTargetComponent "{62C91C0D0A7CBA50}" {
    m_TargetFlags 5

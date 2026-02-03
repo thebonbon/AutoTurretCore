@@ -2,6 +2,11 @@ SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
 GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SAM_USSR.et" {
+ components {
+  BON_AutoTurretComponent "{62ACAE2F976BB219}" {
+   m_bDebug 0
+  }
+ }
  coords 100.271 1 79.571
 }
 GenericEntity : "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst.et" {
