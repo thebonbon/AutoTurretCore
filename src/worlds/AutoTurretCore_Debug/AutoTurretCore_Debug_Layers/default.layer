@@ -4,11 +4,6 @@ SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
 GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SAM_USSR.et" {
  components {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   components {
-    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
-     m_iSearchRadius 5
-    }
-   }
   }
  }
  coords 102.205 1 79.024

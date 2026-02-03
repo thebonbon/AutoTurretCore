@@ -21,6 +21,7 @@ class BON_AutoTurretTargetsEditorAttribute : SCR_BaseMultiSelectPresetsEditorAtt
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Not synced to clients, targeting only happens on server
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		super.WriteVariable(item, var, manager, playerID);
@@ -70,6 +71,7 @@ class BON_AutoTurretEnabledEditorAttribute : SCR_BaseValueListEditorAttribute
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -95,6 +97,7 @@ class BON_AutoTurretRangeEditorAttribute : SCR_BaseValueListEditorAttribute
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Not synced to clients, targeting only happens on server
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -120,6 +123,7 @@ class BON_AutoTurretInaccuracyEditorAttribute : SCR_BaseValueListEditorAttribute
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -127,7 +131,7 @@ class BON_AutoTurretInaccuracyEditorAttribute : SCR_BaseValueListEditorAttribute
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
-			autoTurretComponent.m_fAttackInaccuracy = var.GetFloat();
+			autoTurretComponent.SetAttackInaccuracy(var.GetFloat());
 	}
 }
 
@@ -145,6 +149,7 @@ class BON_AutoTurretAttackSpeedEditorAttribute : SCR_BaseValueListEditorAttribut
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -170,6 +175,7 @@ class BON_AutoTurretRotationSpeedEditorAttribute : SCR_BaseValueListEditorAttrib
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -177,7 +183,7 @@ class BON_AutoTurretRotationSpeedEditorAttribute : SCR_BaseValueListEditorAttrib
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
-			autoTurretComponent.m_AimingComp.m_fRotationSpeed = var.GetFloat();
+			autoTurretComponent.m_AimingComp.SetRotationSpeed(var.GetFloat());
 	}
 }
 
@@ -195,6 +201,7 @@ class BON_AutoTurretRocketGuidanceEditorAttribute : SCR_BaseValueListEditorAttri
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -220,6 +227,7 @@ class BON_AutoTurretRocketTriggerChanceEditorAttribute : SCR_BaseValueListEditor
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -227,7 +235,7 @@ class BON_AutoTurretRocketTriggerChanceEditorAttribute : SCR_BaseValueListEditor
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
-			autoTurretComponent.m_fProjectileTriggerChance = var.GetFloat();
+			autoTurretComponent.SetProjectileTriggerChance(var.GetFloat());
 	}
 }
 
@@ -264,6 +272,7 @@ class BON_AutoTurretFireModeEditorAttribute : SCR_BaseFloatValueHolderEditorAttr
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -271,7 +280,7 @@ class BON_AutoTurretFireModeEditorAttribute : SCR_BaseFloatValueHolderEditorAttr
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
-			autoTurretComponent.m_eFireMode = var.GetInt();
+			autoTurretComponent.SetFireMode(var.GetInt());
 	}
 }
 
@@ -289,6 +298,7 @@ class BON_AutoTurretAngleToleranceEditorAttribute : SCR_BaseValueListEditorAttri
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -296,7 +306,7 @@ class BON_AutoTurretAngleToleranceEditorAttribute : SCR_BaseValueListEditorAttri
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent)
-			autoTurretComponent.m_AimingComp.m_fAngleTolerance = var.GetFloat();
+			autoTurretComponent.m_AimingComp.SetAngleTolerance(var.GetFloat());
 	}
 }
 
@@ -339,6 +349,7 @@ class BON_AutoTurretTriggerOnTargetEditorAttribute : SCR_BaseValueListEditorAttr
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)
@@ -346,7 +357,7 @@ class BON_AutoTurretTriggerOnTargetEditorAttribute : SCR_BaseValueListEditorAttr
 
 		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
 		if (autoTurretComponent && autoTurretComponent.m_bIsMissile)
-			autoTurretComponent.m_bTriggerOnTarget = var.GetBool();
+			autoTurretComponent.SetTriggerOnTarget(var.GetBool());
 	}
 }
 
@@ -364,6 +375,7 @@ class BON_AutoTurretProjectileSpeedEditorAttribute : SCR_BaseValueListEditorAttr
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
 	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
 	{
 		if (!var)

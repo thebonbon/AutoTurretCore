@@ -165,11 +165,14 @@ class BON_GuidedProjectile : Projectile
 
 	//------------------------------------------------------------------------------------------------
 	//! Called from Server
-	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode, float speed, float turnRate = 0)
+	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode, float speed, float turnRate)
 	{
 		if (!Replication.IsServer() || !target)
 			return;
-
+		
+		if (turnRate == 0)
+			Print("[ATC] GuidedProjectile turnrate is zero! " + this, LogLevel.WARNING);
+		
 		m_fMaxTurnRate = turnRate;
 		m_fSpeed = speed;
 		m_eFireMode = fireMode;

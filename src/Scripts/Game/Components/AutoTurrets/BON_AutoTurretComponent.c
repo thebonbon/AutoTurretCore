@@ -52,23 +52,24 @@ class BON_AutoTurretComponent : ScriptComponent
 	[Attribute("SOUND_SHOT", UIWidgets.Auto, "Sound Name set in SoundComponent", category: "Setup")]
 	string m_sShootSound;
 
-	[Attribute("5", UIWidgets.Auto, "Every shot has this chance (%) to explode the projectile its shooting at", "0 100 1", category: "Setup")]
+	[Attribute("5", UIWidgets.Auto, "Every shot has this chance (%) to explode the projectile its shooting at", "0 100 1", category: "Setup"), RplProp()]
 	int m_fProjectileTriggerChance;
 
-	[Attribute("0", UIWidgets.CheckBox, "Trigger projectile near target?", category: "Setup")]
+	[Attribute("0", UIWidgets.CheckBox, "Trigger projectile near target?", category: "Setup"), RplProp()]
 	bool m_bTriggerOnTarget;
 
 	[Attribute("1", UIWidgets.CheckBox, "Enable turret on spawn?", category: "Setup")]
 	bool m_bActiveOnSpawn;
 
 	//--- SHOOTING ---
-	[Attribute("1", UIWidgets.Auto, "Time / Cooldown between attacks (s). Lower = faster", "0 inf 0.1", category: "Muzzle")]
+	[Attribute("1", UIWidgets.Auto, "Time / Cooldown between attacks (s). Lower = faster", "0 inf 0.1", category: "Muzzle"), RplProp()]
 	float m_fTimeBetweenShots;
 
-	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Muzzle")]
+	//GM Setting
+	[Attribute("0.25", UIWidgets.Auto, "Random angles for projectiles. 0 = no inaccuracy", "0 inf 1", category: "Muzzle"), RplProp()]
 	float m_fAttackInaccuracy;
 
-	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | Intercept: Lead the target to intercept at predicted position", enumType: BON_TurretFireMode, category: "Muzzle")]
+	[Attribute("0", uiwidget: UIWidgets.ComboBox, "Direct: Aim straight at the target's current position | Intercept: Lead the target to intercept at predicted position", enumType: BON_TurretFireMode, category: "Muzzle"), RplProp()]
 	BON_TurretFireMode m_eFireMode;
 
 	//--- MISC ---
@@ -91,14 +92,44 @@ class BON_AutoTurretComponent : ScriptComponent
 	//GM Settings
 	[RplProp()]
 	float m_fProjectileSpeed;
+	
 	[RplProp()]
-	float m_fRocketTurnRate = 0;
+	float m_fRocketTurnRate;
+	
 	[RplProp(onRplName: "UpdateSystemState")]
 	bool m_bActive = false;
 
-
+		
 	//------------------------------------------------------------------------------------------------
-	void SetProjectileSpeed(int chance)
+	void SetTriggerOnTarget(bool trigger)
+	{
+		m_bTriggerOnTarget = trigger;
+		Replication.BumpMe();
+	}	
+	
+	//------------------------------------------------------------------------------------------------
+	void SetFireMode(BON_TurretFireMode mode)
+	{
+		m_eFireMode = mode;
+		Replication.BumpMe();
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void SetTimeBetweenShots(float time)
+	{
+		m_fTimeBetweenShots = time;
+		Replication.BumpMe();
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void SetAttackInaccuracy(float inaccuracy)
+	{
+		m_fAttackInaccuracy = inaccuracy;
+		Replication.BumpMe();
+	}
+	
+	//------------------------------------------------------------------------------------------------
+	void SetProjectileTriggerChance(int chance)
 	{
 		m_fProjectileTriggerChance = chance;
 		Replication.BumpMe();

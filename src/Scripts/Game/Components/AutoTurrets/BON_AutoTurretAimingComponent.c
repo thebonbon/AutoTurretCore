@@ -17,7 +17,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("-25 85 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z", category: "Setup")]
 	protected vector m_vLimitVertical;
 
-	[Attribute("1", UIWidgets.Auto, desc: "", category: "Setup")]
+	[Attribute("1", UIWidgets.Auto, desc: "", category: "Setup"), RplProp()]
 	float m_fRotationSpeed;
 
 	[Attribute("w_body", UIWidgets.Auto, "", category: "Setup")]
@@ -29,6 +29,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("false", UIWidgets.CheckBox, "Show Aiming debug?", category: "Debug")]
 	protected bool m_bDebug;
 
+	[RplProp()]
 	float m_fAngleTolerance = 1; // degrees
 
 	protected SignalsManagerComponent m_SignalsManager;
@@ -42,6 +43,19 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	protected vector m_vCurrentAngles;
 	protected vector m_vTargetAngles;
 
+	//------------------------------------------------------------------------------------------------
+	void SetAngleTolerance(float tolerance)
+	{
+		m_fAngleTolerance = tolerance;
+		Replication.BumpMe();
+	}
+	//------------------------------------------------------------------------------------------------
+	void SetRotationSpeed(float speed)
+	{
+		m_fRotationSpeed = speed;
+		Replication.BumpMe();
+	}
+	
 	//------------------------------------------------------------------------------------------------
 	bool IsWithinLimitsAngle(vector angles)
 	{

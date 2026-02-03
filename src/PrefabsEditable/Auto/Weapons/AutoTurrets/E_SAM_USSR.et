@@ -4,7 +4,7 @@ GenericEntity : "{05E6942F6E616690}Prefabs/Weapons/AutoTurrets/SAM_USSR.et" {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    components {
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
-     m_iSearchRadius 5
+     m_iSearchRadius 2000
     }
    }
   }
