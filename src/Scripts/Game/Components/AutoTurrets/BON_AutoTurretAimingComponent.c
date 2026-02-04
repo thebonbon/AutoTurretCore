@@ -29,8 +29,8 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("false", UIWidgets.CheckBox, "Show Aiming debug?", category: "Debug")]
 	protected bool m_bDebug;
 
-	[RplProp()]
-	float m_fAngleTolerance = 1; // degrees
+	[Attribute("2", UIWidgets.Auto, desc: "Angle Tolerance (degrees)", category: "Setup"), RplProp()]
+	float m_fAngleTolerance; // degrees
 
 	protected SignalsManagerComponent m_SignalsManager;
 	protected int m_iSignalBody;
