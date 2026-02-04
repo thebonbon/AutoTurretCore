@@ -298,7 +298,6 @@ class BON_AutoTurretComponent : ScriptComponent
 				m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
 		}
 
-		//TOOD: Maybe first few bullets never hit? To prevent first one to hit. Or increase chance every bullet up to max
 		bool triggerTargetProjectile = s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance;
 		if (triggerTargetProjectile && m_Target.m_Ent.FindComponent(BaseTriggerComponent))
 			TriggerProjectile(m_Target.m_Ent);
@@ -323,7 +322,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (!lastSpawnedProjectile)
 			return null;
 
-		//Update projectile faction of IFF
+		//Update projectile faction for IFF
 		BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(lastSpawnedProjectile.FindComponent(BON_AutoTurretTargetComponent));
 		if (targetComp)
 		{

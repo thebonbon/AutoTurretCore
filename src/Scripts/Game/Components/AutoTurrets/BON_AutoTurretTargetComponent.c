@@ -16,14 +16,15 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 	[Attribute("0", UIWidgets.Flags, enumType: BON_TurretTargetFilterFlags, category: "Setup")]
 	BON_TurretTargetFilterFlags m_TargetFlags;
 
+	static const int PITCH_TARGET_SPOTTED = -6;
+	static const int PITCH_SHOOTING = 6;
+	
 	//Used for e.g missile IFF (Instigator faction)
 	int m_iFactionID = -1;
 	protected SoundComponent m_SoundComp;
 	protected AudioHandle m_AlarmAudioHandle = AudioHandle.Invalid;
 	protected int m_iActiveInstances;
 
-	static const int PITCH_TARGET_SPOTTED = -6;
-	static const int PITCH_SHOOTING = 6;
 
 	//------------------------------------------------------------------------------------------------
 	void StopAlarm()

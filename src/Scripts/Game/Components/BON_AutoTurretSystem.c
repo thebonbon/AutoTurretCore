@@ -5,7 +5,9 @@ class BON_AutoTurretSystem : GameSystem
 	{
 		outInfo
 			.SetAbstract(false)
-			.AddPoint(ESystemPoint.Frame);
+			.AddPoint(ESystemPoint.Frame)
+			.AddPoint(ESystemPoint.FixedFrame)
+			.SetLocation(ESystemLocation.Both);
 	}
 
 	protected ref array<BON_AutoTurretComponent> m_aTurretManagers = {};
@@ -20,21 +22,20 @@ class BON_AutoTurretSystem : GameSystem
 	//------------------------------------------------------------------------------------------------
 	protected override void OnUpdate(ESystemPoint point)
 	{
-		float timeSlice;
-		if (point == ESystemPoint.Frame)
-			timeSlice = GetWorld().GetTimeSlice();
-		else if (point == ESystemPoint.SimulatePhysics || point == ESystemPoint.PostSimulatePhysics)
-			timeSlice = GetWorld().GetPhysicsTimeSlice();
-
-		foreach (BON_AutoTurretComponent component : m_aTurretManagers)
+		if (point == ESystemPoint.FixedFrame)
+			GetGame().GetAutoTurretGrid().Update();
+		else
 		{
-			if (component)
-				component.OnUpdate(timeSlice);
-		}
+			float timeSlice;
+			if (point == ESystemPoint.Frame)
+				timeSlice = GetWorld().GetTimeSlice();
 
-		//Also update the global target gridmap
-		//TODO: OnFixedFrame
-		GetGame().GetAutoTurretGrid().Update();
+			foreach (BON_AutoTurretComponent component : m_aTurretManagers)
+			{
+				if (component)
+					component.OnUpdate(timeSlice);
+			}
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------

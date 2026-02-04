@@ -56,6 +56,9 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		if (traceDistance == 1 || param.TraceEnt == target.m_Ent || mainParent == target.m_Ent)
 			return true;
 
+		if (!param.TraceEnt)
+			return false;
+		
 		//Hit entity but its an equipment of the target (e.g vest, helmet etc..)
 		InventoryItemComponent itemComp = InventoryItemComponent.Cast(param.TraceEnt.FindComponent(InventoryItemComponent));
 		return (itemComp && itemComp.GetParentSlot());
