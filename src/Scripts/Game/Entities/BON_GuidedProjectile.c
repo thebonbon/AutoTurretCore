@@ -11,10 +11,9 @@ class BON_GuidedProjectile : Projectile
 	[Attribute("50", UIWidgets.Slider, "What % chance does a single countermeasure fire have? (def: 50)", "0 100 1")]
 	int m_iCountermeasureSuccessChance;
 
-	//Can be set via GM
-	//m_fMaxTurnRate (Attribute)
-	//m_iCountermeasureSuccessChance (Attribute)
-	int m_iSelfDestructTime = 1;
+	const int SELF_DESTRUCT_DELAY = 2;
+
+	int m_iSelfDestructTime;
 	BON_TurretFireMode m_eFireMode;
 	float m_fSpeed;
 
@@ -33,14 +32,15 @@ class BON_GuidedProjectile : Projectile
 	//------------------------------------------------------------------------------------------------
 	void SteerToTarget(float timeSlice)
 	{
-		if (System.GetUnixTime() > m_iSelfDestructTime)
+		if (m_iSelfDestructTime != 0 && System.GetUnixTime() > m_iSelfDestructTime)
 			Trigger();
 
 		vector targetPos = m_TrackedTarget.GetOrigin();
 		vector targetVel = m_TrackedTarget.GetPhysics().GetVelocity();
 		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
 
-		if (targetDistance <= 1)
+		//Super close to target, trigger for lag / desync compensation?
+		if (targetDistance <= 0.5)
 			Trigger();
 
 		//Add lead
@@ -56,6 +56,10 @@ class BON_GuidedProjectile : Projectile
 		vector axis = SCR_Math3D.Cross(localFwd, dirToTarget);
 
 		float dot = vector.Dot(localFwd, dirToTarget);
+
+		if (dot < 0) //target is behind us.. guess I missed :(
+			m_iSelfDestructTime = System.GetUnixTime() + SELF_DESTRUCT_DELAY;
+
 		dot = Math.Clamp(dot, -1.0, 1.0);
 		float angleRad = Math.Acos(dot);
 
@@ -124,10 +128,6 @@ class BON_GuidedProjectile : Projectile
 
 		m_TrackedTarget = target;
 
-		float targetDistance = vector.Distance(m_TrackedTarget.GetOrigin(), GetOrigin());
-		float timeToTarget = targetDistance / m_fSpeed;
-		m_iSelfDestructTime += System.GetUnixTime() + timeToTarget;
-
 		GetPhysics().SetActive(ActiveState.ACTIVE);
 		SetEventMask(EntityEvent.FRAME);
 
@@ -169,10 +169,10 @@ class BON_GuidedProjectile : Projectile
 	{
 		if (!Replication.IsServer() || !target)
 			return;
-		
+
 		if (turnRate == 0)
 			Print("[ATC] GuidedProjectile turnrate is zero! " + this, LogLevel.WARNING);
-		
+
 		m_fMaxTurnRate = turnRate;
 		m_fSpeed = speed;
 		m_eFireMode = fireMode;
