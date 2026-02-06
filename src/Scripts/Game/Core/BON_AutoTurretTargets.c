@@ -17,6 +17,18 @@ class BON_AutoTurretTarget
 		m_PerceivableComp = PerceivableComponent.Cast(ent.FindComponent(PerceivableComponent));
 		m_TargetComp = BON_AutoTurretTargetComponent.Cast(ent.FindComponent(BON_AutoTurretTargetComponent));
 
+		//Override ent to instigator if projectile
+		BaseProjectileComponent projectileComp = BaseProjectileComponent.Cast(ent.FindComponent(BaseProjectileComponent));
+		if (projectileComp)
+		{
+			Instigator instigator = projectileComp.GetInstigator();
+			if (instigator)
+				ent = instigator.GetInstigatorEntity();
+		}
+
+		if (!ent)
+			return;
+
 		FactionAffiliationComponent factionComp = FactionAffiliationComponent.Cast(ent.FindComponent(FactionAffiliationComponent));
 		if (factionComp)
 		{
@@ -55,6 +67,9 @@ class BON_AutoTurretTarget
 	{
 		if (!m_Ent)
 			return false;
+
+		if (Projectile.Cast(m_Ent))
+			return true;
 
 		DamageManagerComponent dmgManager = DamageManagerComponent.Cast(m_Ent.FindComponent(DamageManagerComponent));
 		if (!dmgManager || dmgManager.IsDestroyed())

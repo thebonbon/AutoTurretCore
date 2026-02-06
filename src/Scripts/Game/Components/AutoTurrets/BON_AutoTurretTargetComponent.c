@@ -18,13 +18,12 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 
 	static const int PITCH_TARGET_SPOTTED = -6;
 	static const int PITCH_SHOOTING = 6;
-	
+
 	//Used for e.g missile IFF (Instigator faction)
 	int m_iFactionID = -1;
 	protected SoundComponent m_SoundComp;
 	protected AudioHandle m_AlarmAudioHandle = AudioHandle.Invalid;
 	protected int m_iActiveInstances;
-
 
 	//------------------------------------------------------------------------------------------------
 	void StopAlarm()
@@ -61,16 +60,13 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 			m_AlarmAudioHandle = m_SoundComp.SoundEvent("SOUND_ATC_WARN");
 	}
 
-	//------------------------------------------------------------------------------------------------
-	override void EOnPhysicsActive(IEntity owner, bool activeState)
-	{
-		if (m_TargetFlags == BON_TurretTargetFilterFlags.PROJECTILES)
-			GetGame().GetAutoTurretGrid().Insert(owner, true, m_TargetFlags);
-	}
 
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
+		if (!GetGame().InPlayMode())
+			return;
+
 		m_SoundComp = SoundComponent.Cast(owner.FindComponent(SoundComponent));
 		GetGame().GetAutoTurretGrid().Insert(owner, true, m_TargetFlags);
 	}
@@ -83,9 +79,18 @@ class BON_AutoTurretTargetComponent : ScriptComponent
 
 	//------------------------------------------------------------------------------------------------
 	//! On Death remove self as target
+	//! Rockets in launcher get Init + Deactivate event instantly
 	override void EOnDeactivate(IEntity owner)
 	{
 		GetGame().GetAutoTurretGrid().Remove(owner);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Rockets in launcher get deactivated so we need to add them here again
+	override void EOnActivate(IEntity owner)
+	{
+		if (Projectile.Cast(owner))
+			GetGame().GetAutoTurretGrid().Insert(owner, true, m_TargetFlags);
 	}
 }
 
