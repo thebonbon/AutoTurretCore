@@ -280,7 +280,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			if (m_fAttackInaccuracy != 0)
 				SCR_Math3D.AddRandomVectorToMat(muzzleMat, -m_fAttackInaccuracy, m_fAttackInaccuracy);
-			
+
 			IEntity projectile = SpawnProjectile(muzzleMat, m_Target);
 			LaunchProjectile(projectile);
 

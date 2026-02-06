@@ -106,21 +106,25 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		IEntitySource projectileSource = SCR_BaseContainerTools.FindEntitySource(projectileResource);
 
 		float timeToTarget;
-		float targetDistance = vector.Distance(barrelOrigin, m_Target.GetAimPoint());
+		vector muzzleMat[4];
+		vector effectMat[4];
+		m_TurretComp.GetMuzzleTransform(muzzleMat, effectMat);
+
+		float targetDistance = vector.Distance(muzzleMat[3], m_Target.GetAimPoint());
 		float heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource);
 
 		Physics targetRB = m_Target.m_Ent.GetPhysics();
 
-		if (targetRB)
+		if (targetRB && targetRB.IsActive())
 		{
 			//Add Leading
 			predictedLeadingOffset = targetRB.GetVelocity() * timeToTarget;
-			targetDistance = vector.Distance(barrelOrigin, m_Target.GetAimPoint() + predictedLeadingOffset);
+			targetDistance = vector.Distance(muzzleMat[3], m_Target.GetAimPoint() + predictedLeadingOffset);
 			heightOffset = BallisticTable.GetHeightFromProjectileSource(targetDistance, timeToTarget, projectileSource);
 		}
 
 		//Add Ballistics
-		predictedLeadingOffset[1] = predictedLeadingOffset[1] + heightOffset;
+		predictedLeadingOffset[1] = heightOffset;
 
 		return predictedLeadingOffset;
 	}
@@ -134,6 +138,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool IsOnTarget()
 	{
+		if (m_vTargetAngles == Vector(-1, -1, -1))
+			return false;
+
 		vector current = SCR_Math3D.FixEulerVector180(m_vCurrentAngles);
 		vector target = SCR_Math3D.FixEulerVector180(m_vTargetAngles);
 
@@ -263,7 +270,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		vector barrelMat[4];
 		GetBarrelTransform(barrelMat);
 
-		Shape.CreateArrow(barrelMat[3], barrelMat[3] + dir * 5, 0.25, Color.BLUE, ShapeFlags.ONCE);
+		Shape.CreateArrow(barrelMat[3], barrelMat[3] + dir * 3000, 0.25, Color.BLUE, ShapeFlags.ONCE);
 
 		if (m_Target && m_Target.m_Ent)
 		{
