@@ -41,13 +41,13 @@ class BON_AutoTurretComponent : ScriptComponent
 	ResourceName m_Projectile;
 
 	[Attribute(desc: "PointInfo: Projectile spawn positions (loops automatically)", category: "Setup")]
-	protected ref array<ref PointInfo> m_ProjectileSpawnPositions;
+	ref array<ref PointInfo> m_ProjectileSpawnPositions;
 
 	[Attribute("", UIWidgets.ResourcePickerThumbnail, "Particle effect to play", "ptc", category: "Setup")]
 	ResourceName m_MuzzleParticle;
 
 	[Attribute(desc: "Effect positions (count and order needs to be the same as ProjectileSpawnPositions)", category: "Setup")]
-	protected ref array<ref PointInfo> m_EffectPositions;
+	ref array<ref PointInfo> m_EffectPositions;
 
 	[Attribute("SOUND_SHOT", UIWidgets.Auto, "Sound Name set in SoundComponent", category: "Setup")]
 	string m_sShootSound;
@@ -278,7 +278,9 @@ class BON_AutoTurretComponent : ScriptComponent
 		//Only spawn and launch if projectile is not replicated. But always do on server
 		if (Replication.IsServer() || !m_bIsProjectileReplicated)
 		{
-			SCR_Math3D.AddRandomVectorToMat(muzzleMat, -m_fAttackInaccuracy, m_fAttackInaccuracy);
+			if (m_fAttackInaccuracy != 0)
+				SCR_Math3D.AddRandomVectorToMat(muzzleMat, -m_fAttackInaccuracy, m_fAttackInaccuracy);
+			
 			IEntity projectile = SpawnProjectile(muzzleMat, m_Target);
 			LaunchProjectile(projectile);
 
