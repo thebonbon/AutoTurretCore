@@ -15,7 +15,7 @@ modded class SCR_Math3D
 	//------------------------------------------------------------------------------------------------
 	static vector GetLocalAngles(vector fromMat[4], vector toPos)
 	{
-		vector dirWorld = toPos - fromMat[3];
+		vector dirWorld = vector.Direction(fromMat[3], toPos);
 		dirWorld.Normalize();
 
 		vector dirLocal;
