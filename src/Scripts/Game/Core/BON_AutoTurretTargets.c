@@ -18,12 +18,14 @@ class BON_AutoTurretTarget
 		m_TargetComp = BON_AutoTurretTargetComponent.Cast(ent.FindComponent(BON_AutoTurretTargetComponent));
 
 		//Override ent to instigator if projectile
-		BaseProjectileComponent projectileComp = BaseProjectileComponent.Cast(ent.FindComponent(BaseProjectileComponent));
-		if (projectileComp)
+		ProjectileMoveComponent moveComponent = ProjectileMoveComponent.Cast(ent.FindComponent(ProjectileMoveComponent));
+		if (moveComponent)
 		{
-			Instigator instigator = projectileComp.GetInstigator();
+			Instigator instigator = moveComponent.GetInstigator();
 			if (instigator)
 				ent = instigator.GetInstigatorEntity();
+			else
+				m_Ent = null; //Invalidate this target
 		}
 
 		if (!ent)
@@ -34,11 +36,6 @@ class BON_AutoTurretTarget
 		{
 			FactionManager factionManager = GetGame().GetFactionManager();
 			m_iFactionID = factionManager.GetFactionIndex(factionComp.GetAffiliatedFaction());
-		}
-		else //e.g missiles dont have faction comp -> try target data
-		{
-			if (m_TargetComp)
-				m_iFactionID = m_TargetComp.m_iFactionID;
 		}
 	}
 

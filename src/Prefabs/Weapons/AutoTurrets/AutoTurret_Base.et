@@ -27,9 +27,9 @@ GenericEntity {
     BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
      m_fRotationSpeed 2
     }
-    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
+    BON_AutoTurretBaseLogicComponent "{673F148EDF2F1E63}" {
     }
-    SCR_MilitaryBaseLogicComponent "{673F148EDF2F1E63}" {
+    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
     }
    }
    m_sShootSound "SOUND_SHOT"

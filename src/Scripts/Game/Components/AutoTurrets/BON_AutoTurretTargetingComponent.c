@@ -30,7 +30,8 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 		FactionManager factionManager = GetGame().GetFactionManager();
 		Faction targetFaction = factionManager.GetFactionByIndex(target.m_iFactionID);
 
-		return targetFaction.IsFactionEnemy(m_FactionComp.GetAffiliatedFaction());
+		bool isEnemy = targetFaction.IsFactionEnemy(m_FactionComp.GetAffiliatedFaction());
+		return isEnemy;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -73,6 +74,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 
 		foreach (BON_AutoTurretTarget target : sortedTargets)
 		{
+			Shape.CreateSphere(Color.RED, ShapeFlags.ONCE, target.m_Ent.GetOrigin(), 0.5);
 			if (m_AimingComp.IsWithinLimitsPos(target) && IsEnemy(target) && LineOfSightTo(target))
 				return target;
 		}

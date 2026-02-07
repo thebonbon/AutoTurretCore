@@ -82,6 +82,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//! Predicts the position with given speed to target pos
 	vector ComputeLeadSimple()
 	{
+		if (!m_Target.IsValid())
+			return vector.Zero;
+		
 		vector targetVelocity = m_Target.m_Ent.GetPhysics().GetVelocity();
 		float targetDistance = vector.Distance(m_Target.m_Ent.GetOrigin(), GetOwner().GetOrigin());
 		float timeToTarget = targetDistance / m_TurretComp.m_fProjectileSpeed;
@@ -93,7 +96,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//! Lead offset (velocity, time) needed to hit target
 	vector ComputeLead()
 	{
-		if (!m_Target.m_Ent)
+		if (!m_Target.IsValid())
 			return vector.Zero;
 
 		vector predictedLeadingOffset;

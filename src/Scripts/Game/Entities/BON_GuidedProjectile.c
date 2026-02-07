@@ -118,14 +118,17 @@ class BON_GuidedProjectile : Projectile
 
 	//------------------------------------------------------------------------------------------------
 	//! Called from Client + Server
-	void Launch(IEntity target)
+	void Launch(IEntity target, IEntity instigatorEnt = null)
 	{
 		if (!target)
 			return;
 
 		m_MissileMove = MissileMoveComponent.Cast(FindComponent(MissileMoveComponent));
+		ProjectileMoveComponent projMove = ProjectileMoveComponent.Cast(FindComponent(ProjectileMoveComponent));
+		
 		m_MissileMove.Launch(GetTransformAxis(2), vector.Zero, 1, this, null, null, null, null);
-
+		projMove.SetInstigator(Instigator.CreateInstigator(instigatorEnt));
+		
 		m_TrackedTarget = target;
 
 		GetPhysics().SetActive(ActiveState.ACTIVE);
@@ -154,18 +157,18 @@ class BON_GuidedProjectile : Projectile
 
 	//------------------------------------------------------------------------------------------------
 	//! Called from Server
-	void DelayLaunch(IEntity target, BON_TurretFireMode fireMode, float speed)
+	void DelayLaunch(IEntity target, BON_TurretFireMode fireMode, float speed, IEntity instigatorEnt)
 	{
 		//Broadcast all data for clients to also steer to target (steering is not replicated)
 		RplComponent targetRplComp = RplComponent.Cast(target.FindComponent(RplComponent));
 		Rpc(RpcDo_Launch, targetRplComp.Id(), fireMode, speed);
 
-		Launch(target);
+		Launch(target, instigatorEnt);
 	}
 
 	//------------------------------------------------------------------------------------------------
 	//! Called from Server
-	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode, float speed, float turnRate)
+	void SetTargetAndLaunch(IEntity target, BON_TurretFireMode fireMode, float speed, float turnRate, IEntity instigatorEnt)
 	{
 		if (!Replication.IsServer() || !target)
 			return;
@@ -177,7 +180,7 @@ class BON_GuidedProjectile : Projectile
 		m_fSpeed = speed;
 		m_eFireMode = fireMode;
 
-		GetGame().GetCallqueue().CallLater(DelayLaunch, 1, false, target, fireMode, speed);
+		GetGame().GetCallqueue().CallLater(DelayLaunch, 1, false, target, fireMode, speed, instigatorEnt);
 	}
 
 	//------------------------------------------------------------------------------------------------

@@ -186,11 +186,7 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		BaseTriggerComponent trigger = BaseTriggerComponent.Cast(projectile.FindComponent(BaseTriggerComponent));
 		if (!trigger)
-		{
-			Print("[AutoTurretCore] No TriggerComponent on " + projectile, LogLevel.WARNING);
-			m_bTriggerOnTarget = false;
 			return;
-		}
 
 		trigger.SetLive();
 		trigger.OnUserTriggerOverrideInstigator(projectile, Instigator.CreateInstigator(GetOwner()));
@@ -206,7 +202,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		if (timeToTarget <= 0)
 			return;
 
-		timeToTarget += s_AIRandomGenerator.RandFloatXY(-0.2, 0.2);
+		timeToTarget += Math.RandomFloat(-0.2, 0.2);
 		//SetTimer on TimerTriggerComponent does not work :(
 		GetGame().GetCallqueue().CallLater(TriggerProjectile, timeToTarget * 1000, false, projectile);
 	}
@@ -215,7 +211,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	//! Intercept (Missile)
 	void LaunchGuided(BON_GuidedProjectile guidedProjectile)
 	{
-		guidedProjectile.SetTargetAndLaunch(m_Target.m_Ent, m_eFireMode, m_fProjectileSpeed, m_fRocketTurnRate);
+		guidedProjectile.SetTargetAndLaunch(m_Target.m_Ent, m_eFireMode, m_fProjectileSpeed, m_fRocketTurnRate, GetOwner());
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -224,7 +220,11 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		ProjectileMoveComponent moveComp = ProjectileMoveComponent.Cast(projectile.FindComponent(ProjectileMoveComponent));
 		if (moveComp)
+		{
+			moveComp.SetInstigator(Instigator.CreateInstigator(GetOwner()));
 			moveComp.Launch(projectile.GetTransformAxis(2), vector.Zero, 1, projectile, GetOwner(), null, null, null);
+			
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -300,10 +300,12 @@ class BON_AutoTurretComponent : ScriptComponent
 				m_AnimationController.CallCommand(m_iShootCmd, 1, 0);
 		}
 
-		bool triggerTargetProjectile = s_AIRandomGenerator.RandIntInclusive(1, 100) < m_fProjectileTriggerChance;
-		if (triggerTargetProjectile && m_Target.m_Ent.FindComponent(BaseTriggerComponent))
-			TriggerProjectile(m_Target.m_Ent);
-
+		if (m_Target.IsValid())
+		{
+			bool triggerTargetProjectile = Math.RandomIntInclusive(1, 100) < m_fProjectileTriggerChance;
+			if (triggerTargetProjectile)
+				TriggerProjectile(m_Target.m_Ent);
+		}
 
 		//Increase muzzle index
 		m_iCurrentMuzzle++;
@@ -323,14 +325,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
 		if (!lastSpawnedProjectile)
 			return null;
-
-		//Update projectile faction for IFF
-		BON_AutoTurretTargetComponent targetComp = BON_AutoTurretTargetComponent.Cast(lastSpawnedProjectile.FindComponent(BON_AutoTurretTargetComponent));
-		if (targetComp)
-		{
-			FactionManager factionManager = GetGame().GetFactionManager();
-			targetComp.m_iFactionID = factionManager.GetFactionIndex(m_FactionComp.GetAffiliatedFaction());
-		}
 
 		return lastSpawnedProjectile;
 	}
