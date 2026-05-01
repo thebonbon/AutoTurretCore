@@ -77,7 +77,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		GetBarrelWorldTransform(barrelMat);
 		GetOwner().GetWorldTransform(ownerMat);
 
-		vector angles = SCR_Math3D.GetLocalAngles(ownerMat, barrelMat[3], target.GetAimPoint());
+		vector angles = SCR_Math3D.ComputeTargetAngles(ownerMat, barrelMat[3], target.GetAimPoint());
 
 		return IsWithinLimitsAngle(angles);
 	}
@@ -177,7 +177,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			GetBarrelWorldTransform(barrelMat);
 			GetOwner().GetWorldTransform(ownerMat);
 
-			targetAngles = SCR_Math3D.GetLocalAngles(ownerMat, barrelMat[3], aimPoint);
+			targetAngles = SCR_Math3D.ComputeTargetAngles(ownerMat, barrelMat[3], aimPoint);
 		}
 
 		RotateTo(targetAngles, timeSlice);
@@ -203,8 +203,8 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		yawDelta = Math.Clamp(yawDelta, -maxStep, maxStep);
 		pitchDelta = Math.Clamp(pitchDelta, -maxStep, maxStep);
 
-		m_vCurrentAngles[0] = m_vCurrentAngles[0] + yawDelta;
-		m_vCurrentAngles[1] = m_vCurrentAngles[1] + pitchDelta;
+		m_vCurrentAngles[0] = SCR_Math3D.WrapAngleDiffDeg(m_vCurrentAngles[0] + yawDelta);
+		m_vCurrentAngles[1] = SCR_Math3D.WrapAngleDiffDeg(m_vCurrentAngles[1] + pitchDelta);
 
 		m_SignalsManager.SetSignalValue(m_iSignalBody, -m_vCurrentAngles[0]);
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);

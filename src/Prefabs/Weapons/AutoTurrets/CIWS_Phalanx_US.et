@@ -11,9 +11,6 @@ GenericEntity : "{1E60A20CFD66FC45}Prefabs/Weapons/AutoTurrets/AutoTurret_Base.e
   }
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    components {
-    BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
-     m_fRotationSpeed 3
-    }
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
      m_eTargetFlags 24
      m_iSearchRadius 1000

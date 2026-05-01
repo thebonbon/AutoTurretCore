@@ -13,22 +13,34 @@ modded class SCR_Math3D
 	}
 
 	//------------------------------------------------------------------------------------------------
-	static vector GetLocalAngles(vector rotationMat[4], vector fromPos, vector toPos)
+	static vector ComputeTargetAngles(vector bodyMat[4], vector barrelPos, vector targetPos)
 	{
-		vector dirToTarget = vector.Direction(fromPos, toPos).Normalized();
+		//Pitch
+		vector dirToTarget = vector.Direction(barrelPos, targetPos);
 	
-		if (float.AlmostEqual(dirToTarget.LengthSq(), 0))
-			return vector.Zero;
+		float bodyQuat[4];
+		Math3D.MatrixToQuat(bodyMat, bodyQuat);
 	
-		float fromQuat[4];
-		Math3D.MatrixToQuat(rotationMat, fromQuat);
+		float bodyQuatInv[4];
+		Math3D.QuatInverse(bodyQuatInv, bodyQuat);
 	
-		float fromQuatInv[4];
-		Math3D.QuatInverse(fromQuatInv, fromQuat);
+		vector dirLocal = SCR_Math3D.QuatMultiply(bodyQuatInv, dirToTarget);
 	
-		vector dirLocal = SCR_Math3D.QuatMultiply(fromQuatInv, dirToTarget);
+		vector localAngles = dirLocal.Normalized().VectorToAngles();
+	
+		float pitch = localAngles[1];
+		pitch = SCR_Math3D.WrapAngleDiffDeg(pitch);
 		
-		return dirLocal.Normalized().VectorToAngles().MapAngles();
+		//Yaw
+		vector bodyPos = bodyMat[3];
+		targetPos[1] = bodyPos[1];
+	
+		vector flatDir = vector.Direction(bodyPos, targetPos).Normalized();
+	
+		float yaw = flatDir.VectorToAngles()[0];
+		yaw = SCR_Math3D.WrapAngleDiffDeg(yaw);
+		
+		return Vector(yaw, pitch, 0);
 	}
 	
 	//------------------------------------------------------------------------------------------------
