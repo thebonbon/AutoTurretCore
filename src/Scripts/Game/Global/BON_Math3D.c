@@ -1,29 +1,36 @@
 modded class SCR_Math3D
 {
 	//------------------------------------------------------------------------------------------------
-	static vector LerpAngle(vector current, vector target, float maxStep)
+	static float WrapAngleDiffDeg(float angle)
 	{
-		vector result;
-		for (int i = 0; i < 3; i++)
-		{
-			result[i] = SCR_Math.LerpAngle(current[i], target[i], Math.Min(maxStep, 1));
-		}
-
-		return result;
+		while (angle < -180)
+			angle += 360;
+	
+		while (angle > 180)
+			angle -= 360;
+	
+		return angle;
 	}
 
 	//------------------------------------------------------------------------------------------------
-	static vector GetLocalAngles(vector fromMat[4], vector toPos)
+	static vector GetLocalAngles(vector rotationMat[4], vector fromPos, vector toPos)
 	{
-		vector dirWorld = vector.Direction(fromMat[3], toPos);
-		dirWorld.Normalize();
-
-		vector dirLocal;
-		Math3D.MatrixInvMultiply3(fromMat, dirWorld, dirLocal);
-
-		return dirLocal.VectorToAngles().MapAngles();
+		vector dirToTarget = vector.Direction(fromPos, toPos).Normalized();
+	
+		if (float.AlmostEqual(dirToTarget.LengthSq(), 0))
+			return vector.Zero;
+	
+		float fromQuat[4];
+		Math3D.MatrixToQuat(rotationMat, fromQuat);
+	
+		float fromQuatInv[4];
+		Math3D.QuatInverse(fromQuatInv, fromQuat);
+	
+		vector dirLocal = SCR_Math3D.QuatMultiply(fromQuatInv, dirToTarget);
+		
+		return dirLocal.Normalized().VectorToAngles().MapAngles();
 	}
-
+	
 	//------------------------------------------------------------------------------------------------
 	static vector GetRandomVector(float min, float max)
 	{

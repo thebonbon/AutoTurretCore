@@ -1,13 +1,25 @@
 SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  coords 0 0 0
 }
-GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SAM_USSR.et" {
+GenericEntity : "{0838D33167666DDA}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CIWS_Phalanx_USSR.et" {
  components {
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
-   m_bDebug 0
+   components {
+    BON_AutoTurretAimingComponent "{671AAD5D15B361F0}" {
+     m_fRotationSpeed 50
+     m_bDebug 1
+    }
+    BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
+     m_eTargetFlags PROJECTILES
+     m_iSearchRadius 5000
+     m_fMaxSearchTime 0.01
+    }
+   }
+   m_fProjectileTriggerChance 50
+   m_bDebug 1
   }
  }
- coords 100.271 1 79.571
+ coords 103.141 1 16.42
 }
 GenericEntity : "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst.et" {
  coords 128.529 2.115 76.489
@@ -15,17 +27,11 @@ GenericEntity : "{0AA8408FE6E989D6}Prefabs/Weapons/AutoTurrets/dst/CIWS_Body_Dst
 GenericEntity : "{1688847C72A5E4C0}Prefabs/Weapons/AutoTurrets/dst/CIWS_Root_Dst.et" {
  coords 128.432 1 76.748
 }
-GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.et" {
- coords 79.72 1 79.981
-}
 GenericEntity : "{2F708543B751BF0E}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Sensor_Dst.et" {
  coords 128.039 3.629 76.851
 }
 GenericEntity : "{357684CC335E515B}Prefabs/Weapons/AutoTurrets/dst/CIWS_Barrel_Dst.et" {
  coords 128.636 3.911 75.963
-}
-BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et" {
- coords 177.717 1 78.827
 }
 GenericEntity : "{4FE1C54CB7A3DA68}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Body_Dst.et" {
  coords 124.599 1.936 75.999
@@ -193,20 +199,14 @@ $grp SCR_DestructibleBuildingEntity : "{6E10F2B9F8C8BB2C}Prefabs/Structures/Cult
  {
   coords -0.282 25.944 193.645
  }
-}
-Vehicle UH1H1 : "{70BAEEFC2D3FEE64}Prefabs/Vehicles/Helicopters/UH1H/UH1H.et" {
- components {
-  SCR_HelicopterSoundComponent "{5A7CE769E7A9C43E}" {
-   Filenames +{
-    "{CE880B60B3A5CA22}Sounds/AutoTurret/Helicopter_Alarm.acp"
-   }
-  }
+ {
+  coords 567.997 216.136 244.845
  }
- coords 58.683 1 239.69
 }
 GenericEntity : "{74913F7E554D1AC7}Prefabs/Weapons/AutoTurrets/dst/Rim-116_Barrel_Dst.et" {
  coords 124.638 3.987 75.638
 }
-GenericEntity : "{D584F2FFFDC7DE49}Prefabs/Weapons/Warheads/Warhead_Shell_HE.et" {
- coords 149.318 1 79.049
+GenericEntity : "{94382B87F09261BE}Prefabs/Props/Civilian/LawnMower_01.et" {
+ coords 128.775 25.818 204.246
+ angles 0 61.305 0
 }

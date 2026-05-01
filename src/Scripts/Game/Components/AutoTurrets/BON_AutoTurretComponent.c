@@ -223,7 +223,6 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			moveComp.SetInstigator(Instigator.CreateInstigator(GetOwner()));
 			moveComp.Launch(projectile.GetTransformAxis(2), vector.Zero, 1, projectile, GetOwner(), null, null, null);
-			
 		}
 	}
 
@@ -316,6 +315,9 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	IEntity SpawnProjectile(vector muzzleMat[4], BON_AutoTurretTarget target)
 	{
+		if (!m_Projectile)
+			return null;
+		
 		EntitySpawnParams spawnParams();
 		spawnParams.TransformMode = ETransformMode.WORLD;
 		spawnParams.Transform = muzzleMat;
@@ -325,7 +327,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
 		if (!lastSpawnedProjectile)
 			return null;
-
+		
 		return lastSpawnedProjectile;
 	}
 
@@ -340,7 +342,9 @@ class BON_AutoTurretComponent : ScriptComponent
 
 		m_Target = m_TargetingComp.GetTarget();
 
-		m_AimingComp.OnUpdate(m_Target, timeSlice);
+		//Only server does aiming
+		if (Replication.IsServer())
+			m_AimingComp.OnUpdate(m_Target, timeSlice);
 
 		m_fAttackTimer -= timeSlice;
 		if (m_fAttackTimer <= 0 && m_AimingComp.CanFire())

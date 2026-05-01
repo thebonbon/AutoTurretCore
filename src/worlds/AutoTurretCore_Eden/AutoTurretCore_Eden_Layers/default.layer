@@ -11,6 +11,9 @@ Vehicle av8b1 {
  }
  coords 4771.258 27.844 11202.952
 }
+GenericEntity : "{01A81E5567E1FC40}PrefabsEditable/Auto/Weapons/AutoTurrets/E_SAM_USSR.et" {
+ coords 4846.816 25.157 12031.868
+}
 BON_GuidedProjectile : "{4DFBFB3EB05896FC}Prefabs/Weapons/Ammo/Ammo_Guided_Rocket.et" {
  coords 4661.311 15.174 10303.27
 }
