@@ -4,7 +4,7 @@ GenericEntity : "{1E60A20CFD66FC46}Prefabs/Weapons/AutoTurrets/CIWS_Phalanx_US.e
   BON_AutoTurretComponent "{62ACAE2F976BB219}" {
    components {
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
-     m_eTargetFlags 30
+     m_eTargetFlags 24
     }
    }
   }
