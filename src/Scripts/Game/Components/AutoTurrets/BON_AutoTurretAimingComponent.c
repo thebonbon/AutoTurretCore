@@ -18,8 +18,11 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[Attribute("-25 85 0", UIWidgets.Auto, desc: "x = min, y = max, ignore z, Keep in range -180,180", category: "Setup")]
 	protected vector m_vLimitVertical;
 
-	[Attribute("1", UIWidgets.Auto, desc: "", category: "Setup"), RplProp()]
+	[Attribute("100", UIWidgets.Auto, desc: "", category: "Setup"), RplProp()]
 	float m_fRotationSpeed;
+	
+	[Attribute("10", UIWidgets.Auto, desc: "", category: "Setup"), RplProp()]
+	float m_fIdleRotationSpeed;
 
 	[Attribute("w_body", UIWidgets.Auto, "", category: "Setup")]
 	protected string m_sBodyBone;
@@ -43,6 +46,10 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	protected ref BON_AutoTurretTarget m_Target;
 	protected vector m_vCurrentAngles;
 	protected vector m_vTargetAngles;
+	protected int m_iIdleDirection;
+
+	[RplProp()]
+	bool m_bOnTarget;
 
 	//------------------------------------------------------------------------------------------------
 	void SetAngleTolerance(float tolerance)
@@ -137,22 +144,9 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	bool CanFire()
-	{
-		return (m_Target && IsOnTarget());
-	}
-
-	//------------------------------------------------------------------------------------------------
 	bool IsOnTarget()
 	{
-		if (m_vTargetAngles == Vector(-1, -1, -1))
-			return false;
-
-		vector current = SCR_Math3D.FixEulerVector180(m_vCurrentAngles);
-		vector target = SCR_Math3D.FixEulerVector180(m_vTargetAngles);
-
-		return Math.AbsFloat(current[0] - target[0]) < m_fAngleTolerance
-			&& Math.AbsFloat(current[1] - target[1]) < m_fAngleTolerance;
+		return m_bOnTarget;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -179,26 +173,49 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 			targetAngles = SCR_Math3D.ComputeTargetAngles(ownerMat, barrelMat[3], aimPoint);
 		}
+		else
+			SetOnTarget(false);
+
+		if (!IsWithinLimitsAngle(targetAngles))
+			targetAngles = vector.Zero;
 
 		RotateTo(targetAngles, timeSlice);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void SetOnTarget(bool onTarget)
+	{
+		m_bOnTarget = onTarget;
+		Replication.BumpMe();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	void UpdateOnTarget(float yawDelta, float pitchDelta)
+	{
+		bool inYawRange = Math.AbsFloat(yawDelta) < m_fAngleTolerance;
+		bool inPitchRange = Math.AbsFloat(pitchDelta) < m_fAngleTolerance;
+
+		bool onTarget = inYawRange && inPitchRange;
+
+		if (m_bOnTarget == onTarget)
+			return;
+
+		SetOnTarget(onTarget);
 	}
 
 	//------------------------------------------------------------------------------------------------
 	//! Rotate to desired angles within limits
 	void RotateTo(vector targetAngles, float timeSlice)
 	{
-		if (!IsWithinLimitsAngle(targetAngles))
-		{
-			m_vTargetAngles = Vector(-1, -1, -1);
-			return;
-		}
-
 		m_vTargetAngles = targetAngles;
 
 		float maxStep = m_fRotationSpeed * timeSlice;
 
 		float yawDelta = SCR_Math3D.WrapAngleDiffDeg(m_vTargetAngles[0] - m_vCurrentAngles[0]);
 		float pitchDelta = SCR_Math3D.WrapAngleDiffDeg(m_vTargetAngles[1] - m_vCurrentAngles[1]);
+
+		if (targetAngles != vector.Zero)
+			UpdateOnTarget(yawDelta, pitchDelta);
 
 		yawDelta = Math.Clamp(yawDelta, -maxStep, maxStep);
 		pitchDelta = Math.Clamp(pitchDelta, -maxStep, maxStep);
@@ -237,18 +254,52 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
+	void HandleIdleSearching(float timeSlice)
+	{
+		float maxYaw = m_vLimitHorizontal[1];
+		float minYaw = m_vLimitHorizontal[0];
+
+		if (m_iIdleDirection == 0)
+			m_iIdleDirection = 1;
+		
+		float yaw = m_vCurrentAngles[0];
+		yaw = yaw + (m_fIdleRotationSpeed * timeSlice * m_iIdleDirection);
+
+		if (yaw >= maxYaw)
+		{
+			yaw = maxYaw;
+			m_iIdleDirection = -1;
+		}
+		else if (yaw <= minYaw)
+		{
+			yaw = minYaw;
+			m_iIdleDirection = 1;
+		}
+
+		float pitch = m_vCurrentAngles[1];
+		float pitchDelta = SCR_Math3D.WrapAngleDiffDeg(0 - pitch);	
+		float pitchStep = m_fIdleRotationSpeed * timeSlice;	
+		pitchDelta = Math.Clamp(pitchDelta, -pitchStep, pitchStep);	
+		pitch += pitchDelta;
+		
+		m_vCurrentAngles[0] = SCR_Math3D.WrapAngleDiffDeg(yaw);
+		m_vCurrentAngles[1] = SCR_Math3D.WrapAngleDiffDeg(pitch);
+		
+		m_SignalsManager.SetSignalValue(m_iSignalBody, -m_vCurrentAngles[0]);
+		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);
+	}
+
+	//------------------------------------------------------------------------------------------------
 	//! Servers
 	//! Called from main AutoTurretComponent
 	void OnUpdate(BON_AutoTurretTarget target, float timeSlice)
 	{
-		// Prevent firing on stale idle angles
-		if (target != m_Target)
-			m_vTargetAngles = Vector(-1, -1, -1);
-
 		m_Target = target;
 
 		if (m_Target)
 			HandleRotatingToTarget(timeSlice);
+		else if (m_fIdleRotationSpeed != 0)
+			HandleIdleSearching(timeSlice);
 	}
 
 	//------------------------------------------------------------------------------------------------

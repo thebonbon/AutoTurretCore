@@ -386,3 +386,29 @@ class BON_AutoTurretProjectileSpeedEditorAttribute : SCR_BaseValueListEditorAttr
 			autoTurretComponent.SetProjectileSpeed(var.GetFloat());
 	}
 }
+
+[BaseContainerProps(), SCR_BaseEditorAttributeCustomTitle()]
+class BON_AutoTurretIdleRotationSpeedEditorAttribute : SCR_BaseValueListEditorAttribute
+{
+	//------------------------------------------------------------------------------------------------
+	override SCR_BaseEditorAttributeVar ReadVariable(Managed item, SCR_AttributesManagerEditorComponent manager)
+	{
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (!autoTurretComponent)
+			return null;
+
+		return SCR_BaseEditorAttributeVar.CreateFloat(autoTurretComponent.m_AimingComp.m_fIdleRotationSpeed);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Synced to clients
+	override void WriteVariable(Managed item, SCR_BaseEditorAttributeVar var, SCR_AttributesManagerEditorComponent manager, int playerID)
+	{
+		if (!var)
+			return;
+
+		BON_AutoTurretComponent autoTurretComponent = BON_AutoTurretComponentClass.IsAutoTurret(item);
+		if (autoTurretComponent)
+			autoTurretComponent.m_AimingComp.m_fIdleRotationSpeed = var.GetFloat();
+	}
+}

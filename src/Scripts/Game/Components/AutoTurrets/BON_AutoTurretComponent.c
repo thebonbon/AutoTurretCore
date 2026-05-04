@@ -261,10 +261,12 @@ class BON_AutoTurretComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void GetMuzzleTransform(out vector spawnMat[4], out vector effectMat[4])
 	{
-		PointInfo spawnPosition = m_ProjectileSpawnPositions[m_iCurrentMuzzle];
+		PointInfo projectilePosition = m_ProjectileSpawnPositions[m_iCurrentMuzzle];
 		PointInfo effectPosition = m_EffectPositions[m_iCurrentMuzzle];
-		spawnPosition.GetTransform(spawnMat);
-		effectPosition.GetTransform(effectMat);
+
+		projectilePosition.GetWorldTransform(spawnMat);
+		effectPosition.GetWorldTransform(effectMat);
+
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -292,6 +294,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		//Dedicated Server doesnt need SFX or VFX
 		if (RplSession.Mode() != RplMode.Dedicated)
 		{
+			//Print("FIRE VFX SFX");
 			SpawnMuzzleParticle(effectMat);
 			PlayShootSound();
 
@@ -317,7 +320,7 @@ class BON_AutoTurretComponent : ScriptComponent
 	{
 		if (!m_Projectile)
 			return null;
-		
+
 		EntitySpawnParams spawnParams();
 		spawnParams.TransformMode = ETransformMode.WORLD;
 		spawnParams.Transform = muzzleMat;
@@ -327,7 +330,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		lastSpawnedProjectile = GetGame().SpawnEntityPrefab(Resource.Load(m_Projectile), GetGame().GetWorld(), spawnParams);
 		if (!lastSpawnedProjectile)
 			return null;
-		
+
 		return lastSpawnedProjectile;
 	}
 
@@ -347,7 +350,7 @@ class BON_AutoTurretComponent : ScriptComponent
 			m_AimingComp.OnUpdate(m_Target, timeSlice);
 
 		m_fAttackTimer -= timeSlice;
-		if (m_fAttackTimer <= 0 && m_AimingComp.CanFire())
+		if (m_Target && m_fAttackTimer <= 0 && m_AimingComp.IsOnTarget())
 		{
 			Fire();
 			m_fAttackTimer = m_fTimeBetweenShots;
@@ -387,6 +390,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		{
 			effectPos.Init(owner);
 		}
+
 
 		if (!GetGame().InPlayMode())
 			return;
@@ -440,6 +444,12 @@ class BON_AutoTurretComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
+	override event int _WB_GetAfterWorldUpdateSpecs(IEntity owner, IEntitySource src)
+	{
+		return EEntityFrameUpdateSpecs.CALL_WHEN_ENTITY_VISIBLE;
+	}
+
+	//------------------------------------------------------------------------------------------------
 	override event void _WB_AfterWorldUpdate(IEntity owner, float timeSlice)
 	{
 		if (!m_bDebug)
@@ -448,7 +458,7 @@ class BON_AutoTurretComponent : ScriptComponent
 		foreach (PointInfo spawnPos : m_ProjectileSpawnPositions)
 		{
 			vector mat[4];
-			spawnPos.GetTransform(mat);
+			spawnPos.GetWorldTransform(mat);
 			Shape.CreateSphere(Color.RED, ShapeFlags.ONCE | ShapeFlags.WIREFRAME, mat[3], 0.075);
 		}
 	}
