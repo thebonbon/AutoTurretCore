@@ -10,7 +10,7 @@ GenericEntity : "{0838D33167666DDA}PrefabsEditable/Auto/Weapons/AutoTurrets/E_CI
      m_bDebug 1
     }
     BON_AutoTurretTargetingComponent "{671AAD5D3497D73F}" {
-     m_eTargetFlags PROJECTILES
+     m_eTargetFlags 18
      m_iSearchRadius 5000
      m_fMaxSearchTime 0.01
     }

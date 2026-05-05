@@ -144,27 +144,22 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	{
 		vector targetAngles = vector.Zero;
 
-		if (m_Target)
+		vector aimPoint = m_Target.GetAimPoint();
+
+		if (m_TurretComp.m_eFireMode == BON_TurretFireMode.Intercept)
 		{
-			vector aimPoint = m_Target.GetAimPoint();
-
-			if (m_TurretComp.m_eFireMode == BON_TurretFireMode.Intercept)
-			{
-				if (m_TurretComp.m_bIsMissile)
-					aimPoint += ComputeLeadSimple();
-				else
-					aimPoint += ComputeLead();
-			}
-
-			vector barrelMat[4];
-			vector ownerMat[4];
-			GetBoneWorldTransform(m_iBarrelBoneIndex, barrelMat);
-			GetOwner().GetWorldTransform(ownerMat);
-
-			targetAngles = SCR_Math3D.ComputeTargetAngles(ownerMat, barrelMat[3], aimPoint);
+			if (m_TurretComp.m_bIsMissile)
+				aimPoint += ComputeLeadSimple();
+			else
+				aimPoint += ComputeLead();
 		}
-		else
-			SetOnTarget(false);
+
+		vector barrelMat[4];
+		vector ownerMat[4];
+		GetBoneWorldTransform(m_iBarrelBoneIndex, barrelMat);
+		GetOwner().GetWorldTransform(ownerMat);
+		
+		targetAngles = SCR_Math3D.ComputeTargetAngles(ownerMat, barrelMat[3], aimPoint);
 
 		if (!IsWithinLimitsAngle(targetAngles))
 			targetAngles = vector.Zero;
@@ -218,7 +213,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	//! Gets MODEL space (from scene root) and returns it as WORLD space
+	//! Gets bone MODEL space (from scene root) and returns it as WORLD space
 	void GetBoneWorldTransform(TNodeId boneIndex, out vector mat[4])
 	{
 		Animation ownerAnim = GetOwner().GetAnimation();
@@ -269,7 +264,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	//! Servers
+	//! Server only
 	//! Called from main AutoTurretComponent
 	void OnUpdate(BON_AutoTurretTarget target, float timeSlice)
 	{
@@ -279,6 +274,8 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			HandleRotatingToTarget(timeSlice);
 		else if (m_fIdleRotationSpeed != 0)
 			HandleIdleSearching(timeSlice);
+		else
+			RotateTo(vector.Zero, timeSlice);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -313,19 +310,15 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		if (!m_bDebug)
 			return;
 
-		Animation ownerAnim = owner.GetAnimation();
-		vector boneMat[4];
-		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBodyBone), boneMat);
+		vector bodyMat[4];
 		vector barrelMat[4];
-		ownerAnim.GetBoneMatrix(ownerAnim.GetBoneIndex(m_sBarrelBone), barrelMat);
-
-		boneMat[3] = owner.CoordToParent(boneMat[3]);
-		barrelMat[3] = owner.CoordToParent(barrelMat[3]);
+		GetBoneWorldTransform(m_iBodyBoneIndex, bodyMat);				
+		GetBoneWorldTransform(m_iBarrelBoneIndex, barrelMat);
 
 		CreateCircleSlice(barrelMat[3], -owner.GetTransformAxis(0).Normalized(), owner.GetTransformAxis(2).Normalized(),
 			m_vLimitVertical[0], m_vLimitVertical[1], 5, Color.RED, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
 
-		CreateCircleSlice(boneMat[3], owner.GetTransformAxis(1).Normalized(), owner.GetTransformAxis(2).Normalized(),
+		CreateCircleSlice(bodyMat[3], owner.GetTransformAxis(1).Normalized(), owner.GetTransformAxis(2).Normalized(),
 			m_vLimitHorizontal[0], m_vLimitHorizontal[1], 5, Color.BLUE, 32, ShapeFlags.NOZBUFFER | ShapeFlags.TRANSP |ShapeFlags.ONCE);
 
 	}

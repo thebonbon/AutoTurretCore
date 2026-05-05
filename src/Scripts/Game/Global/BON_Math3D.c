@@ -15,31 +15,18 @@ modded class SCR_Math3D
 	//------------------------------------------------------------------------------------------------
 	static vector ComputeTargetAngles(vector bodyMat[4], vector barrelPos, vector targetPos)
 	{
-		//Pitch
-		vector dirToTarget = vector.Direction(barrelPos, targetPos);
+		vector dir = vector.Direction(barrelPos, targetPos).Normalized();
 	
-		float bodyQuat[4];
-		Math3D.MatrixToQuat(bodyMat, bodyQuat);
+		float localX = vector.Dot(dir, bodyMat[0]);
+		float localY = vector.Dot(dir, bodyMat[1]);
+		float localZ = vector.Dot(dir, bodyMat[2]);
 	
-		float bodyQuatInv[4];
-		Math3D.QuatInverse(bodyQuatInv, bodyQuat);
+		vector dirLocal = Vector(localX, localY, localZ).Normalized();	
+		vector angles = dirLocal.VectorToAngles();
 	
-		vector dirLocal = SCR_Math3D.QuatMultiply(bodyQuatInv, dirToTarget);
+		float yaw = SCR_Math3D.WrapAngleDiffDeg(angles[0]);
+		float pitch = SCR_Math3D.WrapAngleDiffDeg(angles[1]);
 	
-		vector localAngles = dirLocal.Normalized().VectorToAngles();
-	
-		float pitch = localAngles[1];
-		pitch = SCR_Math3D.WrapAngleDiffDeg(pitch);
-		
-		//Yaw
-		vector bodyPos = bodyMat[3];
-		targetPos[1] = bodyPos[1];
-	
-		vector flatDir = vector.Direction(bodyPos, targetPos).Normalized();
-	
-		float yaw = flatDir.VectorToAngles()[0];
-		yaw = SCR_Math3D.WrapAngleDiffDeg(yaw);
-		
 		return Vector(yaw, pitch, 0);
 	}
 	
