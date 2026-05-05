@@ -60,11 +60,8 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	bool IsWithinLimitsAngle(vector angles)
 	{
-		float yaw = angles[0];
-		float pitch = angles[1];
-
-		bool inHorizontal = Math.IsInRange(yaw, m_vLimitHorizontal[0], m_vLimitHorizontal[1]);
-		bool inVertical = Math.IsInRange(pitch, m_vLimitVertical[0], m_vLimitVertical[1]);
+		bool inHorizontal = Math.IsInRange(angles[0], m_vLimitHorizontal[0], m_vLimitHorizontal[1]);
+		bool inVertical = Math.IsInRange(angles[1], m_vLimitVertical[0], m_vLimitVertical[1]);
 
 		return (inHorizontal && inVertical);
 	}
