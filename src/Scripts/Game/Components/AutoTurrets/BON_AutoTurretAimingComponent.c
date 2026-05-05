@@ -1,10 +1,3 @@
-
-enum BON_TurretAimState
-{
-	IDLE,
-	ROTATING_TO_TARGET
-}
-
 [ComponentEditorProps(category: "GameScripted/Misc", description: "")]
 class BON_AutoTurretAimingComponentClass : ScriptComponentClass
 {
@@ -40,8 +33,8 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	protected int m_iSignalBody;
 	protected int m_iSignalBarrel;
 
-	protected TNodeId m_iBarrelBoneIndex;
-	protected TNodeId m_iBodyBoneIndex;
+	TNodeId m_iBarrelBoneIndex;
+	TNodeId m_iBodyBoneIndex;
 	protected BON_AutoTurretComponent m_TurretComp;
 	protected ref BON_AutoTurretTarget m_Target;
 	protected vector m_vCurrentAngles;
@@ -81,7 +74,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	{
 		vector barrelMat[4];
 		vector ownerMat[4];
-		GetBarrelWorldTransform(barrelMat);
+		GetBoneWorldTransform(m_iBarrelBoneIndex, barrelMat);
 		GetOwner().GetWorldTransform(ownerMat);
 
 		vector angles = SCR_Math3D.ComputeTargetAngles(ownerMat, barrelMat[3], target.GetAimPoint());
@@ -113,7 +106,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		vector predictedLeadingOffset;
 
 		vector barrelMat[4];
-		GetBarrelWorldTransform(barrelMat);
+		GetBoneWorldTransform(m_iBarrelBoneIndex, barrelMat);
 		vector barrelOrigin = GetOwner().CoordToParent(barrelMat[3]);
 
 		Resource projectileResource = Resource.Load(m_TurretComp.m_Projectile);
@@ -168,7 +161,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 			vector barrelMat[4];
 			vector ownerMat[4];
-			GetBarrelWorldTransform(barrelMat);
+			GetBoneWorldTransform(m_iBarrelBoneIndex, barrelMat);
 			GetOwner().GetWorldTransform(ownerMat);
 
 			targetAngles = SCR_Math3D.ComputeTargetAngles(ownerMat, barrelMat[3], aimPoint);
@@ -228,28 +221,17 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	void GetBodyWorldTransform(out vector mat[4])
+	//! Gets MODEL space (from scene root) and returns it as WORLD space
+	void GetBoneWorldTransform(TNodeId boneIndex, out vector mat[4])
 	{
 		Animation ownerAnim = GetOwner().GetAnimation();
+	
 		vector localBoneMat[4];
-		ownerAnim.GetBoneMatrix(m_iBodyBoneIndex, localBoneMat); // MODEL space to Scene root
-
-		//Convert to WORLD space
+		ownerAnim.GetBoneMatrix(boneIndex, localBoneMat);
+	
 		vector ownerMat[4];
 		GetOwner().GetWorldTransform(ownerMat);
-		Math3D.MatrixMultiply4(ownerMat, localBoneMat, mat);
-	}
-
-	//------------------------------------------------------------------------------------------------
-	void GetBarrelWorldTransform(out vector mat[4])
-	{
-		Animation ownerAnim = GetOwner().GetAnimation();
-		vector localBoneMat[4];
-		ownerAnim.GetBoneMatrix(m_iBarrelBoneIndex, localBoneMat); // MODEL space to Scene root
-
-		//Convert to WORLD space
-		vector ownerMat[4];
-		GetOwner().GetWorldTransform(ownerMat);
+	
 		Math3D.MatrixMultiply4(ownerMat, localBoneMat, mat);
 	}
 
