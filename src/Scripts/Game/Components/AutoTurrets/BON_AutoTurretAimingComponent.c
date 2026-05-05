@@ -13,7 +13,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 	[Attribute("100", UIWidgets.Auto, desc: "", category: "Setup"), RplProp()]
 	float m_fRotationSpeed;
-	
+
 	[Attribute("10", UIWidgets.Auto, desc: "", category: "Setup"), RplProp()]
 	float m_fIdleRotationSpeed;
 
@@ -158,7 +158,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		vector ownerMat[4];
 		GetBoneWorldTransform(m_iBarrelBoneIndex, barrelMat);
 		GetOwner().GetWorldTransform(ownerMat);
-		
+
 		targetAngles = SCR_Math3D.ComputeTargetAngles(ownerMat, barrelMat[3], aimPoint);
 
 		if (!IsWithinLimitsAngle(targetAngles))
@@ -217,13 +217,13 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	void GetBoneWorldTransform(TNodeId boneIndex, out vector mat[4])
 	{
 		Animation ownerAnim = GetOwner().GetAnimation();
-	
+
 		vector localBoneMat[4];
 		ownerAnim.GetBoneMatrix(boneIndex, localBoneMat);
-	
+
 		vector ownerMat[4];
 		GetOwner().GetWorldTransform(ownerMat);
-	
+
 		Math3D.MatrixMultiply4(ownerMat, localBoneMat, mat);
 	}
 
@@ -235,7 +235,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		if (m_iIdleDirection == 0)
 			m_iIdleDirection = 1;
-		
+
 		float yaw = m_vCurrentAngles[0];
 		yaw = yaw + (m_fIdleRotationSpeed * timeSlice * m_iIdleDirection);
 
@@ -251,14 +251,14 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		}
 
 		float pitch = m_vCurrentAngles[1];
-		float pitchDelta = SCR_Math3D.WrapAngleDiffDeg(0 - pitch);	
-		float pitchStep = m_fIdleRotationSpeed * timeSlice;	
-		pitchDelta = Math.Clamp(pitchDelta, -pitchStep, pitchStep);	
+		float pitchDelta = SCR_Math3D.WrapAngleDiffDeg(0 - pitch);
+		float pitchStep = m_fIdleRotationSpeed * timeSlice;
+		pitchDelta = Math.Clamp(pitchDelta, -pitchStep, pitchStep);
 		pitch += pitchDelta;
-		
+
 		m_vCurrentAngles[0] = SCR_Math3D.WrapAngleDiffDeg(yaw);
 		m_vCurrentAngles[1] = SCR_Math3D.WrapAngleDiffDeg(pitch);
-		
+
 		m_SignalsManager.SetSignalValue(m_iSignalBody, -m_vCurrentAngles[0]);
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);
 	}
@@ -312,7 +312,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		vector bodyMat[4];
 		vector barrelMat[4];
-		GetBoneWorldTransform(m_iBodyBoneIndex, bodyMat);				
+		GetBoneWorldTransform(m_iBodyBoneIndex, bodyMat);
 		GetBoneWorldTransform(m_iBarrelBoneIndex, barrelMat);
 
 		CreateCircleSlice(barrelMat[3], -owner.GetTransformAxis(0).Normalized(), owner.GetTransformAxis(2).Normalized(),

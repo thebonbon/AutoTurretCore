@@ -59,7 +59,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 
 		if (!param.TraceEnt)
 			return false;
-		
+
 		//Hit entity but its an equipment of the target (e.g vest, helmet etc..)
 		InventoryItemComponent itemComp = InventoryItemComponent.Cast(param.TraceEnt.FindComponent(InventoryItemComponent));
 		return (itemComp && itemComp.GetParentSlot());
@@ -149,7 +149,7 @@ class BON_AutoTurretTargetingComponent : ScriptComponent
 			if (!m_CurrentTarget)
 				return;
 
-			
+
 			//New target found
 			m_CurrentTarget.SetAlarm(BON_AutoTurretTargetComponent.PITCH_TARGET_SPOTTED);
 
