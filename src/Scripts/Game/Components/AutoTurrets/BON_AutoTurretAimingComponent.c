@@ -44,6 +44,37 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[RplProp()]
 	bool m_bOnTarget;
 
+	protected static const float ROTATION_REPLICATION_THRESHOLD = 0.1;
+
+	[RplProp(onRplName: "OnRotationReplicated")]
+	protected vector m_vReplicatedAngles;
+
+	//------------------------------------------------------------------------------------------------
+	protected int FindOrRegisterSignal(string signalName)
+	{
+		int signalIndex = m_SignalsManager.FindSignal(signalName);
+		if (signalIndex >= 0)
+			return signalIndex;
+
+		return m_SignalsManager.AddOrFindMPSignal(signalName, 0.1, 1);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected void ApplyRotationSignals(vector angles)
+	{
+		if (!m_SignalsManager || m_iSignalBody < 0 || m_iSignalBarrel < 0)
+			return;
+
+		m_SignalsManager.SetSignalValue(m_iSignalBody, -angles[0]);
+		m_SignalsManager.SetSignalValue(m_iSignalBarrel, angles[1]);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected void OnRotationReplicated()
+	{
+		ApplyRotationSignals(m_vReplicatedAngles);
+	}
+
 	//------------------------------------------------------------------------------------------------
 	void SetAngleTolerance(float tolerance)
 	{
@@ -208,8 +239,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		m_vCurrentAngles[0] = SCR_Math3D.WrapAngleDiffDeg(m_vCurrentAngles[0] + yawDelta);
 		m_vCurrentAngles[1] = SCR_Math3D.WrapAngleDiffDeg(m_vCurrentAngles[1] + pitchDelta);
 
-		m_SignalsManager.SetSignalValue(m_iSignalBody, -m_vCurrentAngles[0]);
-		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);
+		ApplyRotationSignals(m_vCurrentAngles);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -259,8 +289,7 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		m_vCurrentAngles[0] = SCR_Math3D.WrapAngleDiffDeg(yaw);
 		m_vCurrentAngles[1] = SCR_Math3D.WrapAngleDiffDeg(pitch);
 
-		m_SignalsManager.SetSignalValue(m_iSignalBody, -m_vCurrentAngles[0]);
-		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);
+		ApplyRotationSignals(m_vCurrentAngles);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -276,26 +305,55 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 			HandleIdleSearching(timeSlice);
 		else
 			RotateTo(vector.Zero, timeSlice);
+
+		float yawDelta = Math.AbsFloat(SCR_Math3D.WrapAngleDiffDeg(m_vCurrentAngles[0] - m_vReplicatedAngles[0]));
+		float pitchDelta = Math.AbsFloat(SCR_Math3D.WrapAngleDiffDeg(m_vCurrentAngles[1] - m_vReplicatedAngles[1]));
+		if (yawDelta < ROTATION_REPLICATION_THRESHOLD && pitchDelta < ROTATION_REPLICATION_THRESHOLD)
+			return;
+
+		m_vReplicatedAngles = m_vCurrentAngles;
+		Replication.BumpMe();
 	}
 
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
+		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
+		if (!m_SignalsManager)
+		{
+			Print("[ATC] Auto turret is missing SignalsManagerComponent", LogLevel.ERROR);
+			return;
+		}
+
+		// AutoVariablesBind creates both signals from prefab data before EOnInit.
+		// Re-registering them as MP signals is rejected on current engine versions.
+		m_iSignalBody = FindOrRegisterSignal("BodyRotation");
+		m_iSignalBarrel = FindOrRegisterSignal("BarrelRotation");
+		if (m_iSignalBody < 0 || m_iSignalBarrel < 0)
+		{
+			Print("[ATC] Failed to bind auto turret rotation signals", LogLevel.ERROR);
+			return;
+		}
+
 		if (!Replication.IsServer())
 			return;
 
-		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
 		m_TurretComp = BON_AutoTurretComponent.Cast(owner.FindComponent(BON_AutoTurretComponent));
-
-		m_iSignalBody = m_SignalsManager.AddOrFindMPSignal("BodyRotation", 0.1, 1);
-		m_iSignalBarrel = m_SignalsManager.AddOrFindMPSignal("BarrelRotation", 0.1, 1);
-
-		Animation anim = GetOwner().GetAnimation();
-		if (anim)
+		if (!m_TurretComp)
 		{
-			m_iBarrelBoneIndex = anim.GetBoneIndex(m_sBarrelBone);
-			m_iBodyBoneIndex = anim.GetBoneIndex(m_sBodyBone);
+			Print("[ATC] Auto turret is missing BON_AutoTurretComponent", LogLevel.ERROR);
+			return;
 		}
+
+		Animation anim = owner.GetAnimation();
+		if (!anim)
+		{
+			Print("[ATC] Auto turret owner has no animation instance", LogLevel.ERROR);
+			return;
+		}
+
+		m_iBarrelBoneIndex = anim.GetBoneIndex(m_sBarrelBone);
+		m_iBodyBoneIndex = anim.GetBoneIndex(m_sBodyBone);
 	}
 
 	//------------------------------------------------------------------------------------------------
