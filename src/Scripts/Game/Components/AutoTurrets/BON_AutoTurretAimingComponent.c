@@ -44,6 +44,18 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	[RplProp()]
 	bool m_bOnTarget;
 
+	// ── Rotation replication (fixes clients never seeing turret rotation) ────
+	// Server computes m_vCurrentAngles and drives the local AnimGraph signals
+	// directly, but clients never ran EOnInit's signal setup (server-only
+	// guard below) and never received the angle updates. RplProp replicates
+	// the computed angles to every client, which then writes them into its
+	// own local signals via ATC_OnRotationSynced().
+	[RplProp(onRplName: "ATC_OnRotationSynced")]
+	protected float m_fATC_SyncedBody;
+
+	[RplProp(onRplName: "ATC_OnRotationSynced")]
+	protected float m_fATC_SyncedBarrel;
+
 	//------------------------------------------------------------------------------------------------
 	void SetAngleTolerance(float tolerance)
 	{
@@ -210,6 +222,35 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		m_SignalsManager.SetSignalValue(m_iSignalBody, -m_vCurrentAngles[0]);
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);
+
+		SyncRotation();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Server: replicate the current angles to clients so their local
+	//! signals (and therefore the AnimGraph) actually move.
+	protected void SyncRotation()
+	{
+		if (!Replication.IsServer())
+			return;
+
+		m_fATC_SyncedBody = -m_vCurrentAngles[0];
+		m_fATC_SyncedBarrel = m_vCurrentAngles[1];
+		Replication.BumpMe();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Client: fires automatically whenever the replicated angles change
+	void ATC_OnRotationSynced()
+	{
+		if (!m_SignalsManager)
+			return;
+
+		if (m_iSignalBody != -1)
+			m_SignalsManager.SetSignalValue(m_iSignalBody, m_fATC_SyncedBody);
+
+		if (m_iSignalBarrel != -1)
+			m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_fATC_SyncedBarrel);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -261,6 +302,8 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 
 		m_SignalsManager.SetSignalValue(m_iSignalBody, -m_vCurrentAngles[0]);
 		m_SignalsManager.SetSignalValue(m_iSignalBarrel, m_vCurrentAngles[1]);
+
+		SyncRotation();
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -281,14 +324,33 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	override void EOnInit(IEntity owner)
 	{
+		// Signals manager + signal indices are needed on EVERY machine now,
+		// not just the server: clients drive their own local signals from
+		// the replicated angles in ATC_OnRotationSynced(), so they need a
+		// valid m_SignalsManager / m_iSignalBody / m_iSignalBarrel too.
+		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
+
+		if (m_SignalsManager)
+		{
+			if (Replication.IsServer())
+			{
+				// Only the server registers/owns the MP signal.
+				m_iSignalBody = m_SignalsManager.AddOrFindMPSignal("BodyRotation", 0.1, 1);
+				m_iSignalBarrel = m_SignalsManager.AddOrFindMPSignal("BarrelRotation", 0.1, 1);
+			}
+			else
+			{
+				// Clients just look up the signal that AutoVariablesBind /
+				// the server already registered on the prefab.
+				m_iSignalBody = m_SignalsManager.FindSignal("BodyRotation");
+				m_iSignalBarrel = m_SignalsManager.FindSignal("BarrelRotation");
+			}
+		}
+
 		if (!Replication.IsServer())
 			return;
 
-		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
 		m_TurretComp = BON_AutoTurretComponent.Cast(owner.FindComponent(BON_AutoTurretComponent));
-
-		m_iSignalBody = m_SignalsManager.AddOrFindMPSignal("BodyRotation", 0.1, 1);
-		m_iSignalBarrel = m_SignalsManager.AddOrFindMPSignal("BarrelRotation", 0.1, 1);
 
 		Animation anim = GetOwner().GetAnimation();
 		if (anim)
