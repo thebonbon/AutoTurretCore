@@ -379,7 +379,10 @@ class BON_AutoTurretComponent : ScriptComponent
 	override void EOnInit(IEntity owner)
 	{
 		if (m_ProjectileSpawnPositions.IsEmpty() || !m_Projectile)
+		{
+			Print("[ATC] No Projectile Spawn Positions set or missing Projectile prefab! " + owner, LogLevel.WARNING);
 			return;
+		}
 
 		foreach (PointInfo spawnPos : m_ProjectileSpawnPositions)
 		{

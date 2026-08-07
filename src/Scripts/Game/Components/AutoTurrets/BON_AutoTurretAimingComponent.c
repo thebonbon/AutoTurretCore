@@ -330,22 +330,14 @@ class BON_AutoTurretAimingComponent : ScriptComponent
 		// valid m_SignalsManager / m_iSignalBody / m_iSignalBarrel too.
 		m_SignalsManager = SignalsManagerComponent.Cast(owner.FindComponent(SignalsManagerComponent));
 
-		if (m_SignalsManager)
-		{
-			if (Replication.IsServer())
-			{
-				// Only the server registers/owns the MP signal.
-				m_iSignalBody = m_SignalsManager.AddOrFindMPSignal("BodyRotation", 0.1, 1);
-				m_iSignalBarrel = m_SignalsManager.AddOrFindMPSignal("BarrelRotation", 0.1, 1);
-			}
-			else
-			{
-				// Clients just look up the signal that AutoVariablesBind /
-				// the server already registered on the prefab.
-				m_iSignalBody = m_SignalsManager.FindSignal("BodyRotation");
-				m_iSignalBarrel = m_SignalsManager.FindSignal("BarrelRotation");
-			}
-		}
+		if (!m_SignalsManager)
+			return;
+		
+		m_iSignalBody = m_SignalsManager.FindSignal("BodyRotation");
+		m_iSignalBarrel = m_SignalsManager.FindSignal("BarrelRotation");
+		
+		if (m_iSignalBody == -1 || m_iSignalBarrel == -1)
+			Print("[ATC] Failed to find body or barrel signal, check var bindings on animation component!", LogLevel.WARNING); 
 
 		if (!Replication.IsServer())
 			return;
